@@ -1,0 +1,26 @@
+# Package Files #
+*.jar
+*.war
+*.ear
+*.class
+
+# Build files
+.gradle
+*/build
+
+# Ignore Server
+Servers/
+
+# Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
+!gradle-wrapper.jar
+
+# Avoid ignoring Libraries
+!**/Libraries/*.jar
+!**/libs/*.jar
+
+# Avoid ignoring src files
+!**/src/**/*
+
+# IntelliJ project files
+.idea
+*.iml

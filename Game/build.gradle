@@ -1,0 +1,37 @@
+group 'me.binarynetwork'
+version '1.0-SNAPSHOT'
+
+apply plugin: 'java'
+
+libsDirName = '../../Servers/Game/plugins'
+
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+configurations {
+    //Add configuration!
+    includeInJar
+}
+
+dependencies {
+    //Tests!
+    testCompile group: 'junit', name: 'junit', version: '4.11'
+
+    //Add all jars in src/main/libs
+    compile fileTree(include: ['*.jar'], dir: 'src/main/libs')
+
+    //Add all jars in src/main/libs
+    compile fileTree(include: ['*.jar'], dir: '../Libraries')
+
+    //Add libs
+    includeInJar project(':Core')
+
+    configurations.compile.extendsFrom(configurations.includeInJar)
+}
+
+jar {
+    from configurations.includeInJar.collect { zipTree it }
+}

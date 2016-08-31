@@ -1,0 +1,4 @@
+rootProject.name = 'Hub'
+include ':Core'
+project(':Core').projectDir = new File(settingsDir, '../Core')
+

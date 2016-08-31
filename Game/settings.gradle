@@ -1,0 +1,3 @@
+rootProject.name = 'Game'
+include ':Core'
+project(':Core').projectDir = new File(settingsDir, '../Core')

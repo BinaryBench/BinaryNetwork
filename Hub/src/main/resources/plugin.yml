@@ -3,3 +3,4 @@ version: 0.0.1
 description: This is the Hub plugin for BinaryNetwork!
 author: BinaryBench
 main: me.binarynetwork.hub.Main
+depend: [ProtocolLib]

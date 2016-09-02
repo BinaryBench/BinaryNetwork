@@ -1,35 +1,14 @@
-import groovy.io.FileType
-group 'me.binarynetwork'
-version '1.0-SNAPSHOT'
-
-apply plugin: 'java'
-
-sourceCompatibility = 1.8
-
-repositories {
-    mavenCentral()
-
-}
-
 configurations {
-    //Add configuration!
-    includeInJar
+    includeInJar {
+        transitive = false
+    }
 }
 
 dependencies {
-    //Tests!
-    testCompile group: 'junit', name: 'junit', version: '4.11'
+    compile "org.apache.commons:commons-dbcp2:2.1.1"
 
-    //Add all jars in src/main/libs
-    compile fileTree(include: ['*.jar'], dir: 'src/main/libs')
-
-    //Add all jars in ../Libraries
-    compile fileTree(include: ['*.jar'], dir: '../Libraries')
-
-
-    //Add libs
-    // https://mvnrepository.com/artifact/org.apache.commons/commons-dbcp2
-    includeInJar group: 'org.apache.commons', name: 'commons-dbcp2', version: '2.1.1'
+    // https://mvnrepository.com/artifact/com.google.guava/guava
+    includeInJar group: 'com.google.guava', name: 'guava', version: '19.0'
 
     configurations.compile.extendsFrom(configurations.includeInJar)
 }

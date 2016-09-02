@@ -19,6 +19,7 @@ import java.util.concurrent.TimeUnit;
 public class WorldUtil {
     private WorldUtil() {}
 
+    private static final String TEMP_FILE_NAME = ".temp";
 
     /**
      * @param worldName The name of the world.
@@ -29,6 +30,17 @@ public class WorldUtil {
     public static File getWorldFile(String worldName)
     {
         return new File(Bukkit.getWorldContainer(), worldName);
+    }
+
+    /**
+     * @param world the world
+     * @return The file located at {@link Bukkit#getWorldContainer()}/
+     *         {@code worldName}
+     * @see {@link org.bukkit.Server#getWorld(String)}
+     */
+    public static File getWorldFile(World world)
+    {
+        return new File(Bukkit.getWorldContainer(), world.getName());
     }
 
     public static boolean isWorld(File file)
@@ -306,6 +318,55 @@ public class WorldUtil {
         if (!Bukkit.getServer().unloadWorld(world, save))
         {
             System.out.println("Bukkit cowardly refused to unload the world: " + world.getName());
+        }
+    }
+
+    //THIS IS A HACK AND SHOULD PROBABLY BE REDONE AT SOME POINT!
+    public static World createTemporaryWorld(File srcFile, String worldName)
+    {
+        World world = WorldUtil.createWorld(srcFile, worldName);
+        if (world != null)
+        {
+            File worldFile = WorldUtil.getWorldFile(world);
+            if (worldFile.isDirectory())
+            {
+                try
+                {
+                    if (!new File(worldFile, TEMP_FILE_NAME).createNewFile())
+                    {
+                        System.err.println("Unable to create temporary file in file " + worldFile);
+                    }
+                } catch (IOException e)
+                {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return world;
+    }
+
+    /**
+     * Deletes all temporary worlds.  BE CAREFUL, WORLDS MAY STILL BE IN USE!
+     */
+    public static void purgeTemporaryWorlds()
+    {
+        File[] files = Bukkit.getWorldContainer().listFiles();
+        if (files == null)
+            return;
+        for (File file : files)
+        {
+            if (file.isDirectory() && new File(file, TEMP_FILE_NAME).exists())
+            {
+                WorldUtil.unloadWorld(getWorld(file.getName()), false);
+                try
+                {
+                    FileUtils.deleteDirectory(file);
+                } catch (IOException e)
+                {
+                    e.printStackTrace();
+                }
+
+            }
         }
     }
 

@@ -34,5 +34,7 @@ PAUSE' > $server_root/windowsrun.bat
 
     echo 'eula=true' > $server_root/eula.txt
 
+    chmod +x $server_root/windowsrun.bat
+
 
 done

@@ -14,7 +14,7 @@ public class TestComponent extends BaseComponent {
     @Override
     public void onEnable()
     {
-        System.out.println("Enabled: " + name);
+        System.out.println("Enabled:  " + name);
     }
 
     @Override

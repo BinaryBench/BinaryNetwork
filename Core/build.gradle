@@ -5,10 +5,7 @@ configurations {
 }
 
 dependencies {
-    compile "org.apache.commons:commons-dbcp2:2.1.1"
-
-    // https://mvnrepository.com/artifact/com.google.guava/guava
-    includeInJar group: 'com.google.guava', name: 'guava', version: '19.0'
+    includeInJar "org.apache.commons:commons-dbcp2:2.1.1"
 
     configurations.compile.extendsFrom(configurations.includeInJar)
 }

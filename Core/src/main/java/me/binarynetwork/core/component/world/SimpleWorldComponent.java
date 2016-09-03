@@ -1,11 +1,9 @@
-package me.binarynetwork.game.world;
+package me.binarynetwork.core.component.world;
 
 import me.binarynetwork.core.BinaryNetworkPlugin;
 import me.binarynetwork.core.common.utils.*;
 import me.binarynetwork.core.component.ListenerComponent;
 import me.binarynetwork.game.Main;
-import org.apache.commons.lang.math.RandomUtils;
-import org.apache.logging.log4j.core.jmx.Server;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -17,7 +15,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.function.Supplier;
 
 /**
  * Created by Bench on 9/2/2016.

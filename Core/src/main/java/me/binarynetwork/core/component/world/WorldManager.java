@@ -1,4 +1,4 @@
-package me.binarynetwork.game.world;
+package me.binarynetwork.core.component.world;
 
 import org.bukkit.World;
 

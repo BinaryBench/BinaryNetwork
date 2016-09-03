@@ -16,7 +16,7 @@ public class GameStateManager extends BaseComponent {
 
     public static final Object DEAD_STATE = new Object();
 
-    private Object gameState = DEAD_STATE;
+    private Object currentState = DEAD_STATE;
 
     private Runnable onEnd;
 
@@ -30,19 +30,19 @@ public class GameStateManager extends BaseComponent {
 
     public void end()
     {
-        setGameState(DEAD_STATE);
+        setCurrentState(DEAD_STATE);
     }
 
-    public void setGameState(Object toGameState)
+    public void setCurrentState(Object toGameState)
     {
 
-        GameStateChangeEvent event = new GameStateChangeEvent(this, getGameState(), toGameState);
+        GameStateChangeEvent event = new GameStateChangeEvent(this, getCurrentState(), toGameState);
         Bukkit.getPluginManager().callEvent(event);
 
         if (event.isCancelled())
             return;
 
-        this.gameState = toGameState;
+        this.currentState = toGameState;
 
         List<Component> toDisable = new ArrayList<>();
         List<Component> toEnable = new ArrayList<>();
@@ -61,9 +61,9 @@ public class GameStateManager extends BaseComponent {
             onEnd.run();
     }
 
-    public Object getGameState()
+    public Object getCurrentState()
     {
-        return gameState;
+        return currentState;
     }
 
     public Map<Component, Collection<Object>> getComponents()
@@ -71,10 +71,70 @@ public class GameStateManager extends BaseComponent {
         return components;
     }
 
-    public void add(Component component, Object State, Object... States)
+
+
+    public boolean add(Component component, Object state, Object... states)
     {
-        List<Object> states = ListUtil.append(State, States);
-        states.remove(DEAD_STATE);
-        components.put(component, states);
+        return add(Collections.singleton(component), ListUtil.append(state, states));
     }
+
+    public boolean add(Component component, Collection<Object> states)
+    {
+        return add(Collections.singleton(component), states);
+    }
+
+    public boolean add(Collection<Component> components, Object state, Object... states)
+    {
+        return add(components, ListUtil.append(state, states));
+    }
+
+    public boolean add(Collection<Component> components, Object[] states)
+    {
+        return add(components, Arrays.asList(states));
+    }
+
+    public boolean add(Collection<Component> componentsToAdd, Collection<Object> states)
+    {
+        boolean modified = false;
+
+        states.remove(DEAD_STATE);
+
+        for (Component component : componentsToAdd)
+        {
+            if (components.put(component, states) != states)
+                modified = true;
+        }
+
+        return modified;
+    }
+
+
+    public boolean add(Map<Component, Collection<Object>> map)
+    {
+        boolean modified = false;
+
+        for (Entry<Component, Collection<Object>> entry : map.entrySet())
+        {
+            if (add(entry.getKey(), entry.getValue()))
+                modified = true;
+        }
+        return modified;
+    }
+
+    public boolean remove(Component component)
+    {
+        return remove(Collections.singleton(component));
+    }
+
+    public boolean remove(Collection<Component> componentsToRemove)
+    {
+        boolean modified = false;
+
+        for (Component component : componentsToRemove)
+            if (components.remove(component) != null)
+                modified = true;
+
+        return modified;
+    }
+
 }

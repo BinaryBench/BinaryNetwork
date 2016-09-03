@@ -1,19 +1,16 @@
 package me.binarynetwork.game.spawn;
 
-import me.binarynetwork.core.common.utils.FileUtil;
 import me.binarynetwork.core.common.utils.LocationUtil;
 import me.binarynetwork.core.common.utils.ServerUtil;
 import me.binarynetwork.core.component.ListenerComponent;
 import me.binarynetwork.core.playerholder.PlayerHolder;
-import me.binarynetwork.game.world.WorldConfiguration;
-import me.binarynetwork.game.world.WorldManager;
+import me.binarynetwork.core.component.world.WorldManager;
 import org.bukkit.Location;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.world.WorldLoadEvent;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 

@@ -30,7 +30,7 @@ public class TempPlayerCountdown extends TempCountdown implements Listener {
     {
         if (playerCount >= this.startThreshold)
         {
-            if (getCountdown().isRunning())
+            if (!getCountdown().isRunning())
             {
                 getCountdown().stop();
                 getCountdown().setCount(startCount);

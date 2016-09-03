@@ -4,6 +4,7 @@ import me.binarynetwork.core.BinaryNetworkPlugin;
 import me.binarynetwork.core.common.utils.ListUtil;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -12,6 +13,11 @@ import java.util.List;
 public class ComponentWrapper extends BaseComponent {
 
     private List<Component> components = new ArrayList<>();
+
+    public ComponentWrapper(Component... components)
+    {
+        this.components.addAll(Arrays.asList(components));
+    }
 
     public void addComponent(Component component, Component... components)
     {

@@ -65,7 +65,7 @@ public class SimpleSpawnManager extends ListenerComponent implements SpawnManage
             double bestPlayerDistance = Double.MAX_VALUE;
             for (Player otherPlayer : playerHolder)
             {
-                double distance = loc.distance(otherPlayer.getLocation());
+                double distance =  (loc.getWorld().equals(otherPlayer.getWorld())) ? loc.distance(otherPlayer.getLocation()) : Double.MAX_VALUE;
                 if (distance < bestPlayerDistance)
                     bestPlayerDistance = distance;
             }

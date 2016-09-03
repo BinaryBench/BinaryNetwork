@@ -13,7 +13,9 @@ public interface WorldManager extends WorldConfiguration, Supplier<World>, Predi
     @Override
     default boolean test(World world)
     {
-        return get() != null & get().equals(world);
+        return world.getName().equals(getWorldName());
     }
+
+    String getWorldName();
 
 }

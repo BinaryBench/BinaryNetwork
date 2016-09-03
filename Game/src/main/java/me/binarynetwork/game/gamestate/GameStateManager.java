@@ -14,7 +14,7 @@ import java.util.Map.Entry;
  */
 public class GameStateManager extends BaseComponent {
 
-    private static final Object DEAD_STATE = new Object();
+    public static final Object DEAD_STATE = new Object();
 
     private Object gameState = DEAD_STATE;
 
@@ -37,7 +37,7 @@ public class GameStateManager extends BaseComponent {
     {
 
         GameStateChangeEvent event = new GameStateChangeEvent(this, getGameState(), toGameState);
-        //Bukkit.getPluginManager().callEvent(event);
+        Bukkit.getPluginManager().callEvent(event);
 
         if (event.isCancelled())
             return;
@@ -73,6 +73,8 @@ public class GameStateManager extends BaseComponent {
 
     public void add(Component component, Object State, Object... States)
     {
-        components.put(component, ListUtil.append(State, States));
+        List<Object> states = ListUtil.append(State, States);
+        states.remove(DEAD_STATE);
+        components.put(component, states);
     }
 }

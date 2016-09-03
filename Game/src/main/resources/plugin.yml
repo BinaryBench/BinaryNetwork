@@ -3,4 +3,4 @@ version: 0.0.1
 description: This is the Game plugin for BinaryNetwork!
 author: BinaryBench
 main: me.binarynetwork.game.Main
-[ProtocolLib]
+depend: [ProtocolLib]

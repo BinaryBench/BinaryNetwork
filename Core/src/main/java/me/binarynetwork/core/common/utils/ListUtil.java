@@ -40,5 +40,16 @@ public class ListUtil {
         return list;
     }
 
+    public static boolean containsIgnoreCase(Collection<String> collection, String search)
+    {
+        for (String string : collection)
+        {
+            if (string.equalsIgnoreCase(search))
+                return true;
+        }
+        return false;
+    }
+
+
 
 }

@@ -2,12 +2,10 @@ package me.binarynetwork.core;
 
 import me.binarynetwork.core.common.utils.WorldUtil;
 import org.bukkit.Bukkit;
-import org.bukkit.World;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.File;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -30,7 +28,7 @@ public abstract class BinaryNetworkPlugin extends JavaPlugin {
         HandlerList.unregisterAll(listener);
     }
 
-    private ScheduledExecutorService scheduledExecutorService;
+    private ScheduledExecutorService scheduler;
 
 
 
@@ -38,7 +36,7 @@ public abstract class BinaryNetworkPlugin extends JavaPlugin {
     public final void onEnable()
     {
         plugin = this;
-        scheduledExecutorService = Executors.newScheduledThreadPool(10);
+        scheduler = Executors.newScheduledThreadPool(10);
         WorldUtil.purgeTemporaryWorlds();
         enable();
     }
@@ -63,8 +61,8 @@ public abstract class BinaryNetworkPlugin extends JavaPlugin {
 
 
 
-    public ScheduledExecutorService getScheduledExecutorService()
+    public ScheduledExecutorService getScheduler()
     {
-        return scheduledExecutorService;
+        return scheduler;
     }
 }

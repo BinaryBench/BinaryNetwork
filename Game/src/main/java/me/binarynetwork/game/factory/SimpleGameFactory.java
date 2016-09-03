@@ -20,6 +20,7 @@ public class SimpleGameFactory implements GameFactory {
         this.playerHolder = playerHolder;
         this.scheduler = scheduler;
         this.lobbyWorldComponent = lobbyWorldComponent;
+        lobbyWorldComponent.enable();
     }
 
     @Override

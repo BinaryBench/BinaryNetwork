@@ -51,8 +51,7 @@ public class KeepInWorld extends ListenerComponent {
         checkPlayer(event.getPlayer());
     }
 
-    //TODO fix this as event.getTo() in causing a NullPointerExeption.
-    /*
+
     @EventHandler
     public void onTeleport(PlayerTeleportEvent event)
     {
@@ -65,7 +64,7 @@ public class KeepInWorld extends ListenerComponent {
         event.setCancelled(true);
         event.getPlayer().sendMessage("You are not allowed to leave this world!");
     }
-    */
+
 
     public void checkPlayer(Player player)
     {

@@ -31,6 +31,10 @@ public class LobbyWorldComponent extends ComponentWrapper implements Supplier<Wo
     private World world;
     private Runnable somethingWentWrong;
 
+    public LobbyWorldComponent(ScheduledExecutorService scheduler)
+    {
+        this(scheduler, () -> ServerUtil.shutdown("#BukkitsFault"));
+    }
 
     public LobbyWorldComponent(ScheduledExecutorService scheduler, Runnable somethingWentWrong)
     {

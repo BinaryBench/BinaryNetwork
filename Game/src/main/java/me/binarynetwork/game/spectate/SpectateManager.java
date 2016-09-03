@@ -15,6 +15,7 @@ public interface SpectateManager {
 
     PlayerHolder getSpectateHolder();
     PlayerHolder getNonSpectateHolder();
+    PlayerHolder getDomainPlayerHolder();
 
     default boolean isSpectating(Player player)
     {

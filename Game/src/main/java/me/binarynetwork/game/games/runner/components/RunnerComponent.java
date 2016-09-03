@@ -20,6 +20,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by Bench on 9/3/2016.
  */
+@SuppressWarnings("deprecation")
 public class RunnerComponent extends BaseComponent implements SyncRunnable {
 
     //not static in case I want to have it per-map at some point in the future
@@ -109,7 +110,7 @@ public class RunnerComponent extends BaseComponent implements SyncRunnable {
 
         double z = location.getZ();
 
-        HashSet<Block> blocks = new LinkedHashSet<Block>(
+        HashSet<Block> blocks = new LinkedHashSet<>(
 
                 Arrays.asList(
 

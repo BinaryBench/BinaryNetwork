@@ -71,6 +71,10 @@ public class GameStateManager extends BaseComponent {
         return components;
     }
 
+    public Runnable getSetStateRunnable(Object state)
+    {
+        return () -> setCurrentState(state);
+    }
 
 
     public boolean add(Component component, Object state, Object... states)

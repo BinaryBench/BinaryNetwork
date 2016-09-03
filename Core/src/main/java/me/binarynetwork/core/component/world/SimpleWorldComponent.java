@@ -3,7 +3,6 @@ package me.binarynetwork.core.component.world;
 import me.binarynetwork.core.BinaryNetworkPlugin;
 import me.binarynetwork.core.common.utils.*;
 import me.binarynetwork.core.component.ListenerComponent;
-import me.binarynetwork.game.Main;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.configuration.file.YamlConfiguration;
@@ -110,7 +109,7 @@ public class SimpleWorldComponent extends ListenerComponent implements WorldMana
     @Override
     public void onDisable()
     {
-        Bukkit.getScheduler().runTaskLater(Main.getPlugin(), () ->
+        Bukkit.getScheduler().runTaskLater(BinaryNetworkPlugin.getPlugin(), () ->
                 WorldUtil.deleteWorld(getWorld(), getScheduler(), BinaryNetworkPlugin.getPlugin()), 60);
     }
 

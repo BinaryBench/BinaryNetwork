@@ -1,6 +1,5 @@
 package me.binarynetwork.game.spectate.components;
 
-import com.oracle.jrockit.jfr.EventDefinition;
 import me.binarynetwork.core.component.ListenerComponent;
 import me.binarynetwork.game.spectate.SpectateManager;
 import org.bukkit.entity.Player;

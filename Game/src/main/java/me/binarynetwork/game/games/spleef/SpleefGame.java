@@ -85,7 +85,7 @@ public class SpleefGame extends ComponentWrapper {
 
 
         //Periods
-        manager.add(new TempPlayerCountdown(playerHolder, scheduler, 10, manager.getSetStateRunnable(GameState.PRE_GAME), 2, 1), GameState.LOBBY);
+        manager.add(new TempPlayerCountdown(playerHolder, scheduler, 10, manager.getSetStateRunnable(GameState.PRE_GAME), 2, 2), GameState.LOBBY);
         manager.add(new TempCountdown(playerHolder, scheduler, 5, manager.getSetStateRunnable(GameState.GAME)), GameState.PRE_GAME);
         manager.add(new LMSVictoryCondition(spectateManager.getNonSpectateHolder(), playerHolder, manager.getSetStateRunnable(GameState.POST_GAME)), GameState.PRE_GAME, GameState.GAME);
         manager.add(new TempCountdown(playerHolder, scheduler, 5, manager.getSetStateRunnable(GameStateManager.DEAD_STATE)), GameState.POST_GAME);

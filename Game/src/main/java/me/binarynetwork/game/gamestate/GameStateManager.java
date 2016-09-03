@@ -15,13 +15,12 @@ import java.util.Map.Entry;
 public class GameStateManager extends BaseComponent {
 
     public static final Object DEAD_STATE = new Object();
-
     private Object currentState = DEAD_STATE;
-
     private Runnable onEnd;
-
     private Map<Component, Collection<Object>> components = new LinkedHashMap<>();
 
+    private boolean isStateChanging = false;
+    private Runnable backloggedState = null;
 
     public GameStateManager(Runnable onEnd)
     {
@@ -35,7 +34,13 @@ public class GameStateManager extends BaseComponent {
 
     public void setCurrentState(Object toGameState)
     {
+        if (isStateChanging)
+        {
+            backloggedState = getSetStateRunnable(toGameState);
+            return;
+        }
 
+        isStateChanging = true;
         GameStateChangeEvent event = new GameStateChangeEvent(this, getCurrentState(), toGameState);
         Bukkit.getPluginManager().callEvent(event);
 
@@ -56,9 +61,20 @@ public class GameStateManager extends BaseComponent {
         toDisable.forEach(Component::disable);
         toEnable.forEach(Component::enable);
 
-
         if (toGameState.equals(DEAD_STATE))
+        {
             onEnd.run();
+            return;
+        }
+
+        isStateChanging = false;
+        if (backloggedState != null)
+            backloggedState.run();
+
+
+
+
+
     }
 
     public Object getCurrentState()

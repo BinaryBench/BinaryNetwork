@@ -121,6 +121,12 @@ public class LMSVictoryCondition extends ListenerComponent {
     }
 
     @Override
+    public void onEnable()
+    {
+        checkEnd(getPlayerHolder().getPlayers().size());
+    }
+
+    @Override
     public void onDisable()
     {
         sendWinners();

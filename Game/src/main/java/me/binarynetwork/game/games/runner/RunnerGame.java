@@ -4,6 +4,7 @@ import me.binarynetwork.core.common.utils.FallingBlockKiller;
 import me.binarynetwork.core.component.ComponentWrapper;
 import me.binarynetwork.core.component.RunComponent;
 import me.binarynetwork.core.component.components.*;
+import me.binarynetwork.core.component.runnables.GameModeRunnable;
 import me.binarynetwork.core.playerholder.PlayerHolder;
 import me.binarynetwork.game.countdown.TempCountdown;
 import me.binarynetwork.game.countdown.TempPlayerCountdown;
@@ -19,6 +20,7 @@ import me.binarynetwork.game.spectate.components.DeathSpectate;
 import me.binarynetwork.game.spectate.components.JoinSpectate;
 import me.binarynetwork.core.component.world.SimpleWorldComponent;
 import me.binarynetwork.game.victorycondition.LMSVictoryCondition;
+import org.bukkit.GameMode;
 
 import java.util.Arrays;
 import java.util.concurrent.ScheduledExecutorService;
@@ -74,6 +76,8 @@ public class RunnerGame extends ComponentWrapper {
 
         // Spawning players
         manager.add(new RunComponent(new SpawnAtRunnable(spawnManager, spectateManager.getNonSpectateHolder())), GameState.PRE_GAME);
+        manager.add(new RunComponent(new GameModeRunnable(spectateManager.getNonSpectateHolder(), GameMode.SURVIVAL)), GameState.PRE_GAME);
+
 
         // Runner Game
         manager.add(new RunnerComponent(spectateManager.getNonSpectateHolder(), scheduler), GameState.GAME);

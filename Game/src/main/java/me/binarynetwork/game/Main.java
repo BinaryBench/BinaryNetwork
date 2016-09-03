@@ -10,6 +10,7 @@ import me.binarynetwork.game.playerholder.SimpleGamePlayerHolder;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
 /**
  * Created by Bench on 8/31/2016.
@@ -34,8 +35,9 @@ public class Main extends BinaryNetworkPlugin implements Listener {
     @Override
     public void disable()
     {
-        arena.disable();
-        lobbyWorldComponent.disable();
+        //Disabling these cause a "Plugin attempted to register task while disabled"
+        //arena.disable();
+        //lobbyWorldComponent.disable();
     }
 
 
@@ -45,5 +47,12 @@ public class Main extends BinaryNetworkPlugin implements Listener {
         if (gamePlayerHolder.canJoin(event.getPlayer()))
             gamePlayerHolder.addPlayer(event.getPlayer());
     }
+
+    @EventHandler
+    public void onLeave(PlayerQuitEvent event)
+    {
+        gamePlayerHolder.removePlayer(event.getPlayer());
+    }
+
 
 }

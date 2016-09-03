@@ -55,7 +55,7 @@ public class RunnerGame extends ComponentWrapper {
                 new NoDropItem(playerHolder),
                 new NoPickUpItem(playerHolder),
                 new NoHunger(playerHolder),
-
+                new VoidKiller(spectateManager.getNonSpectateHolder(), worldManager),
 
                 //This Game
                 new NoDamage(playerHolder)

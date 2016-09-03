@@ -22,7 +22,7 @@ import java.util.function.Supplier;
 /**
  * Created by Bench on 9/2/2016.
  */
-public class SimpleWorldComponent extends ListenerComponent implements Supplier<World>, WorldConfiguration {
+public class SimpleWorldComponent extends ListenerComponent implements WorldManager {
 
     private ScheduledExecutorService scheduler;
 
@@ -136,6 +136,12 @@ public class SimpleWorldComponent extends ListenerComponent implements Supplier<
         YamlConfiguration configuration = YamlConfiguration.loadConfiguration(configurationFile);
         configurations.put(configName, configuration);
         return configuration;
+    }
+
+    @Override
+    public String getSaveName()
+    {
+        return saveFile.getName();
     }
 
     public Runnable getSomethingWentWrong()

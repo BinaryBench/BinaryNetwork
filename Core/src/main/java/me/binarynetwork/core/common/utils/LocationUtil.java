@@ -153,4 +153,9 @@ public class LocationUtil {
             return false;
         return true;
     }
+
+    public static Location addWorld(World world, Location loc)
+    {
+        return new Location(world, loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
+    }
 }

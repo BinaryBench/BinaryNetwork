@@ -7,4 +7,5 @@ import org.bukkit.configuration.file.YamlConfiguration;
  */
 public interface WorldConfiguration {
     YamlConfiguration getConfig(String configName);
+    String getSaveName();
 }

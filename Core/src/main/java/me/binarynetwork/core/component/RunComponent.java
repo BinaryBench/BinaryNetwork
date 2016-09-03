@@ -8,6 +8,11 @@ public class RunComponent extends BaseComponent {
     private Runnable runnable;
     private boolean runAfter;
 
+    public RunComponent(Runnable runnable)
+    {
+        this(runnable, false);
+    }
+
     public RunComponent(Runnable runnable, boolean runAfter)
     {
         this.runnable = runnable;

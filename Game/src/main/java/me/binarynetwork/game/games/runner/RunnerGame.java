@@ -2,6 +2,7 @@ package me.binarynetwork.game.games.runner;
 
 import me.binarynetwork.core.common.utils.FallingBlockKiller;
 import me.binarynetwork.core.component.ComponentWrapper;
+import me.binarynetwork.core.component.RunComponent;
 import me.binarynetwork.core.component.components.*;
 import me.binarynetwork.core.playerholder.PlayerHolder;
 import me.binarynetwork.game.countdown.TempCountdown;
@@ -12,8 +13,7 @@ import me.binarynetwork.game.gamestate.GameStateManager;
 import me.binarynetwork.game.lobby.LobbyComponent;
 import me.binarynetwork.game.lobby.LobbyWorldComponent;
 import me.binarynetwork.game.spawn.SimpleSpawnManager;
-import me.binarynetwork.game.spawn.SpawnManager;
-import me.binarynetwork.game.spawn.components.SpawnAtComponent;
+import me.binarynetwork.game.spawn.runnables.SpawnAtRunnable;
 import me.binarynetwork.game.spectate.GameModeSpectateComponent;
 import me.binarynetwork.game.spectate.components.DeathSpectate;
 import me.binarynetwork.game.spectate.components.JoinSpectate;
@@ -41,7 +41,7 @@ public class RunnerGame extends ComponentWrapper {
         spectateManager = new GameModeSpectateComponent(playerHolder);
         spawnManager = new SimpleSpawnManager(worldManager, playerHolder);
 
-        addComponent(worldManager, manager, spectateManager, spawnManager);
+        addComponent(worldManager, manager, spectateManager, spawnManager, new RunComponent(manager.getSetStateRunnable(GameState.LOBBY)));
 
         //Disable weather
         addComponent(new WeatherComponent(worldManager));
@@ -73,7 +73,7 @@ public class RunnerGame extends ComponentWrapper {
         ), GameState.PRE_GAME, GameState.GAME, GameState.POST_GAME);
 
         // Spawning players
-        manager.add(new SpawnAtComponent(spawnManager, spectateManager.getNonSpectateHolder()), GameState.PRE_GAME);
+        manager.add(new RunComponent(new SpawnAtRunnable(spawnManager, spectateManager.getNonSpectateHolder())), GameState.PRE_GAME);
 
         // Runner Game
         manager.add(new RunnerComponent(spectateManager.getNonSpectateHolder(), scheduler), GameState.GAME);

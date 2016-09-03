@@ -36,6 +36,7 @@ public abstract class BinaryNetworkPlugin extends JavaPlugin {
     public final void onEnable()
     {
         plugin = this;
+        getDataFolder().mkdirs();
         scheduler = Executors.newScheduledThreadPool(10);
         WorldUtil.purgeTemporaryWorlds();
         enable();

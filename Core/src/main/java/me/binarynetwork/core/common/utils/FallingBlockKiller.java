@@ -29,7 +29,7 @@ public class FallingBlockKiller extends ListenerComponent {
         if (event.getEntityType().equals(EntityType.FALLING_BLOCK))
         {
 
-            if (worldPredicate.test(event.getBlock().getWorld()))
+            if (!worldPredicate.test(event.getBlock().getWorld()))
                 return;
 
             if (event.getEntity() instanceof FallingBlock)

@@ -55,10 +55,6 @@ public class KeepInWorld extends ListenerComponent {
     @EventHandler
     public void onTeleport(PlayerTeleportEvent event)
     {
-        System.out.println("PlayerHolder: " + getPlayerHolder());
-        System.out.println("event.getPlayer(): " + event.getPlayer());
-        System.out.println("WorldPredicate: " + getWorldPredicate());
-        System.out.println("event.getTo(): " + event.getTo());
         if (!getPlayerHolder().test(event.getPlayer()) || getWorldPredicate().test(event.getTo().getWorld()) || !stopTeleports)
             return;
         event.setCancelled(true);

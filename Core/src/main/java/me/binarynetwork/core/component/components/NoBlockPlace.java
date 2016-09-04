@@ -22,7 +22,7 @@ public class NoBlockPlace extends ListenerComponent {
 
     /**
      *
-     * @param playerPredicate What players should be affected.
+     * @param playerPredicate What playerdata should be affected.
      */
     public NoBlockPlace(Predicate<Player> playerPredicate)
     {
@@ -31,7 +31,7 @@ public class NoBlockPlace extends ListenerComponent {
 
     /**
      *
-     * @param playerPredicate What players should be affected.
+     * @param playerPredicate What playerdata should be affected.
      * @param itemPredicate Which blocks should be affected.
      */
     public NoBlockPlace(Predicate<Player> playerPredicate, Predicate<ItemStack> itemPredicate)
@@ -41,7 +41,7 @@ public class NoBlockPlace extends ListenerComponent {
 
     /**
      *
-     * @param playerPredicate What players should be affected.
+     * @param playerPredicate What playerdata should be affected.
      * @param blockPredicate Which blocks should be affected.
      * @param typeDefiner This is to differentiate from {@link NoBlockBreak#NoBlockBreak(Predicate, Predicate)}.
      */

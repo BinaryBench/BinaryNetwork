@@ -59,7 +59,7 @@ public class SpleefGame extends ComponentWrapper {
                 //Spectate
                 new JoinSpectate(spectateManager),
                 new DeathSpectate(spectateManager),
-                //Keep players in world
+                //Keep playerdata in world
                 new KeepInWorld(playerHolder, worldManager),
 
                 //Standard-ish stuff
@@ -75,7 +75,7 @@ public class SpleefGame extends ComponentWrapper {
 
         ), GameState.PRE_GAME, GameState.GAME, GameState.POST_GAME);
 
-        // Spawning players
+        // Spawning playerdata
         manager.add(new RunComponent(new SpawnAtRunnable(spawnManager, spectateManager.getNonSpectateHolder())), GameState.PRE_GAME);
         manager.add(new RunComponent(new GameModeRunnable(spectateManager.getNonSpectateHolder(), GameMode.SURVIVAL)), GameState.PRE_GAME);
 

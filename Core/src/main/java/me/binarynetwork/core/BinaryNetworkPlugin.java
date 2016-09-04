@@ -1,11 +1,15 @@
 package me.binarynetwork.core;
 
+import me.binarynetwork.core.account.AccountManager;
 import me.binarynetwork.core.common.utils.WorldUtil;
+import me.binarynetwork.core.currency.CurrencyDataStorage;
+import me.binarynetwork.core.database.DataSourceManager;
 import org.bukkit.Bukkit;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import javax.sql.DataSource;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -28,9 +32,10 @@ public abstract class BinaryNetworkPlugin extends JavaPlugin {
         HandlerList.unregisterAll(listener);
     }
 
+
+
     private ScheduledExecutorService scheduler;
-
-
+    private AccountManager accountManager;
 
     @Override
     public final void onEnable()
@@ -38,6 +43,17 @@ public abstract class BinaryNetworkPlugin extends JavaPlugin {
         plugin = this;
         getDataFolder().mkdirs();
         scheduler = Executors.newScheduledThreadPool(10);
+
+
+        accountManager = new AccountManager();
+
+        CurrencyDataStorage currencyDataStorage = new CurrencyDataStorage(accountManager);
+
+
+
+
+
+
         WorldUtil.purgeTemporaryWorlds();
         enable();
     }

@@ -5,6 +5,7 @@ allprojects {
 
 subprojects {
     apply plugin: 'java'
+    apply plugin: 'idea'
 
     sourceCompatibility = 1.8
 
@@ -19,4 +20,12 @@ subprojects {
 
         compile fileTree(include: ['*.jar'], dir: '../Libraries')
     }
+
+    idea {
+        module {
+            downloadJavadoc = true
+            downloadSources = true
+        }
+    }
+
 }

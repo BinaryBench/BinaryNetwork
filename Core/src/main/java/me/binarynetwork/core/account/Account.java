@@ -7,12 +7,12 @@ import java.util.UUID;
  */
 public class Account {
     private int id;
-    private UUID playersUUID;
+    private UUID uuid;
 
-    public Account(int id, UUID playersUUID)
+    public Account(int id, UUID uuid)
     {
         this.id = id;
-        this.playersUUID = playersUUID;
+        this.uuid = uuid;
     }
 
     public int getId()
@@ -20,8 +20,14 @@ public class Account {
         return id;
     }
 
-    public UUID getPlayersUUID()
+    public UUID getUUID()
     {
-        return playersUUID;
+        return uuid;
+    }
+
+    @Override
+    public String toString()
+    {
+        return "Account(id=" + getId() + ", uuid=" + getUUID() + ")";
     }
 }

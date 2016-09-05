@@ -1,15 +1,24 @@
 configurations {
-    includeInJar {
-        transitive = false
-    }
+    includeInJar
 }
 
 dependencies {
     includeInJar "org.apache.commons:commons-dbcp2:2.1.1"
+
+    // https://mvnrepository.com/artifact/com.google.guava/guava
+    includeInJar group: 'com.google.guava', name: 'guava', version: '19.0'
+
 
     configurations.compile.extendsFrom(configurations.includeInJar)
 }
 
 jar {
     from configurations.includeInJar.collect { zipTree it }
+}
+
+idea {
+    module {
+        downloadJavadoc = true
+        downloadSources = true
+    }
 }

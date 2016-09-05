@@ -1,20 +1,36 @@
 package me.binarynetwork.core.account;
 
-
+import me.binarynetwork.core.BinaryNetworkPlugin;
 import me.binarynetwork.core.common.scheduler.Scheduler;
 import me.binarynetwork.core.database.DataSourceManager;
 import me.binarynetwork.core.database.DataStorage;
+import org.bukkit.Bukkit;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
+import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.player.PlayerQuitEvent;
 
-import javax.sql.DataSource;
 import java.sql.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 
 /**
  * Created by Bench on 9/3/2016.
  */
-public class AccountManager extends DataStorage<UUID, Account> {
+public class AccountManager extends DataStorage<UUID, Account> implements Listener {
 
+    public static int RETRY_TIMES = 10;
+
+    private int tempAccountId = -1;
 
     public static String TABLE_NAME = "player_account";
 
@@ -22,36 +38,101 @@ public class AccountManager extends DataStorage<UUID, Account> {
     private static final String NEW_LOGIN = "INSERT IGNORE INTO " + TABLE_NAME + " (uuid) VALUES(?);";
     private static final String SELECT_ACCOUNT = "SELECT id FROM " + TABLE_NAME + " where uuid=?;";
 
-    private List<DataStorage<Account, ?>> listeners = Collections.synchronizedList(new ArrayList<>());
+    private ConcurrentHashMap<PlayerDataStorage<?>, Boolean> listeners = new ConcurrentHashMap<>();
+    private ScheduledExecutorService scheduler;
 
-    public AccountManager()
+    public AccountManager(ScheduledExecutorService scheduler)
     {
-        super(DataSourceManager.PLAYER_DATA);
+        super(DataSourceManager.PLAYER_DATA, null, 0);
+        BinaryNetworkPlugin.registerEvents(this);
+        this.scheduler = scheduler;
     }
 
-    public void addListener(DataStorage<Account, ?> listener)
+    @EventHandler(priority = EventPriority.LOW)
+    public void onLogin(PlayerLoginEvent event)
     {
-        listeners.add(listener);
+        System.err.println("Login event for: " + event.getPlayer().getName());
+        onLogin(event.getPlayer().getUniqueId());
     }
-    private void removeListener(DataStorage<Account, ?> listener)
+
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onLeave(PlayerQuitEvent event)
+    {
+        UUID uuid = event.getPlayer().getUniqueId();
+
+        getIfExists(uuid, account -> {
+
+            removeFromCache(uuid);
+
+            if (account == null)
+                return;
+
+            for (PlayerDataStorage<?> playerDataStorage : listeners.keySet())
+            {
+                playerDataStorage.save(account, new Consumer<Boolean>() {
+                    private int counter = 0;
+
+                    @Override
+                    public void accept(Boolean aBoolean)
+                    {
+                        if (aBoolean)
+                            //FIXME maybe do a better way to make sure this doesn't happen.
+                            if (getIfExists(uuid) == null)
+                                playerDataStorage.removeFromCache(account);
+                        else
+                            if (counter++ < RETRY_TIMES)
+                            {
+                                System.err.println("Unable to save: " + account);
+                                scheduler.scheduleWithFixedDelay(() -> playerDataStorage.save(account, this), 5, 5, TimeUnit.SECONDS);
+                            }
+                    }
+                });
+            }
+        });
+
+
+    }
+
+    @Override
+    public boolean removeFromCache(UUID key)
+    {
+        System.err.println("Removing from cache:" + Bukkit.getOfflinePlayer(key).getName());
+        return super.removeFromCache(key);
+    }
+
+    @Override
+    public void get(UUID key, Consumer<Account> callback)
+    {
+        System.err.println("Getting: " + Bukkit.getOfflinePlayer(key).getName());
+        super.get(key, callback);
+    }
+
+    public void  addPlayerStorage(PlayerDataStorage<?> listener, boolean listenToJoin)
+    {
+        listeners.put(listener, listenToJoin);
+    }
+
+    public void removeListener(PlayerDataStorage<?> listener)
     {
         listeners.remove(listener);
     }
 
     public void onLogin(UUID playersUUID)
     {
-        Scheduler.runAsync(() -> {
-            get(playersUUID, account ->
-            {
+        Scheduler.runAsync(() -> get(playersUUID, account ->
                 Scheduler.runAsync(() ->
                 {
                     StringBuilder sb = new StringBuilder();
 
+                    List<PlayerDataStorage<?>> returnList = new ArrayList<>();
 
-                    for (DataStorage<Account, ?> listener : listeners)
-                    {
-                        sb.append(listener.getQuery(account));
-                    }
+                    listeners.entrySet().stream().filter(entry -> entry.getValue() && entry.getKey().enableWaitingList(account)).forEach(entry -> {
+                        sb.append(entry.getKey().getQuery(account));
+                        returnList.add(entry.getKey());
+                        System.err.println("Added " + entry.getKey().getClass().getSimpleName() + " at position " + (returnList.size() - 1));
+                    });
+                    if (sb.length() == 0)
+                        return;
                     try (Connection connection = getDataSource().getConnection(); Statement statement = connection.createStatement())
                     {
                         boolean hasMoreResultSets = statement.execute(sb.toString());
@@ -60,10 +141,15 @@ public class AccountManager extends DataStorage<UUID, Account> {
                         while ( hasMoreResultSets || statement.getUpdateCount() != -1 ) {
                             if ( hasMoreResultSets ) {
                                 ResultSet rs = statement.getResultSet();
+
                                 // handle your rs here
-                                listeners.get(counter++).loadAndAddToCache(account, rs);
+                                PlayerDataStorage<?> storage = returnList.get(counter++);
+                                System.err.println("Returning to " + storage.getClass().getSimpleName() + " ResultSet at position " + (counter-1));
+                                storage.loadAndAddToCache(account, rs, connection);
+
                             } // if has rs
                             else { // if ddl/dml/...
+                                counter++;
                                 int queryResult = statement.getUpdateCount();
                                 if ( queryResult == -1 ) { // no more queries processed
                                     break;
@@ -80,54 +166,48 @@ public class AccountManager extends DataStorage<UUID, Account> {
                         e.printStackTrace();
                     }
 
-                });
-
-            });
-        });
+                })));
     }
 
-    @Override
-    public Account loadData(ResultSet resultSet)
-    {
-        return null;
-    }
 
     @Override
-    public String getQuery(UUID key)
+    protected Account loadValue(Connection connection, UUID key) throws SQLException
     {
-        return "SELECT id FROM " + TABLE_NAME + " WHERE uuid='" + key.toString() +"';";
-    }
-
-    @Override
-    public Account addData(UUID key)
-    {
-
-        try (PreparedStatement insertStatement = getDataSource().getConnection().prepareStatement(NEW_LOGIN);
-             // Might want to use something besides getQuery(), but for now I'm using it for consistency
-             PreparedStatement queryStatement = getDataSource().getConnection().prepareStatement(getQuery(key)))
+        try (PreparedStatement statement = connection.prepareStatement(SELECT_ACCOUNT))
         {
-            insertStatement.setString(1, key.toString());
-            insertStatement.executeUpdate();
-
-            ResultSet resultSet = queryStatement.executeQuery();
+            statement.setString(1, key.toString());
+            ResultSet resultSet = statement.executeQuery();
 
             if (resultSet.next())
             {
-                int id = resultSet.getInt("id");
-                if (id != 0)
-                    return new Account(id, key);
+                Account account = new Account(resultSet.getInt("id"), key);
+                System.err.println("Loaded account: " + account.toString());
+                return account;
             }
-            return null;
-        }
-        catch (SQLException e)
-        {
-            e.printStackTrace();
             return null;
         }
     }
 
     @Override
-    public void saveData(Map<UUID, Account> key)
+    public Account getNew(Connection connection, UUID key) throws SQLException
+    {
+        try (PreparedStatement insertStatement = connection.prepareStatement(NEW_LOGIN))
+        {
+            insertStatement.setString(1, key.toString());
+            insertStatement.executeUpdate();
+        }
+
+        return loadValue(connection, key);
+    }
+
+    @Override
+    protected Account getNew(UUID key)
+    {
+        return new Account(--tempAccountId, key);
+    }
+
+    @Override
+    public void saveData(Map<UUID, Account> key, Consumer<Integer> successes)
     {
 
     }

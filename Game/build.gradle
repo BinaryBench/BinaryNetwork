@@ -1,13 +1,13 @@
 libsDirName = '../../Servers/Game/plugins'
 
 configurations {
-    includeInJar {
-        transitive = false
-    }
+    includeInJar
 }
 
 dependencies {
-    includeInJar project(':Core')
+    includeInJar(project(':Core')) {
+        transitive = false
+    }
     configurations.compile.extendsFrom(configurations.includeInJar)
 }
 

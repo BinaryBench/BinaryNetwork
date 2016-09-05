@@ -4,9 +4,14 @@ import me.binarynetwork.core.account.AccountManager;
 import me.binarynetwork.core.common.utils.WorldUtil;
 import me.binarynetwork.core.currency.CurrencyDataStorage;
 import me.binarynetwork.core.database.DataSourceManager;
+import org.apache.commons.lang.ArrayUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.command.Command;
+import org.bukkit.command.CommandSender;
+import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
+import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import javax.sql.DataSource;
@@ -36,7 +41,7 @@ public abstract class BinaryNetworkPlugin extends JavaPlugin {
 
     private ScheduledExecutorService scheduler;
     private AccountManager accountManager;
-
+    private CurrencyDataStorage currencyDataStorage;
     @Override
     public final void onEnable()
     {
@@ -45,17 +50,33 @@ public abstract class BinaryNetworkPlugin extends JavaPlugin {
         scheduler = Executors.newScheduledThreadPool(10);
 
 
-        accountManager = new AccountManager();
+        accountManager = new AccountManager(scheduler);
 
-        CurrencyDataStorage currencyDataStorage = new CurrencyDataStorage(accountManager);
-
-
-
-
-
+        currencyDataStorage = new CurrencyDataStorage(scheduler, 0.1, accountManager);
 
         WorldUtil.purgeTemporaryWorlds();
         enable();
+    }
+    @EventHandler
+    public void command(PlayerCommandPreprocessEvent event)
+    {
+
+        String[] derpyderparray = event.getMessage().replace("  ", " ").split(" ");
+        String[] args = (String[]) ArrayUtils.subarray(derpyderparray, 1, derpyderparray.length);
+        if (event.getMessage().startsWith("/coin"))
+        {
+
+
+            currencyDataStorage.get(event.getPlayer(), integerIntegerMap -> {
+                integerIntegerMap.put(Integer.valueOf(args[0]), Integer.valueOf(args[1]));
+            });
+            event.setCancelled(true);
+        }
+        else if (event.getMessage().startsWith("/cache"))
+        {
+            event.getPlayer().sendMessage("" + (getAccountManager().getIfExists(event.getPlayer().getUniqueId()) != null));
+            event.setCancelled(true);
+        }
     }
 
     @Override
@@ -81,5 +102,10 @@ public abstract class BinaryNetworkPlugin extends JavaPlugin {
     public ScheduledExecutorService getScheduler()
     {
         return scheduler;
+    }
+
+    public AccountManager getAccountManager()
+    {
+        return accountManager;
     }
 }

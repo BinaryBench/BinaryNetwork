@@ -1,6 +1,11 @@
 package me.binarynetwork.core;
 
+import com.comphenix.protocol.ProtocolLibrary;
+import com.comphenix.protocol.ProtocolManager;
 import me.binarynetwork.core.account.AccountManager;
+import me.binarynetwork.core.command.CommandManager;
+import me.binarynetwork.core.command.DummyCommand;
+import me.binarynetwork.core.command.SimpleCommandWrapper;
 import me.binarynetwork.core.common.utils.WorldUtil;
 import me.binarynetwork.core.currency.CurrencyDataStorage;
 import me.binarynetwork.core.database.DataSourceManager;
@@ -15,6 +20,8 @@ import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import javax.sql.DataSource;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -38,10 +45,12 @@ public abstract class BinaryNetworkPlugin extends JavaPlugin {
     }
 
 
-
+    private ProtocolManager protocolManager;
     private ScheduledExecutorService scheduler;
     private AccountManager accountManager;
     private CurrencyDataStorage currencyDataStorage;
+    private CommandManager commandManager;
+
     @Override
     public final void onEnable()
     {
@@ -49,23 +58,35 @@ public abstract class BinaryNetworkPlugin extends JavaPlugin {
         getDataFolder().mkdirs();
         scheduler = Executors.newScheduledThreadPool(10);
 
+        this.protocolManager = ProtocolLibrary.getProtocolManager();
 
         accountManager = new AccountManager(scheduler);
-
         currencyDataStorage = new CurrencyDataStorage(scheduler, 0.1, accountManager);
 
+        /*commandManager = new CommandManager(protocolManager);
+
+        commandManager.addCommand(new DummyCommand(), "dummy")
+                .addCommand(new SimpleCommandWrapper()
+                        .addCommand(new DummyCommand(false, true), "youCantSeeThis")
+                        .addCommand(new DummyCommand(), "youCanSeeThis")
+                        .addCommand(new DummyCommand(true, false, "This is usage text!", Arrays.asList("This", "is", "usage", "text")), "special"),
+                "wrapper");*/
+
+
         WorldUtil.purgeTemporaryWorlds();
+
+
         enable();
     }
+
     @EventHandler
     public void command(PlayerCommandPreprocessEvent event)
     {
 
-        String[] derpyderparray = event.getMessage().replace("  ", " ").split(" ");
-        String[] args = (String[]) ArrayUtils.subarray(derpyderparray, 1, derpyderparray.length);
+        String[] deferral = event.getMessage().replace("  ", " ").split(" ");
+        String[] args = (String[]) ArrayUtils.subarray(deferral, 1, deferral.length);
         if (event.getMessage().startsWith("/coin"))
         {
-
 
             currencyDataStorage.get(event.getPlayer(), integerIntegerMap -> {
                 integerIntegerMap.put(Integer.valueOf(args[0]), Integer.valueOf(args[1]));
@@ -77,6 +98,12 @@ public abstract class BinaryNetworkPlugin extends JavaPlugin {
             event.getPlayer().sendMessage("" + (getAccountManager().getIfExists(event.getPlayer().getUniqueId()) != null));
             event.setCancelled(true);
         }
+    }
+
+    @Override
+    public boolean onCommand(CommandSender sender, Command command, String label, String[] args)
+    {
+        return super.onCommand(sender, command, label, args);
     }
 
     @Override
@@ -107,5 +134,10 @@ public abstract class BinaryNetworkPlugin extends JavaPlugin {
     public AccountManager getAccountManager()
     {
         return accountManager;
+    }
+
+    public CommandManager getCommandManager()
+    {
+        return commandManager;
     }
 }

@@ -7,8 +7,8 @@ import me.binarynetwork.core.command.CommandManager;
 import me.binarynetwork.core.command.DummyCommand;
 import me.binarynetwork.core.command.SimpleCommandWrapper;
 import me.binarynetwork.core.common.utils.WorldUtil;
+import me.binarynetwork.core.component.SimpleComponentWrapper;
 import me.binarynetwork.core.currency.CurrencyDataStorage;
-import me.binarynetwork.core.database.DataSourceManager;
 import org.apache.commons.lang.ArrayUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -19,9 +19,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import javax.sql.DataSource;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -44,6 +42,7 @@ public abstract class BinaryNetworkPlugin extends JavaPlugin {
         HandlerList.unregisterAll(listener);
     }
 
+    private SimpleComponentWrapper componentWrapper;
 
     private ProtocolManager protocolManager;
     private ScheduledExecutorService scheduler;
@@ -64,7 +63,6 @@ public abstract class BinaryNetworkPlugin extends JavaPlugin {
         currencyDataStorage = new CurrencyDataStorage(scheduler, 0.1, accountManager);
 
         commandManager = new CommandManager(protocolManager);
-
 
         commandManager.addCommand(new DummyCommand(), "dummy")
                 .addCommand(new SimpleCommandWrapper()

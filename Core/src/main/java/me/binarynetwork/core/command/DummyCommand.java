@@ -35,13 +35,13 @@ public class DummyCommand implements Command {
     }
 
     @Override
-    public boolean executeCommand(CommandSender commandSender, String label, String[] args)
+    public boolean executeCommand(CommandSender commandSender, String[] args)
     {
         return succeed;
     }
 
     @Override
-    public List<String> tabComplete(CommandSender commandSender, String label, String[] args)
+    public List<String> tabComplete(CommandSender commandSender, String[] args)
     {
         String arg = args[0];
         if (tabComplete == null || tabComplete.isEmpty())
@@ -53,13 +53,13 @@ public class DummyCommand implements Command {
     }
 
     @Override
-    public String getUsage(CommandSender commandSender, String label, String[] args)
+    public String getUsage(CommandSender commandSender, String[] args)
     {
         return usage;
     }
 
     @Override
-    public boolean hasPermission(CommandSender commandSender, String label, String[] args)
+    public boolean hasPermission(CommandSender commandSender, String[] args)
     {
         return hasPermission;
     }

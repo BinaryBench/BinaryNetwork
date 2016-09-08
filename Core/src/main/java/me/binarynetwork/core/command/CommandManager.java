@@ -47,7 +47,7 @@ public class CommandManager extends SimpleCommandWrapper implements Listener {
 
                                 String[] args = getArgs(message);
 
-                                List<String> completions = tabComplete(player, null, args);
+                                List<String> completions = tabComplete(player, args);
 
                                 if (completions == null)
                                     return;
@@ -89,16 +89,16 @@ public class CommandManager extends SimpleCommandWrapper implements Listener {
         String[] args = getArgs(message);
 
 
-        if (hasPermission(commandSender, null, args))
+        if (hasPermission(commandSender, args))
         {
             System.out.println("Has permission");
-            boolean success = executeCommand(commandSender, null, args);
+            boolean success = executeCommand(commandSender, args);
 
             if (success)
                 return;
             System.out.println("Command failed");
 
-            String usageMessage = getUsage(commandSender, null, args);
+            String usageMessage = getUsage(commandSender, args);
 
             if (usageMessage != null)
             {
@@ -118,7 +118,7 @@ public class CommandManager extends SimpleCommandWrapper implements Listener {
     }
 
     @Override
-    public String localGetUsage(CommandSender sender, String label, String[] args)
+    public String localGetUsage(CommandSender sender, String[] args)
     {
         return null;
     }

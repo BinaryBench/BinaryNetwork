@@ -1,5 +1,8 @@
 package me.binarynetwork.core;
 
+import me.binarynetwork.core.component.SimpleComponentWrapper;
+import me.binarynetwork.core.component.components.NoDamage;
+
 import java.util.Arrays;
 
 /**
@@ -8,7 +11,6 @@ import java.util.Arrays;
 public class Test {
     public static void main(String[] args)
     {
-        System.out.println("moo".startsWith(""));
-
+        new SimpleComponentWrapper().addComponent(new NoDamage(null));
     }
 }

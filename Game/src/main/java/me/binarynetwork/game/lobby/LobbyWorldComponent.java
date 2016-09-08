@@ -2,7 +2,7 @@ package me.binarynetwork.game.lobby;
 
 import me.binarynetwork.core.BinaryNetworkPlugin;
 import me.binarynetwork.core.common.utils.*;
-import me.binarynetwork.core.component.ComponentWrapper;
+import me.binarynetwork.core.component.SimpleComponentWrapper;
 import me.binarynetwork.core.component.components.NoBlockBreak;
 import me.binarynetwork.core.component.components.NoBlockPlace;
 import me.binarynetwork.core.component.components.WeatherComponent;
@@ -20,7 +20,7 @@ import java.util.function.Supplier;
 /**
  * Created by Bench on 9/3/2016.
  */
-public class LobbyWorldComponent extends ComponentWrapper implements Supplier<World>, Predicate<World> {
+public class LobbyWorldComponent extends SimpleComponentWrapper implements Supplier<World>, Predicate<World> {
 
     public static final String LOBBY_WORLD_NAME = "LobbyWorld";
 

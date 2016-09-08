@@ -1,7 +1,7 @@
 package me.binarynetwork.game.games.spleef;
 
 import me.binarynetwork.core.common.utils.FallingBlockKiller;
-import me.binarynetwork.core.component.ComponentWrapper;
+import me.binarynetwork.core.component.SimpleComponentWrapper;
 import me.binarynetwork.core.component.RunComponent;
 import me.binarynetwork.core.component.components.*;
 import me.binarynetwork.core.component.runnables.GameModeRunnable;
@@ -9,7 +9,6 @@ import me.binarynetwork.core.component.world.SimpleWorldComponent;
 import me.binarynetwork.core.playerholder.PlayerHolder;
 import me.binarynetwork.game.countdown.TempCountdown;
 import me.binarynetwork.game.countdown.TempPlayerCountdown;
-import me.binarynetwork.game.games.runner.components.RunnerComponent;
 import me.binarynetwork.game.games.spleef.components.SpleefComponent;
 import me.binarynetwork.game.gamestate.GameState;
 import me.binarynetwork.game.gamestate.GameStateManager;
@@ -29,7 +28,7 @@ import java.util.concurrent.ScheduledExecutorService;
 /**
  * Created by Bench on 9/3/2016.
  */
-public class SpleefGame extends ComponentWrapper {
+public class SpleefGame extends SimpleComponentWrapper {
     public static final String NAME = "Spleef";
 
     GameStateManager manager;

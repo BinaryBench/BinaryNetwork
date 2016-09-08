@@ -3,9 +3,7 @@ package me.binarynetwork.game.lobby;
 import me.binarynetwork.core.BinaryNetworkPlugin;
 import me.binarynetwork.core.common.utils.PlayerUtil;
 import me.binarynetwork.core.common.utils.RandomUtil;
-import me.binarynetwork.core.component.Component;
-import me.binarynetwork.core.component.ComponentWrapper;
-import me.binarynetwork.core.component.ListenerComponent;
+import me.binarynetwork.core.component.SimpleComponentWrapper;
 import me.binarynetwork.core.component.components.*;
 import me.binarynetwork.core.playerholder.PlayerHolder;
 import me.binarynetwork.core.playerholder.events.PlayerAddEvent;
@@ -17,14 +15,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
-import java.util.Arrays;
-import java.util.List;
 import java.util.function.Supplier;
 
 /**
  * Created by Bench on 9/3/2016.
  */
-public class LobbyComponent extends ComponentWrapper implements Runnable, Listener {
+public class LobbyComponent extends SimpleComponentWrapper implements Runnable, Listener {
 
 
     private int id;

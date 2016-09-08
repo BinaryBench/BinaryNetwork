@@ -1,7 +1,7 @@
 package me.binarynetwork.game.games.runner;
 
 import me.binarynetwork.core.common.utils.FallingBlockKiller;
-import me.binarynetwork.core.component.ComponentWrapper;
+import me.binarynetwork.core.component.SimpleComponentWrapper;
 import me.binarynetwork.core.component.RunComponent;
 import me.binarynetwork.core.component.components.*;
 import me.binarynetwork.core.component.runnables.GameModeRunnable;
@@ -28,7 +28,7 @@ import java.util.concurrent.ScheduledExecutorService;
 /**
  * Created by Bench on 9/3/2016.
  */
-public class RunnerGame extends ComponentWrapper {
+public class RunnerGame extends SimpleComponentWrapper {
     public static final String NAME = "Runner";
 
     GameStateManager manager;

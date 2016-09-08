@@ -8,6 +8,7 @@ import me.binarynetwork.core.command.DummyCommand;
 import me.binarynetwork.core.command.SimpleCommandWrapper;
 import me.binarynetwork.core.common.utils.WorldUtil;
 import me.binarynetwork.core.component.SimpleComponentWrapper;
+import me.binarynetwork.core.component.components.NoDamage;
 import me.binarynetwork.core.currency.CurrencyDataStorage;
 import org.apache.commons.lang.ArrayUtils;
 import org.bukkit.Bukkit;
@@ -75,6 +76,8 @@ public abstract class BinaryNetworkPlugin extends JavaPlugin {
 
         WorldUtil.purgeTemporaryWorlds();
 
+        SimpleComponentWrapper simpleComponentWrapper = new SimpleComponentWrapper();
+        simpleComponentWrapper.addComponent(new NoDamage(null));
 
         enable();
     }

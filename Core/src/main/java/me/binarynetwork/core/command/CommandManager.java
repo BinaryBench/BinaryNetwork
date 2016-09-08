@@ -49,7 +49,7 @@ public class CommandManager extends SimpleCommandWrapper implements Listener {
 
                                 event.setCancelled(true);
 
-                                String[] args = message.substring(1, message.length()).trim().replaceAll("( )+", " ").split(" ");
+                                String[] args = getArgs(message);
 
                                 List<String> completions = tabComplete(player, null, args);
 
@@ -90,27 +90,27 @@ public class CommandManager extends SimpleCommandWrapper implements Listener {
 
     private void executeCommand(CommandSender commandSender, String message)
     {
-        String[] args = message.substring(1, message.length()).trim().replaceAll("( )+", " ").split(" ");
+        String[] args = getArgs(message);
 
-        boolean success = executeCommand(commandSender, null, args);
 
-        if (success)
-            return;
 
-        System.out.println("Command Failed");
-
-        String usageMessage = getUsage(commandSender, null, args);
-
-        if (usageMessage != null)
+        if (hasPermission(commandSender, null, args))
         {
-            commandSender.sendMessage(usageMessage);
-        }
-        else
-        {
-            commandSender.sendMessage("use /help to see commands!");
-            System.out.println("Usage is null");
+            boolean success = executeCommand(commandSender, null, args);
+
+            if (success)
+                return;
+
+            String usageMessage = getUsage(commandSender, null, args);
+
+            if (usageMessage != null)
+            {
+                commandSender.sendMessage(usageMessage);
+                return;
+            }
         }
 
+        commandSender.sendMessage("use /help to see commands!");
 
     }
 
@@ -156,6 +156,21 @@ public class CommandManager extends SimpleCommandWrapper implements Listener {
         }
         System.out.println("commandData is null");
         return null;
+    }
+
+    private String[] getArgs(String message)
+    {
+        //Remove preceding
+        message = message.replaceAll("^\\s+", "");
+
+        //Remove slash
+        message = message.substring(1, message.length());
+
+        //Remove double spaces
+        message = message.replaceAll("( )+", " ");
+
+        //Split
+        return message.split(" ", -1);
     }
 
 }

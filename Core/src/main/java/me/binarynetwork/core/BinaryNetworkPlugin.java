@@ -63,14 +63,14 @@ public abstract class BinaryNetworkPlugin extends JavaPlugin {
         accountManager = new AccountManager(scheduler);
         currencyDataStorage = new CurrencyDataStorage(scheduler, 0.1, accountManager);
 
-        /*commandManager = new CommandManager(protocolManager);
+        commandManager = new CommandManager(protocolManager);
 
         commandManager.addCommand(new DummyCommand(), "dummy")
                 .addCommand(new SimpleCommandWrapper()
                         .addCommand(new DummyCommand(false, true), "youCantSeeThis")
                         .addCommand(new DummyCommand(), "youCanSeeThis")
                         .addCommand(new DummyCommand(true, false, "This is usage text!", Arrays.asList("This", "is", "usage", "text")), "special"),
-                "wrapper");*/
+                "wrapper");
 
 
         WorldUtil.purgeTemporaryWorlds();

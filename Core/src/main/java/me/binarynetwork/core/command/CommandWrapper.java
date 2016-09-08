@@ -7,4 +7,6 @@ public interface CommandWrapper {
 
     CommandWrapper addCommand(Command command, String label, String... aliases);
 
+    CommandWrapper removeCommand(Command command);
+
 }

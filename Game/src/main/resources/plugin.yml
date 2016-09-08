@@ -4,3 +4,10 @@ description: This is the Game plugin for BinaryNetwork!
 author: BinaryBench
 main: me.binarynetwork.game.Main
 depend: [ProtocolLib]
+
+commands:
+  test:
+    description: This test test's your test-test!
+    aliases: [combust_me, combustMe]
+    usage: Test test test test test test test test.
+

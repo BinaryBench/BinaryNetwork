@@ -1,6 +1,5 @@
 package me.binarynetwork.core.command;
 
-import com.comphenix.net.sf.cglib.asm.Label;
 import com.comphenix.protocol.PacketType;
 import com.comphenix.protocol.ProtocolManager;
 import com.comphenix.protocol.events.ListenerPriority;
@@ -8,9 +7,6 @@ import com.comphenix.protocol.events.PacketAdapter;
 import com.comphenix.protocol.events.PacketContainer;
 import com.comphenix.protocol.events.PacketEvent;
 import me.binarynetwork.core.BinaryNetworkPlugin;
-import me.binarynetwork.core.common.utils.ListUtil;
-import org.apache.commons.lang.ArrayUtils;
-import org.apache.commons.lang.SystemUtils;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -93,13 +89,14 @@ public class CommandManager extends SimpleCommandWrapper implements Listener {
         String[] args = getArgs(message);
 
 
-
         if (hasPermission(commandSender, null, args))
         {
+            System.out.println("Has permission");
             boolean success = executeCommand(commandSender, null, args);
 
             if (success)
                 return;
+            System.out.println("Command failed");
 
             String usageMessage = getUsage(commandSender, null, args);
 
@@ -110,51 +107,19 @@ public class CommandManager extends SimpleCommandWrapper implements Listener {
             }
         }
 
-        commandSender.sendMessage("use /help to see commands!");
+        commandSender.sendMessage("Use /help to see commands!");
 
     }
 
-
-    public List<String> tabComplete(CommandSender commandSender, String label, String[] args)
+    @Override
+    public String modifyString(String string)
     {
-        List<String> returnList = new ArrayList<>();
-        if (args.length < 1)
-        {
-            returnList.addAll(getSubCommands().values().stream().filter(commands -> commands.size() >= 1).map(commands -> commands.get(0)).collect(Collectors.toList()));
-        }
-        else
-        {
-            CommandData commandData = getSupCommandData(commandSender, label, args);
-
-            if (commandData != null)
-                return commandData.tabComplete();
-
-            for (List<String> commands : getSubCommands().values())
-                for (String command : commands)
-                    if (command.toLowerCase().startsWith(args[0].toLowerCase()))
-                    {
-                        returnList.add(command);
-                        break;
-                    }
-        }
-
-        List<String> temp = new ArrayList<>();
-        for (String string : returnList)
-            temp.add("/" + string);
-        return temp;
+        return "/" + string;
     }
 
-
-    public String getUsage(CommandSender commandSender, String label, String[] args)
+    @Override
+    public String localGetUsage(CommandSender sender, String label, String[] args)
     {
-        CommandData commandData = getSupCommandData(commandSender, label, args);
-        if (commandData != null)
-        {
-            String returnString = commandData.getUsage();
-            System.out.print("return string: " + returnString);
-            return returnString == null ? null : "/" + commandData.getAliases().get(0) + " " + returnString;
-        }
-        System.out.println("commandData is null");
         return null;
     }
 
@@ -164,7 +129,7 @@ public class CommandManager extends SimpleCommandWrapper implements Listener {
         message = message.replaceAll("^\\s+", "");
 
         //Remove slash
-        message = message.substring(1, message.length());
+        //message = message.substring(1, message.length());
 
         //Remove double spaces
         message = message.replaceAll("( )+", " ");

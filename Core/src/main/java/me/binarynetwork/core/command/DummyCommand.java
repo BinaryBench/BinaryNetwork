@@ -43,10 +43,11 @@ public class DummyCommand implements Command {
     @Override
     public List<String> tabComplete(CommandSender commandSender, String label, String[] args)
     {
+        String arg = args[0];
         if (tabComplete == null || tabComplete.isEmpty())
             return null;
         if (args.length >= 1)
-            return ListUtil.startsWith(tabComplete, args[0], false);
+            return ListUtil.startsWith(tabComplete, arg, false);
         else
             return tabComplete;
     }

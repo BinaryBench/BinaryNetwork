@@ -12,6 +12,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
+import java.util.concurrent.ScheduledExecutorService;
+
 /**
  * Created by Bench on 8/31/2016.
  */
@@ -30,6 +32,11 @@ public class Main extends BinaryNetworkPlugin implements Listener {
         arena = new Arena(gameFactory);
         registerEvents(this);
         arena.enable();
+
+
+        //TestCommand testCommand = new TestCommand();
+        //getCommand("test").setExecutor(testCommand);
+        //getCommand("test").setTabCompleter(testCommand);
     }
 
     @Override

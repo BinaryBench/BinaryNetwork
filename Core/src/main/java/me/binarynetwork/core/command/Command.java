@@ -1,5 +1,6 @@
 package me.binarynetwork.core.command;
 
+import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -10,11 +11,11 @@ import java.util.List;
  */
 public interface Command {
 
-    boolean hasPermission(CommandSender commandSender, String label, String[] args);
+    boolean hasPermission(CommandSender commandSender, String[] args);
 
-    boolean executeCommand(CommandSender commandSender, String label, String[] args);
+    boolean executeCommand(CommandSender commandSender, String[] args);
 
-    List<String> tabComplete(CommandSender commandSender, String label, String[] args);
+    List<String> tabComplete(CommandSender commandSender, String[] args);
 
-    String getUsage(CommandSender commandSender, String label, String[] args);
+    String getUsage(CommandSender commandSender, String[] args);
 }

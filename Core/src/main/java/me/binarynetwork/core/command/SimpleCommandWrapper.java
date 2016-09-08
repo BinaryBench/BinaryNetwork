@@ -40,6 +40,7 @@ public class SimpleCommandWrapper implements CommandWrapper, Command {
     }
 
     // Tab Complete
+    @Override
     public List<String> tabComplete(CommandSender sender, String label, String[] args)
     {
         Pair<List<String>, CommandData> pair = subTabCompletePair(sender, label, args);
@@ -50,7 +51,7 @@ public class SimpleCommandWrapper implements CommandWrapper, Command {
             return localTabComplete(sender, label, args);
     }
 
-    public List<String> localTabComplete(CommandSender sender, String label, String[] args)
+    protected List<String> localTabComplete(CommandSender sender, String label, String[] args)
     {
         List<String> returnList = new ArrayList<>();
         for (List<String> commands : getPermittedCommands(sender, label, args).values())
@@ -69,7 +70,7 @@ public class SimpleCommandWrapper implements CommandWrapper, Command {
 
 
 
-    public List<String> subTabComplete(CommandSender sender, String label, String[] args)
+    protected List<String> subTabComplete(CommandSender sender, String label, String[] args)
     {
         Pair<List<String>, CommandData> pair = subTabCompletePair(sender, label, args);
         if (pair != null)
@@ -77,7 +78,7 @@ public class SimpleCommandWrapper implements CommandWrapper, Command {
         return null;
     }
 
-    public Pair<List<String>, CommandData> subTabCompletePair(CommandSender sender, String label, String[] args)
+    protected Pair<List<String>, CommandData> subTabCompletePair(CommandSender sender, String label, String[] args)
     {
         CommandData commandData = getSupCommandData(sender, label, args);
         if (commandData == null)
@@ -90,6 +91,7 @@ public class SimpleCommandWrapper implements CommandWrapper, Command {
 
 
     // Permissions
+    @Override
     public boolean hasPermission(CommandSender sender, String label, String[] args)
     {
         Boolean hasSubPermission = subHasPermission(sender, label, args);
@@ -99,12 +101,12 @@ public class SimpleCommandWrapper implements CommandWrapper, Command {
             return localHasPermission(sender, label, args);
     }
 
-    public boolean localHasPermission(CommandSender sender, String label, String[] args)
+    protected boolean localHasPermission(CommandSender sender, String label, String[] args)
     {
         return !getPermittedCommands(sender, label, args).isEmpty();
     }
 
-    public Boolean subHasPermission(CommandSender sender, String label, String[] args)
+    protected Boolean subHasPermission(CommandSender sender, String label, String[] args)
     {
         Pair<Boolean, CommandData> pair = subHasPermissionPair(sender, label, args);
         if (pair != null)
@@ -112,7 +114,7 @@ public class SimpleCommandWrapper implements CommandWrapper, Command {
         return null;
     }
 
-    public Pair<Boolean, CommandData> subHasPermissionPair(CommandSender sender, String label, String[] args)
+    protected Pair<Boolean, CommandData> subHasPermissionPair(CommandSender sender, String label, String[] args)
     {
         CommandData commandData = getSupCommandData(sender, label, args);
         if (commandData == null)
@@ -125,7 +127,7 @@ public class SimpleCommandWrapper implements CommandWrapper, Command {
     }
 
     // Execute Command
-
+    @Override
     public boolean executeCommand(CommandSender sender, String label, String[] args)
     {
         Boolean success = subExecuteCommand(sender, label, args);
@@ -135,12 +137,12 @@ public class SimpleCommandWrapper implements CommandWrapper, Command {
             return localExecuteCommand(sender, label, args);
     }
 
-    public boolean localExecuteCommand(CommandSender sender, String label, String[] args)
+    protected boolean localExecuteCommand(CommandSender sender, String label, String[] args)
     {
         return false;
     }
 
-    public Boolean subExecuteCommand(CommandSender sender, String label, String[] args)
+    protected Boolean subExecuteCommand(CommandSender sender, String label, String[] args)
     {
         Pair<Boolean, CommandData> pair = subExecuteCommandPair(sender, label, args);
         if (pair != null)
@@ -148,7 +150,7 @@ public class SimpleCommandWrapper implements CommandWrapper, Command {
         return null;
     }
 
-    public Pair<Boolean, CommandData> subExecuteCommandPair(CommandSender sender, String label, String[] args)
+    protected Pair<Boolean, CommandData> subExecuteCommandPair(CommandSender sender, String label, String[] args)
     {
         CommandData commandData = getSupCommandData(sender, label, args);
         if (commandData == null)
@@ -159,6 +161,7 @@ public class SimpleCommandWrapper implements CommandWrapper, Command {
 
 
     // Get Usage
+    @Override
     public String getUsage(CommandSender sender, String label, String[] args)
     {
         Pair<String, CommandData> pair = subGetUsagePair(sender, label, args);
@@ -172,7 +175,7 @@ public class SimpleCommandWrapper implements CommandWrapper, Command {
         return localGetUsage(sender, label, args);
     }
 
-    public String localGetUsage(CommandSender sender, String label, String[] args)
+    protected String localGetUsage(CommandSender sender, String label, String[] args)
     {
         Map<Command, List<String>> permitted = getPermittedCommands(sender, label, args);
         if (permitted.isEmpty())
@@ -192,7 +195,7 @@ public class SimpleCommandWrapper implements CommandWrapper, Command {
      * @return The sub commands result (which may be null) or null if no sub command was found.
      */
     @Deprecated
-    public String subGetUsage(CommandSender sender, String label, String[] args)
+    protected String subGetUsage(CommandSender sender, String label, String[] args)
     {
         Pair<String, CommandData> pair = subGetUsagePair(sender, label, args);
         if (pair != null)
@@ -200,7 +203,7 @@ public class SimpleCommandWrapper implements CommandWrapper, Command {
         return null;
     }
 
-    public Pair<String, CommandData> subGetUsagePair(CommandSender sender, String label, String[] args)
+    protected Pair<String, CommandData> subGetUsagePair(CommandSender sender, String label, String[] args)
     {
         CommandData commandData = getSupCommandData(sender, label, args);
         if (commandData == null)
@@ -232,7 +235,7 @@ public class SimpleCommandWrapper implements CommandWrapper, Command {
         return returnMap;
     }
 
-    public CommandData getSupCommandData(CommandSender sender, String label, String[] args)
+    protected CommandData getSupCommandData(CommandSender sender, String label, String[] args)
     {
         if (args.length >= 1)
         {

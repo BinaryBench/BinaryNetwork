@@ -11,6 +11,7 @@ import me.binarynetwork.core.component.ComponentWrapper;
 import me.binarynetwork.core.component.SimpleComponentWrapper;
 import me.binarynetwork.core.component.components.NoDamage;
 import me.binarynetwork.core.currency.CurrencyDataStorage;
+import me.binarynetwork.core.permissions.RankDataStorage;
 import me.binarynetwork.core.permissions.RankPermissionManager;
 import org.apache.commons.lang.ArrayUtils;
 import org.bukkit.Bukkit;
@@ -70,7 +71,8 @@ public abstract class BinaryNetworkPlugin extends JavaPlugin {
 
         //DataStorage
         accountManager = new AccountManager(scheduler);
-        currencyDataStorage = new CurrencyDataStorage(scheduler, 0.1, accountManager);
+        currencyDataStorage = new CurrencyDataStorage(scheduler, accountManager);
+        new RankDataStorage(getScheduler(), getAccountManager());
 
         //Command
         commandManager = new CommandManager(protocolManager);

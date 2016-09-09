@@ -23,7 +23,7 @@ public abstract class PlayerDataStorage<V> extends KeyValueDataStorage<Account, 
 
     private AccountManager accountManager;
 
-    public PlayerDataStorage(DataSource dataSource, ScheduledExecutorService scheduler, double offset, AccountManager accountManager, boolean loadOnJoin)
+    public PlayerDataStorage(DataSource dataSource, ScheduledExecutorService scheduler, AccountManager accountManager, boolean loadOnJoin)
     {
         super(dataSource, scheduler);
         this.accountManager = accountManager;

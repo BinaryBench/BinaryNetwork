@@ -32,9 +32,9 @@ public class CurrencyDataStorage extends PlayerDataStorage<Map<Integer, Integer>
 
     public static String INSERT_INTO_ON_DUPLICATE_KEY = "INSERT INTO currency (accountId, currencyId, currencyAmount) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE currencyAmount=VALUES(currencyAmount);";
 
-    public CurrencyDataStorage(ScheduledExecutorService scheduler, double offset, AccountManager accountManager)
+    public CurrencyDataStorage(ScheduledExecutorService scheduler, AccountManager accountManager)
     {
-        super(DataSourceManager.PLAYER_DATA, scheduler, offset, accountManager, true);
+        super(DataSourceManager.PLAYER_DATA, scheduler, accountManager, true);
     }
 
     @Override

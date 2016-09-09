@@ -96,6 +96,7 @@ public class AccountManager extends KeyValueDataStorage<UUID, Account> implement
 
     public void onLogin(UUID playersUUID)
     {
+
         Scheduler.runAsync(() -> get(playersUUID, account ->
                 Scheduler.runAsync(() ->
                 {

@@ -20,14 +20,14 @@ import java.util.function.Consumer;
  */
 public class RankDataStorage  extends PlayerDataStorage<Rank> {
 
-    public RankDataStorage(DataSource dataSource, ScheduledExecutorService scheduler, double offset, AccountManager accountManager, boolean loadOnJoin)
+    public RankDataStorage(ScheduledExecutorService scheduler, AccountManager accountManager)
     {
-        super(dataSource, scheduler, offset, accountManager, loadOnJoin);
+        super(DataSourceManager.PLAYER_DATA, scheduler, accountManager, true);
     }
 
     public static final String CREATE_RANKS_TABLE =
             "CREATE TABLE IF NOT EXISTS ranks (" +
-                "id INT unsigned NOT NULL AUTO_INCREMENT," +
+                "id TINYINT unsigned NOT NULL AUTO_INCREMENT," +
                 "rankName varchar(10) NOT NULL," +
                     "PRIMARY KEY (id)," +
                     "UNIQUE (rankName)," +
@@ -42,8 +42,8 @@ public class RankDataStorage  extends PlayerDataStorage<Rank> {
                 "rankId TINYINT unsigned NOT NULL," +
                 "rankTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n" +
                     "PRIMARY KEY (accountId)," +
-                    "FOREIGN KEY (rankId) REFERENCES player_data.ranks(id) ON DELETE CASCADE ON UPDATE CASCADE," +
-                    "FOREIGN KEY (accountId) REFERENCES player_data.player_account(id) ON DELETE CASCADE ON UPDATE CASCADE" +
+                    "FOREIGN KEY (rankId) REFERENCES ranks(id) ON DELETE CASCADE ON UPDATE CASCADE," +
+                    "FOREIGN KEY (accountId) REFERENCES player_account(id) ON DELETE CASCADE ON UPDATE CASCADE" +
             ") ENGINE=InnoDB;";
 
     public static final String INSERT_INTO_PLAYER_RANK_ON_DUPLICATE_KEY = "INSERT IGNORE INTO player_rank (accountId, rankId) SELECT ?, id FROM ranks WHERE (rankName=UPPER(?)) ON DUPLICATE KEY UPDATE rankId=VALUES(rankId);";
@@ -69,18 +69,24 @@ public class RankDataStorage  extends PlayerDataStorage<Rank> {
     @Override
     public Rank loadData(ResultSet resultSet) throws SQLException
     {
+        Rank returnRank = null;
         if (resultSet.next())
         {
             String id = resultSet.getString("rankName");
             for (Rank rank : Rank.values())
             {
-                if (rank.getId().equalsIgnoreCase("rankName"))
+                if (rank.getId().equalsIgnoreCase(id))
                 {
-                    return rank;
+                    returnRank = rank;
+                    break;
+                    // /return rank;
                 }
             }
         }
-        return null;
+
+        System.err.println("Rank: " + returnRank);
+
+        return returnRank;
     }
 
     @Override
@@ -118,7 +124,7 @@ public class RankDataStorage  extends PlayerDataStorage<Rank> {
     }
 
     @Override
-    public void initialize(Connection connection)
+    public void initialize(Connection connection) throws SQLException
     {
         try (PreparedStatement createRanksTable = connection.prepareStatement(CREATE_RANKS_TABLE);
              PreparedStatement createPlayerRanksTable = connection.prepareStatement(CREATE_PLAYER_RANKS_TABLE);
@@ -135,11 +141,7 @@ public class RankDataStorage  extends PlayerDataStorage<Rank> {
                 populateRanksTable.addBatch();
             }
 
-            populateRanksTable.execute();
-        }
-        catch (SQLException e)
-        {
-            e.printStackTrace();
+            populateRanksTable.executeBatch();
         }
     }
 

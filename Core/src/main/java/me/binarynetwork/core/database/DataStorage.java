@@ -23,6 +23,8 @@ public class DataStorage {
     private DataSource dataSource;
     private ScheduledExecutorService scheduler;
 
+    private volatile boolean running;
+
     private ScheduledFuture<?> futureTask;
 
     private long period;
@@ -52,7 +54,14 @@ public class DataStorage {
     {
         if (isRunning())
             return false;
-        futureTask = scheduler.scheduleAtFixedRate(() -> executeCalls(failedCalls.keySet()), period, period, timeUnit);
+        futureTask = scheduler.scheduleAtFixedRate(() -> {
+            if (!running)
+            {
+                running = true;
+                executeCalls(failedCalls.keySet());
+                running = false;
+            }
+        }, period, period, timeUnit);
         return true;
     }
 

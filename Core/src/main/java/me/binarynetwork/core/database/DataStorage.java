@@ -139,7 +139,10 @@ public class DataStorage {
                 attempts = attempts+1;
 
             if (attempts >= maxAttempts && maxAttempts >= 0)
+            {
+                call.onFail();
                 failedCalls.remove(call);
+            }
             else
                 failedCalls.put(call, attempts);
         }

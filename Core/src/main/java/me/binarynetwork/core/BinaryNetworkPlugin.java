@@ -21,6 +21,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerCommandPreprocessEvent;
+import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.Arrays;
@@ -30,7 +31,7 @@ import java.util.concurrent.ScheduledExecutorService;
 /**
  * Created by Bench on 8/31/2016.
  */
-public abstract class BinaryNetworkPlugin extends JavaPlugin {
+public abstract class BinaryNetworkPlugin extends JavaPlugin implements Listener{
 
     private static BinaryNetworkPlugin plugin;
     public static BinaryNetworkPlugin getPlugin()
@@ -80,9 +81,19 @@ public abstract class BinaryNetworkPlugin extends JavaPlugin {
 
         new RankPermissionManager(componentWrapper);
 
+        registerEvents(this);
+
         WorldUtil.purgeTemporaryWorlds();
         componentWrapper.enable();
         enable();
+    }
+
+    @EventHandler
+    public void onLoginEvent(PlayerLoginEvent event)
+    {
+        currencyDataStorage.get(event.getPlayer(), integerIntegerMap -> {
+            System.out.println("currency is " + integerIntegerMap);
+        });
     }
 
     @Override

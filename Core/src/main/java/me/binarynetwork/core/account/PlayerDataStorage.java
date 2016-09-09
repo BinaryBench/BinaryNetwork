@@ -9,7 +9,8 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.HashSet;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
@@ -30,11 +31,11 @@ public abstract class PlayerDataStorage<V> extends KeyValueDataStorage<Account, 
         getAccountManager().addPlayerStorage(this, loadOnJoin);
     }
 
-
     public void get(Player player, Consumer<V> callback)
     {
-        getAccountManager().get(player.getUniqueId(), account ->
-                get(account, callback));
+        getAccountManager().get(player.getUniqueId(), account -> {
+            get(account, callback);
+        });
     }
 
     @Override
@@ -98,7 +99,7 @@ public abstract class PlayerDataStorage<V> extends KeyValueDataStorage<Account, 
         {
             throw new IllegalStateException("There is already a waiting list!");
         }
-        waitingList.put(account, new HashSet<>());
+        waitingList.put(account, new LinkedHashSet<>());
         return true;
     }
 

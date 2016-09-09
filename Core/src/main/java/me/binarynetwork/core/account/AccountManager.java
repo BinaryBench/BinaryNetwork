@@ -96,59 +96,62 @@ public class AccountManager extends KeyValueDataStorage<UUID, Account> implement
 
     public void onLogin(UUID playersUUID)
     {
+        get(playersUUID, account -> {
 
-        Scheduler.runAsync(() -> get(playersUUID, account ->
-                Scheduler.runAsync(() ->
+            StringBuilder sb = new StringBuilder();
+
+            List<AccountListener> returnList = new ArrayList<>();
+
+            for (Map.Entry<AccountListener, Boolean> entry: listeners.entrySet())
+            {
+                if (entry.getValue())
                 {
-                    StringBuilder sb = new StringBuilder();
+                    sb.append(entry.getKey().getQuery(account));
+                    returnList.add(entry.getKey());
+                    //System.err.println("Added " + entry.getKey().getClass().getSimpleName() + " at position " + (returnList.size() - 1));
+                }
+            }
 
-                    List<AccountListener> returnList = new ArrayList<>();
+            if (sb.length() == 0)
+                return;
 
-                    for (Map.Entry<AccountListener, Boolean> entry: listeners.entrySet())
-                    {
-                        if (entry.getValue())
-                        {
-                            sb.append(entry.getKey().getQuery(account));
-                            returnList.add(entry.getKey());
-                            System.err.println("Added " + entry.getKey().getClass().getSimpleName() + " at position " + (returnList.size() - 1));
-                        }
-                    }
+            execute(connection ->
+            {
+                try (Statement statement = connection.createStatement())
+                {
+                    boolean hasMoreResultSets = statement.execute(sb.toString());
 
-                    if (sb.length() == 0)
-                        return;
-                    try (Connection connection = getDataSource().getConnection(); Statement statement = connection.createStatement())
-                    {
-                        boolean hasMoreResultSets = statement.execute(sb.toString());
+                    int counter = 0;
+                    while ( hasMoreResultSets || statement.getUpdateCount() != -1 ) {
+                        if ( hasMoreResultSets ) {
+                            ResultSet rs = statement.getResultSet();
 
-                        int counter = 0;
-                        while ( hasMoreResultSets || statement.getUpdateCount() != -1 ) {
-                            if ( hasMoreResultSets ) {
-                                ResultSet rs = statement.getResultSet();
+                            // handle your rs here
+                            //System.err.println("Returning to " + returnList.get(counter).getClass().getSimpleName() + " ResultSet at position " + (counter));
+                            returnList.get(counter++).handleResultSet(account, connection, rs);
 
-                                // handle your rs here
-                                System.err.println("Returning to " + returnList.get(counter).getClass().getSimpleName() + " ResultSet at position " + (counter));
-                                returnList.get(counter++).handleResultSet(account, connection, rs);
+                        } // if has rs
+                        else { // if ddl/dml/...
+                            counter++;
+                            int queryResult = statement.getUpdateCount();
+                            if ( queryResult == -1 ) { // no more queries processed
+                                break;
+                            } // no more queries processed
+                            // handle success, failure, generated keys, etc here
+                        } // if ddl/dml/...
 
-                            } // if has rs
-                            else { // if ddl/dml/...
-                                counter++;
-                                int queryResult = statement.getUpdateCount();
-                                if ( queryResult == -1 ) { // no more queries processed
-                                    break;
-                                } // no more queries processed
-                                // handle success, failure, generated keys, etc here
-                            } // if ddl/dml/...
+                        // check to continue in the loop
+                        hasMoreResultSets = statement.getMoreResults();
+                    } // while results
+                }
+                catch (SQLException e)
+                {
+                    e.printStackTrace();
+                }
 
-                            // check to continue in the loop
-                            hasMoreResultSets = statement.getMoreResults();
-                        } // while results
-                    }
-                    catch (SQLException e)
-                    {
-                        e.printStackTrace();
-                    }
+            });
 
-                })));
+        });
     }
 
 
@@ -178,7 +181,6 @@ public class AccountManager extends KeyValueDataStorage<UUID, Account> implement
             insertStatement.setString(1, key.toString());
             insertStatement.executeUpdate();
         }
-
         return loadValue(connection, key);
     }
 

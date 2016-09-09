@@ -8,10 +8,7 @@ import me.binarynetwork.core.common.utils.RandomUtil;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -27,7 +24,7 @@ public abstract class KeyValueDataStorage<K, V> extends DataStorage {
     private ConcurrentHashMap<K, V> cache;
     private Cache<K, V> tempCache;
 
-    protected ConcurrentHashMap<K, Set<Consumer<V>>> waitingList;
+    protected ConcurrentHashMap<K, LinkedHashSet<Consumer<V>>> waitingList;
 
     public KeyValueDataStorage(DataSource dataSource, ScheduledExecutorService scheduler)
     {
@@ -85,14 +82,13 @@ public abstract class KeyValueDataStorage<K, V> extends DataStorage {
             return;
         }
 
-
         if (waitingList.containsKey(key))
         {
             waitingList.get(key).add(callback);
             return;
         }
 
-        waitingList.put(key, new HashSet<>());
+        waitingList.put(key, new LinkedHashSet<>());
         waitingList.get(key).add(callback);
 
         execute(connection -> {
@@ -149,7 +145,6 @@ public abstract class KeyValueDataStorage<K, V> extends DataStorage {
     protected abstract V getNew(K key);
 
     public abstract void saveData(Connection connection, Map<K, V> key, Consumer<Integer> successes);
-
 
     public boolean removeFromCache(K key)
     {

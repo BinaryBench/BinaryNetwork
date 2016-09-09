@@ -120,7 +120,14 @@ public class CommandManager extends SimpleCommandWrapper implements Listener {
     @Override
     public String localGetUsage(CommandSender sender, String[] args)
     {
-        return null;
+        Map<Command, List<String>> permitted = getPermittedCommands(sender, args);
+        if (permitted.isEmpty())
+            return null;
+
+        StringJoiner sj = new StringJoiner("\n", "", "");
+        for (Map.Entry<Command, List<String>> commands : permitted.entrySet())
+            sj.add(commands.getValue().get(0) + " " + commands.getKey().getUsage(sender, args));
+        return sj.toString();
     }
 
     private String[] getArgs(String message)

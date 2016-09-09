@@ -7,6 +7,7 @@ import me.binarynetwork.core.command.CommandManager;
 import me.binarynetwork.core.common.utils.WorldUtil;
 import me.binarynetwork.core.component.SimpleComponentWrapper;
 import me.binarynetwork.core.currency.CurrencyDataStorage;
+import me.binarynetwork.core.currency.CurrencyManager;
 import me.binarynetwork.core.permissions.RankDataStorage;
 import me.binarynetwork.core.permissions.RankPermissionManager;
 import org.bukkit.Bukkit;
@@ -43,7 +44,7 @@ public abstract class BinaryNetworkPlugin extends JavaPlugin implements Listener
     private ProtocolManager protocolManager;
     private ScheduledExecutorService scheduler;
     private AccountManager accountManager;
-    private CurrencyDataStorage currencyDataStorage;
+    private CurrencyManager currencyManager;
     private CommandManager commandManager;
 
     @Override
@@ -55,7 +56,10 @@ public abstract class BinaryNetworkPlugin extends JavaPlugin implements Listener
         scheduler = Executors.newScheduledThreadPool(10);
 
         //Protocol
-        this.protocolManager = ProtocolLibrary.getProtocolManager();
+        protocolManager = ProtocolLibrary.getProtocolManager();
+
+        //Command
+        commandManager = new CommandManager(protocolManager);
 
         //ComponentWrapper
         this.componentWrapper = new SimpleComponentWrapper();
@@ -63,11 +67,11 @@ public abstract class BinaryNetworkPlugin extends JavaPlugin implements Listener
 
         //DataStorage
         accountManager = new AccountManager(scheduler);
-        currencyDataStorage = new CurrencyDataStorage(scheduler, accountManager);
+        currencyManager = new CurrencyManager(scheduler, accountManager, commandManager);
+
         new RankDataStorage(getScheduler(), getAccountManager());
 
-        //Command
-        commandManager = new CommandManager(protocolManager);
+
 
 
         new RankPermissionManager(componentWrapper);
@@ -77,14 +81,6 @@ public abstract class BinaryNetworkPlugin extends JavaPlugin implements Listener
         WorldUtil.purgeTemporaryWorlds();
         componentWrapper.enable();
         enable();
-    }
-
-    @EventHandler
-    public void onLoginEvent(PlayerLoginEvent event)
-    {
-        currencyDataStorage.get(event.getPlayer(), integerIntegerMap -> {
-            System.out.println("currency is " + integerIntegerMap);
-        });
     }
 
     @Override

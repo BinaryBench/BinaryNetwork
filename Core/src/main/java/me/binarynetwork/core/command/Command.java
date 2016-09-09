@@ -11,11 +11,11 @@ import java.util.List;
  */
 public interface Command {
 
-    boolean hasPermission(CommandSender commandSender, String[] args);
+    boolean hasPermission(CommandSender sender, String[] args);
 
-    boolean executeCommand(CommandSender commandSender, String[] args);
+    boolean executeCommand(CommandSender sender, String[] args);
 
-    List<String> tabComplete(CommandSender commandSender, String[] args);
+    List<String> tabComplete(CommandSender sender, String[] args);
 
-    String getUsage(CommandSender commandSender, String[] args);
+    String getUsage(CommandSender sender, String[] args);
 }

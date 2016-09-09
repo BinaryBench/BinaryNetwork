@@ -1,6 +1,8 @@
 package me.binarynetwork.core.common.utils;
 
 
+import com.comphenix.protocol.PacketType;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 
@@ -10,6 +12,16 @@ import org.bukkit.potion.PotionEffect;
 public class PlayerUtil {
 
     private PlayerUtil() {}
+
+    public static void message(CommandSender player, String message)
+    {
+        player.sendMessage(message);
+    }
+
+    public static String getName(Player player)
+    {
+        return player.getName();
+    }
 
     /**
      *

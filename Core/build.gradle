@@ -7,7 +7,7 @@ dependencies {
 
     // https://mvnrepository.com/artifact/com.google.guava/guava
     includeInJar group: 'com.google.guava', name: 'guava', version: '19.0'
-
+    includeInJar group: 'org.atteo', name: 'evo-inflector', version: '1.2'
 
     configurations.compile.extendsFrom(configurations.includeInJar)
 }

@@ -1,6 +1,7 @@
 package me.binarynetwork.core.command;
 
 import com.comphenix.protocol.PacketType;
+import me.binarynetwork.core.common.utils.CommandUtil;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -12,12 +13,11 @@ import java.util.List;
 public interface PlayerCommand extends Command {
 
     @Override
-    default boolean executeCommand(CommandSender commandSender, String[] args)
+    default boolean executeCommand(CommandSender sender, String[] args)
     {
-        if (commandSender instanceof Player)
-            return executeCommand((Player) commandSender, args);
-        commandSender.sendMessage("You must be a player in order to use this command!");
-        return false;
+        if (CommandUtil.mustBePlayer(sender))
+            return true;
+        return executeCommand((Player) sender, args);
     }
 
     boolean executeCommand(Player player, String[] args);

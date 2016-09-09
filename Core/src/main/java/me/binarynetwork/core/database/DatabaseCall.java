@@ -14,6 +14,4 @@ import java.sql.Statement;
 @FunctionalInterface
 public interface DatabaseCall {
     void execute(Connection connection) throws SQLException;
-
-    default void onFail(){}
 }

@@ -3,6 +3,7 @@ package me.binarynetwork.core.database;
 import me.binarynetwork.core.common.scheduler.Scheduler;
 import org.bukkit.Bukkit;
 
+import javax.annotation.Nullable;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -17,7 +18,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class DataStorage {
 
-    private Map<DatabaseCall, Integer> failedCalls = new ConcurrentHashMap<>();
+    private Map<DatabaseCallData, Integer> failedCalls = new ConcurrentHashMap<>();
 
     private final int maxAttempts;
     private DataSource dataSource;
@@ -81,17 +82,24 @@ public class DataStorage {
 
     public void execute(DatabaseCall call)
     {
-        if (Bukkit.isPrimaryThread())
-            Scheduler.runAsync(() -> executeCall(call));
-        else
-            executeCall(call);
+        execute(call, null);
     }
 
-    public void executeCalls(Iterable<DatabaseCall> calls)
+    public void execute(DatabaseCall call, @Nullable Runnable onFail)
+    {
+        DatabaseCallData callData = new DatabaseCallData(call, onFail);
+
+        if (Bukkit.isPrimaryThread())
+            Scheduler.runAsync(() -> executeCall(callData));
+        else
+            executeCall(callData);
+    }
+
+    public void executeCalls(Iterable<DatabaseCallData> calls)
     {
         try (Connection connection = dataSource.getConnection())
         {
-            for (DatabaseCall call : calls)
+            for (DatabaseCallData call : calls)
             {
                 executeCall(call, connection);
             }
@@ -105,7 +113,7 @@ public class DataStorage {
         }
     }
 
-    private void executeCall(DatabaseCall call)
+    private void executeCall(DatabaseCallData call)
     {
         try (Connection connection = dataSource.getConnection())
         {
@@ -120,7 +128,7 @@ public class DataStorage {
         }
     }
 
-    private void executeCall(DatabaseCall call, Connection connection)
+    private void executeCall(DatabaseCallData call, Connection connection)
     {
         try {
             call.execute(connection);

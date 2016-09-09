@@ -1,192 +1,148 @@
 package me.binarynetwork.core.database;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import me.binarynetwork.core.BinaryNetworkPlugin;
 import me.binarynetwork.core.common.scheduler.Scheduler;
-import me.binarynetwork.core.common.utils.RandomUtil;
+import org.bukkit.Bukkit;
 
-import javax.persistence.Table;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
 
 /**
- * Created by Bench on 9/4/2016.
+ * Created by Bench on 9/8/2016.
  */
-public abstract class DataStorage<K, V> {
+public class DataStorage {
 
-    public static long UPDATE_TIME = 60 * 3;
+    private Map<DatabaseCall, Integer> failedCalls = new ConcurrentHashMap<>();
 
-    private ConcurrentHashMap<K, V> cache;
-    private Cache<K, V> tempCache;
-
-    protected ConcurrentHashMap<K, Set<Consumer<V>>> waitingList;
-
+    private final int maxAttempts;
     private DataSource dataSource;
+    private ScheduledExecutorService scheduler;
 
-    private DataStorage(DataSource dataSource)
+    private ScheduledFuture<?> futureTask;
+
+    private long period;
+    private TimeUnit timeUnit;
+
+    public DataStorage(DataSource dataSource, ScheduledExecutorService scheduler)
     {
-        this(dataSource, null, 0);
+        this(dataSource, scheduler, 5);
     }
 
-    private DataStorage(DataSource dataSource, ScheduledExecutorService scheduler)
+    public DataStorage(DataSource dataSource, ScheduledExecutorService scheduler, int maxAttempts)
     {
-        this(dataSource, scheduler, RandomUtil.getRandom().nextDouble());
+        this(dataSource, scheduler, maxAttempts, 10, TimeUnit.SECONDS);
     }
 
-    public DataStorage(DataSource dataSource, ScheduledExecutorService scheduler, double offset)
+    public DataStorage(DataSource dataSource, ScheduledExecutorService scheduler, int maxAttempts, long period, TimeUnit timeUnit)
     {
+        this.maxAttempts = maxAttempts == 0 ? 1 : maxAttempts;
         this.dataSource = dataSource;
-        this.cache = new ConcurrentHashMap<K, V>();
-        this.waitingList = new ConcurrentHashMap<K, Set<Consumer<V>>>();
-        this.tempCache = CacheBuilder.newBuilder()
-                .expireAfterWrite(5, TimeUnit.MINUTES)
-                .build();
-
-        if (scheduler != null)
-            scheduler.scheduleWithFixedDelay(this::saveData, (long) ((UPDATE_TIME*offset) % UPDATE_TIME), UPDATE_TIME, TimeUnit.SECONDS);
-    }
-
-    public V getIfExists(K key)
-    {
-        return cache.get(key);
-    }
-
-    public void getIfExists(K key, Consumer<V> callback)
-    {
-        callback.accept(getIfExists(key));
-    }
-
-    public void get(K key, Consumer<V> callback)
-    {
-        if (cache.containsKey(key)){
-            callback.accept(cache.get(key));
-            return;
-        }
-
-        V v;
-        if ((v = tempCache.getIfPresent(key)) != null)
-        {
-            callback.accept(v);
-            return;
-        }
-
-
-        if (waitingList.containsKey(key))
-        {
-            waitingList.get(key).add(callback);
-            return;
-        }
-
-        waitingList.put(key, new HashSet<>());
-        waitingList.get(key).add(callback);
-
-        Scheduler.runAsync(() -> {
-
-            V value = null;
-
-            try (Connection connection = getDataSource().getConnection())
-            {
-
-                value = loadValue(connection, key);
-
-                // if loadValue returned null then sate value to new
-                if (value == null)
-                    value = getNew(connection, key);
-
-                addToCache(key, value);
-            }
-            catch (SQLException e)
-            {
-                // If a SQL error occurred return a new key and add to temp cache
-                value = getNew(key);
-                addToTempCache(key, value);
-                e.printStackTrace();
-            }
-
-            final V returnValue = value;
-
-            Scheduler.runSync(() -> {
-                waitingList.get(key).forEach(vConsumer -> vConsumer.accept(returnValue));
-                waitingList.remove(key);
-            });
-        });
+        this.scheduler = scheduler;
+        this.period = period;
+        this.timeUnit = timeUnit;
 
     }
 
-    public void addToCache(K key, V value)
+    public boolean start()
     {
-        cache.put(key, value);
-        tempCache.invalidate(key);
-    }
-
-    public void addToTempCache(K key, V value)
-    {
-        tempCache.put(key, value);
-    }
-
-
-    //public abstract String getQuery(K key);
-    //public abstract V loadData(ResultSet resultSet) throws SQLException;
-
-    protected abstract V loadValue(Connection connection, K key) throws SQLException;
-
-    protected V getNew(Connection connection, K key) throws SQLException
-    {
-        return getNew(key);
-    }
-
-    protected abstract V getNew(K key);
-
-    public abstract void saveData(Map<K, V> key, Consumer<Integer> successes);
-
-
-    public boolean removeFromCache(K key)
-    {
-        if (!cache.containsKey(key))
+        if (isRunning())
             return false;
-        cache.remove(key);
+        futureTask = scheduler.scheduleAtFixedRate(() -> executeCalls(failedCalls.keySet()), period, period, timeUnit);
         return true;
     }
 
-    public boolean save(K key, Consumer<Boolean> success)
+    public boolean isRunning()
     {
-        if (!cache.containsKey(key))
+        return futureTask != null && !futureTask.isCancelled();
+    }
+
+    public boolean stop()
+    {
+        if (!isRunning())
             return false;
-        saveData(Collections.singletonMap(key, cache.get(key)), integer -> {
-            success.accept(integer < 1);
-        });
+        futureTask.cancel(true);
+        futureTask = null;
         return true;
     }
 
-    public boolean save(K key)
+    public void execute(DatabaseCall call)
     {
-        return save(key, aBoolean -> {
-            if (aBoolean)
-                throw new RuntimeException("Failed to save key: " + key);
-        });
+        if (Bukkit.isPrimaryThread())
+            Scheduler.runAsync(() -> executeCall(call));
+        else
+            executeCall(call);
     }
 
-    public void saveData()
+    public void executeCalls(Iterable<DatabaseCall> calls)
     {
-        saveData(integer -> {
-            if (integer < cache.size())
-                throw new RuntimeException("Failed to save cache, cache size="+cache.size() + " saved=" + integer);
-        });
+        try (Connection connection = dataSource.getConnection())
+        {
+            for (DatabaseCall call : calls)
+            {
+                executeCall(call, connection);
+            }
+        }
+        catch (SQLException e)
+        {
+            //TODO Log connection fails
+            e.printStackTrace();
+            calls.forEach(call -> failedCalls.put(call, 0));
+            updateScheduler();
+        }
     }
 
-    public void saveData(Consumer<Integer> successes)
+    private void executeCall(DatabaseCall call)
     {
-        saveData(cache, successes);
+        try (Connection connection = dataSource.getConnection())
+        {
+            executeCall(call, connection);
+        }
+        catch (SQLException e)
+        {
+            //TODO Log connection failures
+            e.printStackTrace();
+            failedCalls.put(call, 0);
+            updateScheduler();
+        }
+    }
+
+    private void executeCall(DatabaseCall call, Connection connection)
+    {
+        try {
+            call.execute(connection);
+            failedCalls.remove(call);
+        }
+        catch (SQLException e)
+        {
+            //TODO Log fails
+            e.printStackTrace();
+
+            Integer attempts = failedCalls.get(call);
+
+            if (attempts == null)
+                attempts = 1;
+            else
+                attempts = attempts+1;
+
+            if (attempts >= maxAttempts && maxAttempts >= 0)
+                failedCalls.remove(call);
+            else
+                failedCalls.put(call, attempts);
+        }
+        updateScheduler();
+    }
+
+    private void updateScheduler()
+    {
+        if (failedCalls.isEmpty())
+            stop();
+        else
+            start();
     }
 
     public DataSource getDataSource()
@@ -194,5 +150,8 @@ public abstract class DataStorage<K, V> {
         return dataSource;
     }
 
-
+    public ScheduledExecutorService getScheduler()
+    {
+        return scheduler;
+    }
 }

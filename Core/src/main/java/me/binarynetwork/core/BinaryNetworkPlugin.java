@@ -7,9 +7,11 @@ import me.binarynetwork.core.command.CommandManager;
 import me.binarynetwork.core.command.DummyCommand;
 import me.binarynetwork.core.command.SimpleCommandWrapper;
 import me.binarynetwork.core.common.utils.WorldUtil;
+import me.binarynetwork.core.component.ComponentWrapper;
 import me.binarynetwork.core.component.SimpleComponentWrapper;
 import me.binarynetwork.core.component.components.NoDamage;
 import me.binarynetwork.core.currency.CurrencyDataStorage;
+import me.binarynetwork.core.permissions.RankPermissionManager;
 import org.apache.commons.lang.ArrayUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -56,63 +58,36 @@ public abstract class BinaryNetworkPlugin extends JavaPlugin {
     {
         plugin = this;
         getDataFolder().mkdirs();
+        //Scheduler
         scheduler = Executors.newScheduledThreadPool(10);
 
+        //Protocol
         this.protocolManager = ProtocolLibrary.getProtocolManager();
 
+        //ComponentWrapper
+        this.componentWrapper = new SimpleComponentWrapper();
+
+
+        //DataStorage
         accountManager = new AccountManager(scheduler);
         currencyDataStorage = new CurrencyDataStorage(scheduler, 0.1, accountManager);
 
+        //Command
         commandManager = new CommandManager(protocolManager);
 
-        commandManager.addCommand(new DummyCommand(), "dummy")
-                .addCommand(new SimpleCommandWrapper()
-                        .addCommand(new DummyCommand(false, true), "youCantSeeThis")
-                        .addCommand(new DummyCommand(), "youCanSeeThis")
-                        .addCommand(new DummyCommand(true, false, "This is usage text!", Arrays.asList("This", "is", "usage", "text")), "special"),
 
-                "wrapper");
-
+        new RankPermissionManager(componentWrapper);
 
         WorldUtil.purgeTemporaryWorlds();
-
-        SimpleComponentWrapper simpleComponentWrapper = new SimpleComponentWrapper();
-        simpleComponentWrapper.addComponent(new NoDamage(null));
-
+        componentWrapper.enable();
         enable();
-    }
-
-    @EventHandler
-    public void command(PlayerCommandPreprocessEvent event)
-    {
-
-        String[] deferral = event.getMessage().replace("  ", " ").split(" ");
-        String[] args = (String[]) ArrayUtils.subarray(deferral, 1, deferral.length);
-        if (event.getMessage().startsWith("/coin"))
-        {
-
-            currencyDataStorage.get(event.getPlayer(), integerIntegerMap -> {
-                integerIntegerMap.put(Integer.valueOf(args[0]), Integer.valueOf(args[1]));
-            });
-            event.setCancelled(true);
-        }
-        else if (event.getMessage().startsWith("/cache"))
-        {
-            event.getPlayer().sendMessage("" + (getAccountManager().getIfExists(event.getPlayer().getUniqueId()) != null));
-            event.setCancelled(true);
-        }
-    }
-
-    @Override
-    public boolean onCommand(CommandSender sender, Command command, String label, String[] args)
-    {
-        return super.onCommand(sender, command, label, args);
     }
 
     @Override
     public final void onDisable()
     {
         disable();
+        componentWrapper.disable();
         WorldUtil.purgeTemporaryWorlds();
     }
 
@@ -142,5 +117,15 @@ public abstract class BinaryNetworkPlugin extends JavaPlugin {
     public CommandManager getCommandManager()
     {
         return commandManager;
+    }
+
+    public SimpleComponentWrapper getComponentWrapper()
+    {
+        return componentWrapper;
+    }
+
+    public ProtocolManager getProtocolManager()
+    {
+        return protocolManager;
     }
 }

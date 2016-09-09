@@ -1,7 +1,7 @@
 package me.binarynetwork.core.account;
 
 import me.binarynetwork.core.common.scheduler.Scheduler;
-import me.binarynetwork.core.database.DataStorage;
+import me.binarynetwork.core.database.KeyValueDataStorage;
 import org.bukkit.entity.Player;
 
 import javax.sql.DataSource;
@@ -11,18 +11,21 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashSet;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 /**
  * Created by Bench on 9/4/2016.
  */
-public abstract class PlayerDataStorage<V> extends DataStorage<Account, V> {
+public abstract class PlayerDataStorage<V> extends KeyValueDataStorage<Account, V> implements AccountListener {
+
+    public static final int RETRY_TIMES = 10;
 
     private AccountManager accountManager;
 
     public PlayerDataStorage(DataSource dataSource, ScheduledExecutorService scheduler, double offset, AccountManager accountManager, boolean loadOnJoin)
     {
-        super(dataSource, scheduler, offset);
+        super(dataSource, scheduler);
         this.accountManager = accountManager;
         getAccountManager().addPlayerStorage(this, loadOnJoin);
     }
@@ -34,8 +37,46 @@ public abstract class PlayerDataStorage<V> extends DataStorage<Account, V> {
                 get(account, callback));
     }
 
+    @Override
+    public final String getQuery(Account account)
+    {
+        enableWaitingList(account);
+        return getAccountQuery(account);
+    }
 
-    public abstract String getQuery(Account account);
+    @Override
+    public void handleResultSet(Account account, Connection connection, ResultSet resultSet)
+    {
+        loadAndAddToCache(account, resultSet, connection);
+    }
+
+    @Override
+    public void accountRemoved(Account account)
+    {
+        if (account == null)
+            return;
+
+        save(account, new Consumer<Boolean>() {
+            private int counter = 0;
+
+            @Override
+            public void accept(Boolean aBoolean)
+            {
+                if (aBoolean)
+                    //FIXME maybe do a better way to make sure this doesn't happen.
+                    if (getAccountManager().getIfExists(account.getUUID()) == null)
+                        removeFromCache(account);
+                    else
+                    if (counter++ < RETRY_TIMES)
+                    {
+                        System.err.println("Unable to save: " + account + " Trying " + (RETRY_TIMES - counter) + " more times.");
+                        getScheduler().scheduleWithFixedDelay(() -> save(account, this), 5, 5, TimeUnit.SECONDS);
+                    }
+            }
+        });
+    }
+
+    public abstract String getAccountQuery(Account account);
 
     public abstract V loadData(ResultSet resultSet) throws SQLException;
 
@@ -84,18 +125,6 @@ public abstract class PlayerDataStorage<V> extends DataStorage<Account, V> {
             waitingList.get(account).forEach(vConsumer -> vConsumer.accept(returnValue));
             waitingList.remove(account);
         });
-    }
-
-    @Override
-    public boolean save(Account key)
-    {
-        return super.save(key);
-    }
-
-    @Override
-    public boolean save(Account key, Consumer<Boolean> success)
-    {
-        return super.save(key, success);
     }
 
     @Override

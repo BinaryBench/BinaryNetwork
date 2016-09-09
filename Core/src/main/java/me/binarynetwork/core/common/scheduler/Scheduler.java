@@ -17,6 +17,11 @@ public class Scheduler {
         Bukkit.getScheduler().runTask(BinaryNetworkPlugin.getPlugin(), runnable);
     }
 
+    public static void runAsync(Runnable runnable, long ticks)
+    {
+        Bukkit.getScheduler().runTaskLaterAsynchronously(BinaryNetworkPlugin.getPlugin(), runnable, ticks);
+    }
+
     public static void runAsync(Runnable runnable)
     {
         Bukkit.getScheduler().runTaskAsynchronously(BinaryNetworkPlugin.getPlugin(), runnable);

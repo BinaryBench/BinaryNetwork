@@ -21,6 +21,15 @@ import java.util.function.Consumer;
  */
 public class CurrencyDataStorage extends PlayerDataStorage<Map<Integer, Integer>> {
 
+    public static String CREATE_TABLE = "CREATE TABLE IF NOT EXISTS currency (" +
+                "accountId INT unsigned NOT NULL," +
+                "currencyId TINYINT NOT NULL," +
+                "currencyAmount INT DEFAULT 0," +
+                    "CONSTRAINT accountId" +
+                    "PRIMARY KEY (accountId, currencyId)," +
+                    "FOREIGN KEY (accountId) REFERENCES " + AccountManager.TABLE_NAME + "(id) ON DELETE CASCADE ON UPDATE CASCADE" +
+            ") ENGINE=InnoDB;";
+
     public static String INSERT_INTO_ON_DUPLICATE_KEY = "INSERT INTO currency (accountId, currencyId, currencyAmount) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE currencyAmount=VALUES(currencyAmount);";
 
     public CurrencyDataStorage(ScheduledExecutorService scheduler, double offset, AccountManager accountManager)
@@ -47,8 +56,8 @@ public class CurrencyDataStorage extends PlayerDataStorage<Map<Integer, Integer>
         return map;
     }
 
-    @Override
-    public String getQuery(Account key)
+
+    public String getAccountQuery(Account key)
     {
         return "SELECT currencyId, currencyAmount FROM player_data.currency WHERE accountId=" + key.getId() +";";
     }
@@ -60,10 +69,9 @@ public class CurrencyDataStorage extends PlayerDataStorage<Map<Integer, Integer>
     }
 
     @Override
-    public void saveData(Map<Account, Map<Integer, Integer>> key, Consumer<Integer> successes)
+    public void saveData(Connection connection, Map<Account, Map<Integer, Integer>> key, Consumer<Integer> successes)
     {
-        try(Connection connection = getDataSource().getConnection();
-            PreparedStatement preparedStatement = connection.prepareStatement(INSERT_INTO_ON_DUPLICATE_KEY))
+        try(PreparedStatement preparedStatement = connection.prepareStatement(INSERT_INTO_ON_DUPLICATE_KEY))
         {
             for (Map.Entry<Account, Map<Integer, Integer>> accountsEntry : key.entrySet())
             {
@@ -89,6 +97,19 @@ public class CurrencyDataStorage extends PlayerDataStorage<Map<Integer, Integer>
         {
             e.printStackTrace();
             successes.accept(0);
+        }
+    }
+
+    @Override
+    public void initialize(Connection connection)
+    {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(CREATE_TABLE))
+        {
+            //preparedStatement.executeUpdate();
+        }
+        catch (SQLException e)
+        {
+            e.printStackTrace();
         }
     }
 }

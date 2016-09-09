@@ -3,20 +3,17 @@ package me.binarynetwork.core.account;
 import me.binarynetwork.core.BinaryNetworkPlugin;
 import me.binarynetwork.core.common.scheduler.Scheduler;
 import me.binarynetwork.core.database.DataSourceManager;
-import me.binarynetwork.core.database.DataStorage;
+import me.binarynetwork.core.database.KeyValueDataStorage;
 import org.bukkit.Bukkit;
-import org.bukkit.OfflinePlayer;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
+import javax.sql.DataSource;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -26,7 +23,7 @@ import java.util.function.Consumer;
 /**
  * Created by Bench on 9/3/2016.
  */
-public class AccountManager extends DataStorage<UUID, Account> implements Listener {
+public class AccountManager extends KeyValueDataStorage<UUID, Account> implements Listener {
 
     public static int RETRY_TIMES = 10;
 
@@ -38,15 +35,14 @@ public class AccountManager extends DataStorage<UUID, Account> implements Listen
     private static final String NEW_LOGIN = "INSERT IGNORE INTO " + TABLE_NAME + " (uuid) VALUES(?);";
     private static final String SELECT_ACCOUNT = "SELECT id FROM " + TABLE_NAME + " where uuid=?;";
 
-    private ConcurrentHashMap<PlayerDataStorage<?>, Boolean> listeners = new ConcurrentHashMap<>();
-    private ScheduledExecutorService scheduler;
+    private ConcurrentHashMap<AccountListener, Boolean> listeners = new ConcurrentHashMap<>();
 
     public AccountManager(ScheduledExecutorService scheduler)
     {
-        super(DataSourceManager.PLAYER_DATA, null, 0);
+        super(DataSourceManager.PLAYER_DATA, scheduler);
         BinaryNetworkPlugin.registerEvents(this);
-        this.scheduler = scheduler;
     }
+
 
     @EventHandler(priority = EventPriority.LOW)
     public void onLogin(PlayerLoginEvent event)
@@ -67,30 +63,11 @@ public class AccountManager extends DataStorage<UUID, Account> implements Listen
             if (account == null)
                 return;
 
-            for (PlayerDataStorage<?> playerDataStorage : listeners.keySet())
+            for (AccountListener accountListener : listeners.keySet())
             {
-                playerDataStorage.save(account, new Consumer<Boolean>() {
-                    private int counter = 0;
-
-                    @Override
-                    public void accept(Boolean aBoolean)
-                    {
-                        if (aBoolean)
-                            //FIXME maybe do a better way to make sure this doesn't happen.
-                            if (getIfExists(uuid) == null)
-                                playerDataStorage.removeFromCache(account);
-                        else
-                            if (counter++ < RETRY_TIMES)
-                            {
-                                System.err.println("Unable to save: " + account);
-                                scheduler.scheduleWithFixedDelay(() -> playerDataStorage.save(account, this), 5, 5, TimeUnit.SECONDS);
-                            }
-                    }
-                });
+                accountListener.accountRemoved(account);
             }
         });
-
-
     }
 
     @Override
@@ -107,12 +84,12 @@ public class AccountManager extends DataStorage<UUID, Account> implements Listen
         super.get(key, callback);
     }
 
-    public void  addPlayerStorage(PlayerDataStorage<?> listener, boolean listenToJoin)
+    public void  addPlayerStorage(AccountListener listener, boolean listenToJoin)
     {
         listeners.put(listener, listenToJoin);
     }
 
-    public void removeListener(PlayerDataStorage<?> listener)
+    public void removeListener(AccountListener listener)
     {
         listeners.remove(listener);
     }
@@ -124,13 +101,18 @@ public class AccountManager extends DataStorage<UUID, Account> implements Listen
                 {
                     StringBuilder sb = new StringBuilder();
 
-                    List<PlayerDataStorage<?>> returnList = new ArrayList<>();
+                    List<AccountListener> returnList = new ArrayList<>();
 
-                    listeners.entrySet().stream().filter(entry -> entry.getValue() && entry.getKey().enableWaitingList(account)).forEach(entry -> {
-                        sb.append(entry.getKey().getQuery(account));
-                        returnList.add(entry.getKey());
-                        System.err.println("Added " + entry.getKey().getClass().getSimpleName() + " at position " + (returnList.size() - 1));
-                    });
+                    for (Map.Entry<AccountListener, Boolean> entry: listeners.entrySet())
+                    {
+                        if (entry.getValue())
+                        {
+                            sb.append(entry.getKey().getQuery(account));
+                            returnList.add(entry.getKey());
+                            System.err.println("Added " + entry.getKey().getClass().getSimpleName() + " at position " + (returnList.size() - 1));
+                        }
+                    }
+
                     if (sb.length() == 0)
                         return;
                     try (Connection connection = getDataSource().getConnection(); Statement statement = connection.createStatement())
@@ -143,9 +125,8 @@ public class AccountManager extends DataStorage<UUID, Account> implements Listen
                                 ResultSet rs = statement.getResultSet();
 
                                 // handle your rs here
-                                PlayerDataStorage<?> storage = returnList.get(counter++);
-                                System.err.println("Returning to " + storage.getClass().getSimpleName() + " ResultSet at position " + (counter-1));
-                                storage.loadAndAddToCache(account, rs, connection);
+                                System.err.println("Returning to " + returnList.get(counter).getClass().getSimpleName() + " ResultSet at position " + (counter));
+                                returnList.get(counter++).handleResultSet(account, connection, rs);
 
                             } // if has rs
                             else { // if ddl/dml/...
@@ -207,8 +188,18 @@ public class AccountManager extends DataStorage<UUID, Account> implements Listen
     }
 
     @Override
-    public void saveData(Map<UUID, Account> key, Consumer<Integer> successes)
+    public void saveData(Connection connection, Map<UUID, Account> key, Consumer<Integer> successes)
     {
 
+    }
+
+    @Override
+    public void initialize(Connection connection) throws SQLException
+    {
+        try (PreparedStatement preparedStatement = connection.prepareStatement(CREATE_TABLE))
+        {
+            //To do log stuff!
+            preparedStatement.executeUpdate();
+        }
     }
 }

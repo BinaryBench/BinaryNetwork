@@ -5,6 +5,8 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -48,7 +50,12 @@ public class ServerUtil {
     public static List<String> getOnlinePlayerNames()
     {
         List<String> names = new ArrayList<>();
-        Bukkit.getOnlinePlayers().forEach(o -> names.add(o.getDisplayName()));
+        getOnlinePlayers().forEach(o -> names.add(o.getDisplayName()));
         return names;
+    }
+
+    public static Collection<? extends Player> getOnlinePlayers()
+    {
+        return Bukkit.getOnlinePlayers();
     }
 }

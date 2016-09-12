@@ -1,5 +1,6 @@
 package me.binarynetwork.core.account;
 
+import com.comphenix.protocol.PacketType;
 import me.binarynetwork.core.common.scheduler.Scheduler;
 import me.binarynetwork.core.database.KeyValueDataStorage;
 import org.bukkit.entity.Player;
@@ -29,6 +30,14 @@ public abstract class PlayerDataStorage<V> extends KeyValueDataStorage<Account, 
         super(dataSource, scheduler);
         this.accountManager = accountManager;
         getAccountManager().addPlayerStorage(this, loadOnJoin);
+    }
+
+    public V getIfExists(Player player)
+    {
+        Account account = getAccountManager().getIfExists(player.getUniqueId());
+        if (account == null)
+            return null;
+        return getIfExists(account);
     }
 
     public void get(Player player, Consumer<V> callback)

@@ -4,6 +4,7 @@ import com.comphenix.protocol.PacketType;
 import me.binarynetwork.core.command.Command;
 import me.binarynetwork.core.common.format.F;
 import me.binarynetwork.core.common.utils.*;
+import me.binarynetwork.core.permissions.PermissionManager;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
@@ -16,9 +17,11 @@ public class CurrencyCommand implements Command {
 
     private Currency currency;
     private CurrencyManager currencyManager;
+    private PermissionManager permissionManager;
 
-    public CurrencyCommand(Currency currency, CurrencyManager currencyManager)
+    public CurrencyCommand(Currency currency, CurrencyManager currencyManager, PermissionManager permissionManager)
     {
+        this.permissionManager = permissionManager;
         this.currency = currency;
         this.currencyManager = currencyManager;
     }
@@ -26,7 +29,7 @@ public class CurrencyCommand implements Command {
     @Override
     public boolean hasPermission(CommandSender commandSender, String[] args)
     {
-        return true;
+        return permissionManager.hasPermission(commandSender, "currency.command");
     }
 
     @Override

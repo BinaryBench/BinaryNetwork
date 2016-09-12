@@ -4,6 +4,7 @@ import me.binarynetwork.core.account.Account;
 import me.binarynetwork.core.account.AccountManager;
 import me.binarynetwork.core.account.PlayerDataStorage;
 import me.binarynetwork.core.database.DataSourceManager;
+import org.bukkit.entity.Player;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
@@ -18,7 +19,7 @@ import java.util.function.Consumer;
 /**
  * Created by Bench on 9/8/2016.
  */
-public class RankDataStorage  extends PlayerDataStorage<Rank> {
+public class RankDataStorage extends PlayerDataStorage<Rank> {
 
     public RankDataStorage(ScheduledExecutorService scheduler, AccountManager accountManager)
     {
@@ -40,25 +41,13 @@ public class RankDataStorage  extends PlayerDataStorage<Rank> {
             "CREATE TABLE IF NOT EXISTS player_data.player_rank (" +
                 "accountId INT unsigned NOT NULL," +
                 "rankId TINYINT unsigned NOT NULL," +
-                "rankTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n" +
+                "rankTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP," +
                     "PRIMARY KEY (accountId)," +
                     "FOREIGN KEY (rankId) REFERENCES ranks(id) ON DELETE CASCADE ON UPDATE CASCADE," +
                     "FOREIGN KEY (accountId) REFERENCES player_account(id) ON DELETE CASCADE ON UPDATE CASCADE" +
             ") ENGINE=InnoDB;";
 
     public static final String INSERT_INTO_PLAYER_RANK_ON_DUPLICATE_KEY = "INSERT IGNORE INTO player_rank (accountId, rankId) SELECT ?, id FROM ranks WHERE (rankName=UPPER(?)) ON DUPLICATE KEY UPDATE rankId=VALUES(rankId);";
-
-    public static void main(String[] args) throws Exception
-    {
-        Connection connection = DataSourceManager.PLAYER_DATA.getConnection();
-
-        PreparedStatement statement = connection.prepareStatement(INSERT_INTO_PLAYER_RANK_ON_DUPLICATE_KEY);
-        statement.setInt(1, 1);
-        statement.setString(2, "test");
-
-        System.out.println(statement.executeUpdate());
-
-    }
 
     @Override
     public String getAccountQuery(Account account)

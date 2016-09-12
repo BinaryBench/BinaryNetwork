@@ -2,6 +2,7 @@ package me.binarynetwork.core.currency;
 
 import me.binarynetwork.core.account.AccountManager;
 import me.binarynetwork.core.command.CommandWrapper;
+import me.binarynetwork.core.permissions.PermissionManager;
 import org.bukkit.entity.Player;
 
 import java.util.concurrent.ScheduledExecutorService;
@@ -14,12 +15,12 @@ public class CurrencyManager {
 
     private CurrencyDataStorage currencyDataStorage;
 
-    public CurrencyManager(ScheduledExecutorService scheduler, AccountManager accountManager, CommandWrapper commandWrapper)
+    public CurrencyManager(ScheduledExecutorService scheduler, AccountManager accountManager, PermissionManager permissionManager, CommandWrapper commandWrapper)
     {
         this.currencyDataStorage = new CurrencyDataStorage(scheduler, accountManager);
         for (Currency currency : Currency.values())
         {
-            commandWrapper.addCommand(new CurrencyCommand(currency, this), currency.getDisplayName(), currency.toString(), currency.getId());
+            commandWrapper.addCommand(new CurrencyCommand(currency, this, permissionManager), currency.getDisplayName(), currency.toString(), currency.getId());
         }
     }
 

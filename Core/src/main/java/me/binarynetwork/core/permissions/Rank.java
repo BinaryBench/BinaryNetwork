@@ -11,11 +11,23 @@ import java.util.List;
  */
 public enum Rank {
 
-    OWNER("owner", ChatColor.RED + "Owner", "*"),
-    DEV("dev", ChatColor.RED + "Dev", "*"),
-    MODERATOR("mod", ChatColor.GOLD + "Mod", "*"),
-    BUILDER("build", ChatColor.DARK_GRAY + "Builder", "*"),
-    BERRY("berry", ChatColor.DARK_PURPLE + "Berry", "*"),
+    OWNER("owner", ChatColor.RED + "Owner",
+            "*"
+    ),
+    DEV("dev", ChatColor.RED + "Dev",
+            "*",
+            "!server.stop"
+    ),
+    MODERATOR("mod", ChatColor.GOLD + "Mod",
+            "*"
+    ),
+    BUILDER("build", ChatColor.DARK_GRAY + "Builder",
+            "money.command.*",
+            ""
+    ),
+    BERRY("berry", ChatColor.DARK_PURPLE + "Berry",
+            "*"
+    ),
     DEFAULT("default", null);
 
 

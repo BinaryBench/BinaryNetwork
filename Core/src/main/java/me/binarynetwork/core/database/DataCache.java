@@ -43,6 +43,11 @@ public abstract class DataCache<K, V> {
         return future.getNow(null);
     }
 
+    public boolean hasCached(K key)
+    {
+        return getIfExists(key) != null;
+    }
+
     protected CompletableFuture<V> getFuture(K key)
     {
         CompletableFuture<V> future;
@@ -55,6 +60,7 @@ public abstract class DataCache<K, V> {
 
         return future;
     }
+
     public abstract V load(K key);
 
     public void removeFromCache(K key)
@@ -62,7 +68,7 @@ public abstract class DataCache<K, V> {
         futures.remove(key);
     }
 
-    public Map<K, V> getCache()
+    public Map<K, V> getCacheAsMap()
     {
         Map<K, V> map = new HashMap<K, V>();
         for (Map.Entry<K, CompletableFuture<V>> entry : futures.entrySet())
@@ -74,7 +80,7 @@ public abstract class DataCache<K, V> {
         return map;
     }
 
-    public ConcurrentHashMap<K, CompletableFuture<V>> getFutures()
+    protected ConcurrentHashMap<K, CompletableFuture<V>> getFutures()
     {
         return futures;
     }

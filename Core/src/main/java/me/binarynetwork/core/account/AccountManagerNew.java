@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -179,5 +180,13 @@ public class AccountManagerNew extends SQLDataCacheWithTemp<UUID, Account> imple
 
         for (AccountListener accountListener : listeners.keySet())
             accountListener.accountRemoved(account);
+    }
+
+    @Override
+    protected CompletableFuture<Account> getFuture(UUID key)
+    {
+        if (Bukkit.getPlayer(key) == null)
+            markAsTemp(key);
+        return super.getFuture(key);
     }
 }

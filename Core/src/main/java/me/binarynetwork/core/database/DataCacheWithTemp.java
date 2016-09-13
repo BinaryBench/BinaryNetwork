@@ -1,10 +1,6 @@
 package me.binarynetwork.core.database;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-
 import java.util.concurrent.*;
-import java.util.function.Consumer;
 
 /**
  * Created by Bench on 9/13/2016.
@@ -30,15 +26,27 @@ public abstract class DataCacheWithTemp<K, V> extends DataCache<K, V> {
         {
             e.printStackTrace();
         }
-
-        tasks.put(key,getScheduler().schedule(() -> {
-            removeFromCache(key);
-        }, 5, TimeUnit.SECONDS));
+        markAsTemp(key);
         return loadTemp(key);
     }
 
     @Override
     public void removeFromCache(K key)
+    {
+        unmarkAsTemp(key);
+        super.removeFromCache(key);
+    }
+
+    public void markAsTemp(K key)
+    {
+        ScheduledFuture<?> future = tasks.remove(key);
+        if (future != null)
+            future.cancel(true);
+        tasks.put(key,getScheduler().schedule(() -> {
+            removeFromCache(key);
+        }, 1, TimeUnit.MINUTES));
+    }
+    public void unmarkAsTemp(K key)
     {
         ScheduledFuture<?> future = tasks.remove(key);
         if (future != null)
@@ -48,12 +56,12 @@ public abstract class DataCacheWithTemp<K, V> extends DataCache<K, V> {
             unloadedTemp(key, value);
             future.cancel(true);
         }
-        super.removeFromCache(key);
     }
 
     public abstract V loadValue(K key) throws Exception;
 
     public abstract V loadTemp(K key);
+
 
     public void unloadedTemp(K key, V value)
     {

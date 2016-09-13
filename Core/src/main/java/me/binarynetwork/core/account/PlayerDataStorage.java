@@ -137,12 +137,6 @@ public abstract class PlayerDataStorage<V> extends KeyValueDataStorage<Account, 
         });
     }
 
-    @Override
-    public boolean removeFromCache(Account key)
-    {
-        return super.removeFromCache(key);
-    }
-
     public AccountManager getAccountManager()
     {
         return accountManager;

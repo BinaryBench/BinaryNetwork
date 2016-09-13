@@ -7,6 +7,7 @@ import me.binarynetwork.core.account.AccountManagerNew;
 import me.binarynetwork.core.command.CommandManager;
 import me.binarynetwork.core.common.utils.WorldUtil;
 import me.binarynetwork.core.component.SimpleComponentWrapper;
+import me.binarynetwork.core.currency.CurrencyDataCacheNew;
 import me.binarynetwork.core.currency.CurrencyDataStorage;
 import me.binarynetwork.core.currency.CurrencyManager;
 import me.binarynetwork.core.permissions.PermissionManager;
@@ -15,6 +16,7 @@ import me.binarynetwork.core.permissions.RankManager;
 import me.binarynetwork.core.permissions.RankPermissionManager;
 import org.bukkit.Bukkit;
 import org.bukkit.event.EventHandler;
+import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
@@ -49,7 +51,7 @@ public abstract class BinaryNetworkPlugin extends JavaPlugin implements Listener
     private ProtocolManager protocolManager;
     private ScheduledExecutorService scheduler;
     private AccountManager accountManager;
-    private CurrencyManager currencyManager;
+    private CurrencyDataCacheNew currencyDataCacheNew;
     private CommandManager commandManager;
 
     @Override
@@ -72,7 +74,9 @@ public abstract class BinaryNetworkPlugin extends JavaPlugin implements Listener
         this.componentWrapper = new SimpleComponentWrapper();
 
 
-        new AccountManagerNew(getScheduler());
+        AccountManagerNew accountManagerNew = new AccountManagerNew(getScheduler());
+
+        new CurrencyDataCacheNew(getScheduler(), accountManagerNew);
 
         //DataStorage
         //accountManager = new AccountManager(scheduler);
@@ -100,7 +104,7 @@ public abstract class BinaryNetworkPlugin extends JavaPlugin implements Listener
     }
 
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGH)
     public void prelogin(AsyncPlayerPreLoginEvent event)
     {
 

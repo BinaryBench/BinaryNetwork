@@ -97,7 +97,7 @@ public abstract class KeyValueDataStorage<K, V> extends DataStorage {
             {
                 value = loadValue(connection, key);
 
-                // if loadValue returned null then sate value to new
+                // if load returned null then sate value to new
                 if (value == null)
                     value = getNew(connection, key);
 

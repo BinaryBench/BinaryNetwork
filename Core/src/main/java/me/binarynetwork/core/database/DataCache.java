@@ -6,17 +6,14 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
 
 /**
  * Created by Bench on 9/13/2016.
  */
 public abstract class DataCache<K, V> {
 
-    private ConcurrentHashMap<K, CompletableFuture<V>> futures = new ConcurrentHashMap<>();
+    protected ConcurrentHashMap<K, CompletableFuture<V>> futures = new ConcurrentHashMap<>();
 
-    private Function<K, V> get;
 
     public void get(K key, Consumer<V> callback)
     {
@@ -38,25 +35,33 @@ public abstract class DataCache<K, V> {
         return null;
     }
 
-    private CompletableFuture<V> getFuture(K key)
+    public V getIfExists(K key)
+    {
+        CompletableFuture<V> future = futures.get(key);
+        if (future == null)
+            return null;
+        return future.getNow(null);
+    }
+
+    protected CompletableFuture<V> getFuture(K key)
     {
         CompletableFuture<V> future;
         if ((future = futures.get(key)) != null)
             return future;
 
-        future = CompletableFuture.supplyAsync(() -> {
-            return get.apply(key);
-        });
+        future = CompletableFuture.supplyAsync(() -> load(key));
 
         futures.put(key, future);
 
         return future;
     }
+    public abstract V load(K key);
 
     public void removeFromCache(K key)
     {
         futures.remove(key);
     }
+
     public Map<K, V> getCache()
     {
         Map<K, V> map = new HashMap<K, V>();
@@ -67,5 +72,10 @@ public abstract class DataCache<K, V> {
                 map.put(entry.getKey(), value);
         }
         return map;
+    }
+
+    public ConcurrentHashMap<K, CompletableFuture<V>> getFutures()
+    {
+        return futures;
     }
 }

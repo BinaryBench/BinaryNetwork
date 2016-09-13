@@ -3,6 +3,7 @@ package me.binarynetwork.core;
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import me.binarynetwork.core.account.AccountManager;
+import me.binarynetwork.core.account.AccountManagerNew;
 import me.binarynetwork.core.command.CommandManager;
 import me.binarynetwork.core.common.utils.WorldUtil;
 import me.binarynetwork.core.component.SimpleComponentWrapper;
@@ -71,18 +72,20 @@ public abstract class BinaryNetworkPlugin extends JavaPlugin implements Listener
         this.componentWrapper = new SimpleComponentWrapper();
 
 
+        new AccountManagerNew(getScheduler());
+
         //DataStorage
-        accountManager = new AccountManager(scheduler);
-        RankManager rankManager = new RankManager(getScheduler(), accountManager);
+        //accountManager = new AccountManager(scheduler);
+        //RankManager rankManager = new RankManager(getScheduler(), accountManager);
 
-        PermissionManager permissionManager = new RankPermissionManager(rankManager, componentWrapper);
+        //PermissionManager permissionManager = new RankPermissionManager(rankManager, componentWrapper);
 
-        currencyManager = new CurrencyManager(scheduler, accountManager, permissionManager, commandManager);
-
-
+        //currencyManager = new CurrencyManager(scheduler, accountManager, permissionManager, commandManager);
 
 
-        new RankDataStorage(getScheduler(), getAccountManager());
+
+
+        //new RankDataStorage(getScheduler(), getAccountManager());
 
 
 

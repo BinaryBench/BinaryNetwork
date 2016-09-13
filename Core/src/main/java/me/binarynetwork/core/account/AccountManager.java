@@ -70,20 +70,6 @@ public class AccountManager extends KeyValueDataStorage<UUID, Account> implement
         });
     }
 
-    @Override
-    public boolean removeFromCache(UUID key)
-    {
-        System.err.println("Removing from cache:" + Bukkit.getOfflinePlayer(key).getName());
-        return super.removeFromCache(key);
-    }
-
-    @Override
-    public void get(UUID key, Consumer<Account> callback)
-    {
-        System.err.println("Getting: " + Bukkit.getOfflinePlayer(key).getName());
-        super.get(key, callback);
-    }
-
     public void  addPlayerStorage(AccountListener listener, boolean listenToJoin)
     {
         listeners.put(listener, listenToJoin);

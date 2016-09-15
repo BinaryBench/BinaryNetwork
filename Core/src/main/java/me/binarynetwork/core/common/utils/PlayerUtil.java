@@ -2,7 +2,9 @@ package me.binarynetwork.core.common.utils;
 
 
 import com.comphenix.protocol.PacketType;
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 
@@ -159,6 +161,22 @@ public class PlayerUtil {
             return;
 
         player.damage(player.getHealth());
+    }
+
+    public static Player getPlayer(Entity entity)
+    {
+        if (entity instanceof Player)
+            return (Player) entity;
+        else
+            return null;
+    }
+
+    public static ProxiedPlayer getProxyPlayer(CommandSender sender)
+    {
+        if (sender instanceof ProxiedPlayer)
+            return (ProxiedPlayer) sender;
+        else
+            return null;
     }
 
 }

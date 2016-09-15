@@ -18,15 +18,17 @@ public enum Rank {
             "!server.stop"
     ),
     MODERATOR("mod", "Mod",ChatColor.GOLD + "Mod",
-            "*"
+            ""
     ),
     BUILDER("build", "Builder", ChatColor.DARK_GRAY + "Builder",
-            "money.command.*"
+            ""
     ),
     BERRY("berry", "Berry",ChatColor.DARK_PURPLE + "Berry",
-            "*"
+            ""
     ),
-    DEFAULT("default", "Default", null);
+    DEFAULT("default", "Default", null,
+            ""
+    );
 
 
     private String id;
@@ -36,7 +38,8 @@ public enum Rank {
 
     Rank(String id, String displayName, String tag, String... permissions)
     {
-        this.tag = tag;
+        if (tag != null)
+            this.tag = tag + ChatColor.RESET;
         this.displayName = displayName;
         this.id = id;
         this.permissions = Arrays.asList(permissions);

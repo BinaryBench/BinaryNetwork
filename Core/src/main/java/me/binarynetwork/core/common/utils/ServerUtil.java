@@ -1,7 +1,9 @@
 package me.binarynetwork.core.common.utils;
 
+import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 
@@ -50,6 +52,13 @@ public class ServerUtil {
         return Bukkit.getPlayer(uuid);
     }
 
+
+
+    public static boolean isOnline(UUID uuid)
+    {
+        return getPlayer(uuid) != null;
+    }
+
     public static UUID getPlayersUUID(String name)
     {
         return getOfflinePlayer(name).getUniqueId();
@@ -69,7 +78,7 @@ public class ServerUtil {
     public static List<String> getOnlinePlayerNames()
     {
         List<String> names = new ArrayList<>();
-        getOnlinePlayers().forEach(o -> names.add(o.getDisplayName()));
+        getOnlinePlayers().forEach(o -> names.add(o.getName()));
         return names;
     }
 

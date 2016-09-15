@@ -50,7 +50,6 @@ public class RankPermissionManager extends ListenerComponent implements Permissi
     @Override
     public boolean hasPermission(Player player, String permission)
     {
-        System.out.println("Checking permission " + permission + " for " + player.getName());
         if (!registeredPermissions.containsKey(permission.toLowerCase()))
         {
             // if never seen this command before add command to bukkit and reload known commands
@@ -74,7 +73,6 @@ public class RankPermissionManager extends ListenerComponent implements Permissi
     {
         if (registeredPermissions.containsKey(permissionString.toLowerCase()))
             return;
-        System.out.println("Adding permission: " + permissionString);
         Permission permission = new Permission(permissionString.toLowerCase());
         Bukkit.getPluginManager().addPermission(permission);
         registeredPermissions.put(permission.getName().toLowerCase(), permission);
@@ -99,11 +97,8 @@ public class RankPermissionManager extends ListenerComponent implements Permissi
 
     public void reloadRankPermissions()
     {
-        System.out.println("Known permissions:");
-        registeredPermissions.forEach((s, permission) -> System.out.println(s));
         for (Rank rank : Rank.values())
         {
-            System.out.println("loading permissions for: " + rank);
             rankPermissions.put(rank, getPermissions(rank.getPermissions()));
         }
 
@@ -130,18 +125,15 @@ public class RankPermissionManager extends ListenerComponent implements Permissi
 
         for (String string : permStrings)
         {
-            System.out.println("Processing permission:" + string);
             final boolean hasPerm = !string.startsWith("!");
             if (!hasPerm)
                 string = string.substring(1);
 
             if (string.endsWith("*"))
             {
-                System.out.println("EndsWith: *");
                 string = string.substring(0, string.length() - 1);
                 List<Permission> list = MapUtil.getValueStartsWith(registeredPermissions, string, false);
                 list.forEach(permission -> {
-                    System.out.println("Adding permission: " + permission.getName());
                     perms.put(permission, hasPerm);
                 });
             }
@@ -185,9 +177,7 @@ public class RankPermissionManager extends ListenerComponent implements Permissi
                 throw new IllegalStateException("Permissions not set for rank: " + rank.getTag());
             for (Map.Entry<Permission, Boolean> entry : perms.entrySet())
             {
-                System.out.println("Adding permission: " + entry.getKey().getName() + " " + entry.getValue());
                 attachment.setPermission(entry.getKey(), entry.getValue());
-                System.out.println("Has permission: " + player.hasPermission(entry.getKey().getName()));
             }
         });
 

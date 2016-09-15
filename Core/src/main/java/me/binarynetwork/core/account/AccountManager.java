@@ -134,16 +134,16 @@ public class AccountManager extends SQLDataCacheTemp<UUID, Account> implements L
         Account returnAccount = loadAccount(key, connection);
         if (returnAccount != null)
             return returnAccount;
-        prepareNewLogin(key, connection).executeUpdate();
+        executeNewLogin(key, connection);
         return loadAccount(key, connection);
     }
 
-    public PreparedStatement prepareNewLogin(UUID uuid, Connection connection) throws SQLException
+    public PreparedStatement executeNewLogin(UUID uuid, Connection connection) throws SQLException
     {
         try (PreparedStatement insertStatement = connection.prepareStatement(NEW_LOGIN))
         {
             insertStatement.setString(1, uuid.toString());
-            //insertStatement.executeUpdate();
+            insertStatement.executeUpdate();
             return insertStatement;
         }
     }

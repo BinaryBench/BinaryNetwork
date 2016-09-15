@@ -8,13 +8,14 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Consumer;
 
 /**
  * Created by Bench on 9/8/2016.
  */
-public class RankDataCache extends SavingPlayerDataCache<Rank> {
+public class RankDataCache extends PlayerDataCache<Rank> {
 
     public RankDataCache(ScheduledExecutorService scheduler, AccountManager accountManager)
     {
@@ -29,7 +30,7 @@ public class RankDataCache extends SavingPlayerDataCache<Rank> {
                     "PRIMARY KEY (id)," +
                     "UNIQUE (rankName)," +
                     "UNIQUE (id)" +
-            "    ) ENGINE=InnoDB;";
+            ") ENGINE=InnoDB;";
 
     public static final String INSERT_INTO_RANKS = "INSERT IGNORE INTO ranks (rankName) VALUES (UPPER(?));";
 
@@ -43,7 +44,12 @@ public class RankDataCache extends SavingPlayerDataCache<Rank> {
                     "FOREIGN KEY (accountId) REFERENCES player_account(id) ON DELETE CASCADE ON UPDATE CASCADE" +
             ") ENGINE=InnoDB;";
 
-    public static final String INSERT_INTO_PLAYER_RANK_ON_DUPLICATE_KEY = "INSERT IGNORE INTO player_rank (accountId, rankId) SELECT ?, id FROM ranks WHERE (rankName=UPPER(?)) ON DUPLICATE KEY UPDATE rankId=VALUES(rankId);";
+    public static final String INSERT_ONLINE_PLAYER = "INSERT IGNORE INTO player_rank (accountId, rankId) SELECT ?, id FROM ranks WHERE (rankName=UPPER(?)) ON DUPLICATE KEY UPDATE rankId=VALUES(rankId);";
+
+    public static final String INSERT_OFFLINE_PLAYER = "INSERT IGNORE INTO player_rank (accountId, rankId) " +
+            "SELECT B.id, A.id FROM ranks A " +
+            "JOIN player_account B ON B.uuid = ?" +
+            "WHERE (A.rankName=UPPER(?)) ON DUPLICATE KEY UPDATE rankId=VALUES(rankId);";
 
     @Override
     public String getAccountQuery(Account account)
@@ -72,10 +78,9 @@ public class RankDataCache extends SavingPlayerDataCache<Rank> {
         return Rank.DEFAULT;
     }
 
-    @Override
     public void saveData(Connection connection, Map<Account, Rank> key, Consumer<Integer> successes)
     {
-        try(PreparedStatement preparedStatement = connection.prepareStatement(INSERT_INTO_PLAYER_RANK_ON_DUPLICATE_KEY))
+        try(PreparedStatement preparedStatement = connection.prepareStatement(INSERT_ONLINE_PLAYER))
         {
             for (Map.Entry<Account, Rank> accountsEntry : key.entrySet())
             {
@@ -100,6 +105,39 @@ public class RankDataCache extends SavingPlayerDataCache<Rank> {
         }
     }
 
+    public void setRank(UUID uuid, Rank rank, Consumer<Boolean> callback)
+    {
+        Runnable onFail = () -> {
+            callback.accept(false);
+        };
+        final Account account = getAccountManager().getIfExists(uuid);
+        if (account != null)
+            execute(connection -> {
+
+                try (PreparedStatement statement = connection.prepareStatement(INSERT_ONLINE_PLAYER))
+                {
+                    statement.setInt(1, account.getId());
+                    statement.setString(2, rank.getId());
+                    statement.executeUpdate();
+                }
+                callback.accept(true);
+            }, onFail);
+        else
+            execute(connection -> {
+                connection.setAutoCommit(false);
+
+                getAccountManager().executeNewLogin(uuid, connection);
+
+                try (PreparedStatement statement = connection.prepareStatement(INSERT_OFFLINE_PLAYER))
+                {
+                    statement.setString(1, uuid.toString());
+                    statement.setString(2, rank.getId());
+                    statement.executeUpdate();
+                }
+                connection.commit();
+                callback.accept(true);
+            }, onFail);
+    }
 
     public void initialize(Connection connection) throws SQLException
     {
@@ -122,4 +160,9 @@ public class RankDataCache extends SavingPlayerDataCache<Rank> {
         }
     }
 
+    @Override
+    public void accountRemoved(Account account)
+    {
+
+    }
 }

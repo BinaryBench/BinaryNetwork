@@ -63,7 +63,17 @@ public abstract class SQLDataCacheTemp<K, V> extends DataCacheTemp<K, V> {
         {
             try (Connection connection = getDataSource().getConnection())
             {
-                return callable.call(connection);
+                try
+                {
+                    return callable.call(connection);
+                }
+                catch (SQLException e)
+                {
+                    if (connection.getAutoCommit())
+                        connection.rollback();
+                    e.printStackTrace();
+                    break;
+                }
             }
             catch (Exception e)
             {
@@ -72,7 +82,7 @@ public abstract class SQLDataCacheTemp<K, V> extends DataCacheTemp<K, V> {
             tries++;
             try
             {
-                Thread.sleep(1000);
+                Thread.sleep(5000);
             }
             catch (InterruptedException e)
             {

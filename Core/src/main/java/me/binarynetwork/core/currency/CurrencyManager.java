@@ -13,34 +13,51 @@ import java.util.function.Consumer;
  */
 public class CurrencyManager {
 
-    private CurrencyDataStorage currencyDataStorage;
+    private CurrencyDataCache cache;
 
     public CurrencyManager(ScheduledExecutorService scheduler, AccountManager accountManager, PermissionManager permissionManager, CommandWrapper commandWrapper)
     {
-        this.currencyDataStorage = new CurrencyDataStorage(scheduler, accountManager);
+        this.cache = new CurrencyDataCache(scheduler, accountManager);
         for (Currency currency : Currency.values())
         {
             commandWrapper.addCommand(new CurrencyCommand(currency, this, permissionManager), currency.getDisplayName(), currency.toString(), currency.getId());
         }
     }
 
+    public Integer getCurrency(Player player, Currency currency)
+    {
+        CurrencyToken token = getCache().getIfExists(player);
+        if (token == null)
+            return null;
+        return token.getCurrency(currency);
+    }
+    public void getCurrency(Player player, Currency currency, Consumer<Integer> callback)
+    {
+        getCache().get(player, currencyToken -> {
+            callback.accept(currencyToken.getCurrency(currency));
+        });
+    }
+
+    public boolean setCurrency(Player player, Currency currency, int amount)
+    {
+        CurrencyToken token = getCache().getIfExists(player);
+        if (token == null)
+            return false;
+        token.setCurrency(currency, amount);
+        return true;
+    }
     public void setCurrency(Player player, Currency currency, int amount, Runnable callback)
     {
-        getCurrencyDataStorage().get(player, currencyIntegerMap -> {
-            currencyIntegerMap.put(currency, amount);
+        getCache().get(player, currencyToken -> {
+            currencyToken.setCurrency(currency, amount);
             callback.run();
         });
     }
 
-    public void getCurrency(Player player, Currency currency, Consumer<Integer> callback)
-    {
-        getCurrencyDataStorage().get(player, currencyIntegerMap -> {
-            callback.accept(currencyIntegerMap.getOrDefault(currency, 0));
-        });
-    }
 
-    private CurrencyDataStorage getCurrencyDataStorage()
+
+    public CurrencyDataCache getCache()
     {
-        return currencyDataStorage;
+        return cache;
     }
 }

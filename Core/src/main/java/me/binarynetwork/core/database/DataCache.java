@@ -14,16 +14,17 @@ public abstract class DataCache<K, V> {
 
     protected ConcurrentHashMap<K, CompletableFuture<V>> futures = new ConcurrentHashMap<>();
 
+    public abstract V load(K key);
 
     public void get(K key, Consumer<V> callback)
     {
-        CompletableFuture<V> future = getFuture(key);
+        CompletableFuture<V> future = getOrCreateFuture(key);
         future.thenAccept(callback);
     }
 
     public V getSync(K key)
     {
-        CompletableFuture<V> future = getFuture(key);
+        CompletableFuture<V> future = getOrCreateFuture(key);
         try
         {
             return future.get();
@@ -43,12 +44,12 @@ public abstract class DataCache<K, V> {
         return future.getNow(null);
     }
 
-    public boolean hasCached(K key)
+    public boolean isCached(K key)
     {
         return getIfExists(key) != null;
     }
 
-    protected CompletableFuture<V> getFuture(K key)
+    protected CompletableFuture<V> getOrCreateFuture(K key)
     {
         CompletableFuture<V> future;
         if ((future = futures.get(key)) != null)
@@ -61,7 +62,7 @@ public abstract class DataCache<K, V> {
         return future;
     }
 
-    public abstract V load(K key);
+
 
     public void removeFromCache(K key)
     {
@@ -78,6 +79,10 @@ public abstract class DataCache<K, V> {
                 map.put(entry.getKey(), value);
         }
         return map;
+    }
+    public int getCacheSize()
+    {
+        return getFutures().size();
     }
 
     protected ConcurrentHashMap<K, CompletableFuture<V>> getFutures()

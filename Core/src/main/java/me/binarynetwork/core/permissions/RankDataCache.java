@@ -1,29 +1,25 @@
 package me.binarynetwork.core.permissions;
 
-import me.binarynetwork.core.account.Account;
-import me.binarynetwork.core.account.AccountManager;
-import me.binarynetwork.core.account.PlayerDataStorage;
+import me.binarynetwork.core.account.*;
 import me.binarynetwork.core.database.DataSourceManager;
-import org.bukkit.entity.Player;
 
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Consumer;
 
 /**
  * Created by Bench on 9/8/2016.
  */
-public class RankDataStorage extends PlayerDataStorage<Rank> {
+public class RankDataCache extends SavingPlayerDataCache<Rank> {
 
-    public RankDataStorage(ScheduledExecutorService scheduler, AccountManager accountManager)
+    public RankDataCache(ScheduledExecutorService scheduler, AccountManager accountManager)
     {
         super(DataSourceManager.PLAYER_DATA, scheduler, accountManager, true);
+        execute(this::initialize);
     }
 
     public static final String CREATE_RANKS_TABLE =
@@ -62,24 +58,16 @@ public class RankDataStorage extends PlayerDataStorage<Rank> {
         if (resultSet.next())
         {
             String id = resultSet.getString("rankName");
-            for (Rank rank : Rank.values())
-            {
-                if (rank.getId().equalsIgnoreCase(id))
-                {
-                    returnRank = rank;
-                    break;
-                    // /return rank;
-                }
-            }
+            returnRank = Rank.getRankById(id);
         }
-
-        System.err.println("Rank: " + returnRank);
+        if (returnRank == null)
+            returnRank = Rank.DEFAULT;
 
         return returnRank;
     }
 
     @Override
-    protected Rank getNew(Account key)
+    public Rank sqlFailure(Account key)
     {
         return Rank.DEFAULT;
     }
@@ -112,7 +100,7 @@ public class RankDataStorage extends PlayerDataStorage<Rank> {
         }
     }
 
-    @Override
+
     public void initialize(Connection connection) throws SQLException
     {
         try (PreparedStatement createRanksTable = connection.prepareStatement(CREATE_RANKS_TABLE);

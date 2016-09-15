@@ -1,4 +1,4 @@
-package me.binarynetwork.core.database;
+package me.binarynetwork.core.database.old;
 
 import java.util.HashSet;
 import java.util.Set;

@@ -1,6 +1,8 @@
-package me.binarynetwork.core.database;
+package me.binarynetwork.core.database.old;
 
 import me.binarynetwork.core.common.scheduler.Scheduler;
+import me.binarynetwork.core.database.old.DatabaseCall;
+import me.binarynetwork.core.database.old.DatabaseCallData;
 import org.bukkit.Bukkit;
 
 import javax.annotation.Nullable;

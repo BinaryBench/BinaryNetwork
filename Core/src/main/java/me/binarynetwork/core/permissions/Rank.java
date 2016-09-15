@@ -57,4 +57,16 @@ public enum Rank {
     {
         return permissions;
     }
+
+    public static Rank getRankById(String string)
+    {
+        for (Rank rank : Rank.values())
+        {
+            if (rank.getId().equalsIgnoreCase(string))
+            {
+                return rank;
+            }
+        }
+        return null;
+    }
 }

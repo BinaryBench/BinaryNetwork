@@ -1,4 +1,4 @@
-package me.binarynetwork.core.database;
+package me.binarynetwork.core.database.old;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;

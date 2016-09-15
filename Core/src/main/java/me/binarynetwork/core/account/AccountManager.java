@@ -1,31 +1,31 @@
 package me.binarynetwork.core.account;
 
 import me.binarynetwork.core.BinaryNetworkPlugin;
-import me.binarynetwork.core.common.scheduler.Scheduler;
+import me.binarynetwork.core.common.Log;
+import me.binarynetwork.core.common.utils.PlayerUtil;
 import me.binarynetwork.core.database.DataSourceManager;
-import me.binarynetwork.core.database.KeyValueDataStorage;
+import me.binarynetwork.core.database.SQLDataCacheTemp;
 import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
-import javax.sql.DataSource;
 import java.sql.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-import java.util.function.Consumer;
-
 
 /**
- * Created by Bench on 9/3/2016.
+ * Created by Bench on 9/13/2016.
  */
-public class AccountManager extends KeyValueDataStorage<UUID, Account> implements Listener {
-
-    public static int RETRY_TIMES = 10;
+public class AccountManager extends SQLDataCacheTemp<UUID, Account> implements Listener {
 
     private int tempAccountId = -1;
 
@@ -39,38 +39,11 @@ public class AccountManager extends KeyValueDataStorage<UUID, Account> implement
 
     public AccountManager(ScheduledExecutorService scheduler)
     {
-        super(DataSourceManager.PLAYER_DATA, scheduler);
+        super(scheduler, DataSourceManager.PLAYER_DATA);
         BinaryNetworkPlugin.registerEvents(this);
     }
 
-
-    @EventHandler(priority = EventPriority.LOW)
-    public void onLogin(PlayerLoginEvent event)
-    {
-        System.err.println("Login event for: " + event.getPlayer().getName());
-        onLogin(event.getPlayer().getUniqueId());
-    }
-
-    @EventHandler(priority = EventPriority.HIGH)
-    public void onLeave(PlayerQuitEvent event)
-    {
-        UUID uuid = event.getPlayer().getUniqueId();
-
-        getIfExists(uuid, account -> {
-
-            removeFromCache(uuid);
-
-            if (account == null)
-                return;
-
-            for (AccountListener accountListener : listeners.keySet())
-            {
-                accountListener.accountRemoved(account);
-            }
-        });
-    }
-
-    public void  addPlayerStorage(AccountListener listener, boolean listenToJoin)
+    public void  addListener(AccountListener listener, boolean listenToJoin)
     {
         listeners.put(listener, listenToJoin);
     }
@@ -80,69 +53,96 @@ public class AccountManager extends KeyValueDataStorage<UUID, Account> implement
         listeners.remove(listener);
     }
 
-    public void onLogin(UUID playersUUID)
+    @EventHandler
+    public void preLogin(AsyncPlayerPreLoginEvent event)
     {
-        get(playersUUID, account -> {
+        Account account = getSync(event.getUniqueId());
 
-            StringBuilder sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
 
-            List<AccountListener> returnList = new ArrayList<>();
+        List<AccountListener> returnList = new ArrayList<>();
 
-            for (Map.Entry<AccountListener, Boolean> entry: listeners.entrySet())
+        for (Map.Entry<AccountListener, Boolean> entry: listeners.entrySet())
+        {
+            if (entry.getValue())
             {
-                if (entry.getValue())
+                String query = entry.getKey().getQuery(account);
+                if (query != null)
                 {
-                    sb.append(entry.getKey().getQuery(account));
+                    sb.append(query);
                     returnList.add(entry.getKey());
-                    //System.err.println("Added " + entry.getKey().getClass().getSimpleName() + " at position " + (returnList.size() - 1));
                 }
             }
+        }
 
-            if (sb.length() == 0)
-                return;
+        if (sb.length() == 0)
+            return;
 
-            execute(connection ->
+        execute(connection -> {
+            try(Statement statement = connection.createStatement())
             {
-                try (Statement statement = connection.createStatement())
-                {
-                    boolean hasMoreResultSets = statement.execute(sb.toString());
+                boolean hasMoreResultSets = statement.execute(sb.toString());
 
-                    int counter = 0;
-                    while ( hasMoreResultSets || statement.getUpdateCount() != -1 ) {
-                        if ( hasMoreResultSets ) {
-                            ResultSet rs = statement.getResultSet();
+                int counter = 0;
+                while ( hasMoreResultSets || statement.getUpdateCount() != -1 ) {
+                    if ( hasMoreResultSets ) {
+                        ResultSet rs = statement.getResultSet();
 
-                            // handle your rs here
-                            //System.err.println("Returning to " + returnList.get(counter).getClass().getSimpleName() + " ResultSet at position " + (counter));
+                        // handle your rs here
+                        try
+                        {
                             returnList.get(counter++).handleResultSet(account, connection, rs);
+                        }
+                        catch (Throwable e)
+                        {
+                            Log.errorf("Failed to load: %s", returnList.get(counter).getClass().getName());
+                            e.printStackTrace();
+                        }
 
-                        } // if has rs
-                        else { // if ddl/dml/...
-                            counter++;
-                            int queryResult = statement.getUpdateCount();
-                            if ( queryResult == -1 ) { // no more queries processed
-                                break;
-                            } // no more queries processed
-                            // handle success, failure, generated keys, etc here
-                        } // if ddl/dml/...
+                    } // if has rs
+                    else { // if ddl/dml/...
+                        counter++;
+                        int queryResult = statement.getUpdateCount();
+                        if ( queryResult == -1 ) { // no more queries processed
+                            break;
+                        } // no more queries processed
+                        // handle success, failure, generated keys, etc here
+                    } // if ddl/dml/...
 
-                        // check to continue in the loop
-                        hasMoreResultSets = statement.getMoreResults();
-                    } // while results
-                }
-                catch (SQLException e)
-                {
-                    e.printStackTrace();
-                }
+                    // check to continue in the loop
+                    hasMoreResultSets = statement.getMoreResults();
+                } // while results
+            }
+        }, () ->
+            Log.errorf("Failed to load data for account: %s", account.toString())
+        );
 
-            });
 
-        });
+
     }
 
+    @EventHandler(priority = EventPriority.HIGH)
+    public void onLeave(PlayerQuitEvent event)
+    {
+        UUID uuid = event.getPlayer().getUniqueId();
+        removeFromCache(uuid);
+    }
 
     @Override
-    protected Account loadValue(Connection connection, UUID key) throws SQLException
+    public Account loadValue(UUID key, Connection connection) throws SQLException
+    {
+        Account returnAccount = loadAccount(key, connection);
+        if (returnAccount != null)
+            return returnAccount;
+        try (PreparedStatement insertStatement = connection.prepareStatement(NEW_LOGIN))
+        {
+            insertStatement.setString(1, key.toString());
+            insertStatement.executeUpdate();
+        }
+        return loadAccount(key, connection);
+    }
+
+    public Account loadAccount(UUID key, Connection connection) throws SQLException
     {
         try (PreparedStatement statement = connection.prepareStatement(SELECT_ACCOUNT))
         {
@@ -155,42 +155,39 @@ public class AccountManager extends KeyValueDataStorage<UUID, Account> implement
                 System.err.println("Loaded account: " + account.toString());
                 return account;
             }
-            return null;
         }
+        return null;
     }
 
     @Override
-    public Account getNew(Connection connection, UUID key) throws SQLException
+    public Account sqlFailure(UUID key)
     {
-        try (PreparedStatement insertStatement = connection.prepareStatement(NEW_LOGIN))
-        {
-            insertStatement.setString(1, key.toString());
-            insertStatement.executeUpdate();
-        }
-        return loadValue(connection, key);
-    }
+        Player player = Bukkit.getPlayer(key);
+        if (player != null)
+            PlayerUtil.message(player, "Hey, things didn't load right!  " +
+                    "You are currently in 'temp account' mode, which means changes to your account won't be saved.\n " +
+                    "Please contact BinaryBench(or whoever is running the server) about this!");
 
-    @Override
-    protected Account getNew(UUID key)
-    {
         return new Account(--tempAccountId, key);
     }
 
-    @Override
-    public void saveData(Connection connection, Map<UUID, Account> key, Consumer<Integer> successes)
-    {
 
+    //Overridden
+    @Override
+    public void removeFromCache(UUID key)
+    {
+        Account account = getIfExists(key);
+        if (account != null)
+            for (AccountListener accountListener : listeners.keySet())
+                accountListener.accountRemoved(account);
+        super.removeFromCache(key);
     }
 
     @Override
-    public void initialize(Connection connection) throws SQLException
+    protected CompletableFuture<Account> getOrCreateFuture(UUID key)
     {
-        try (PreparedStatement preparedStatement = connection.prepareStatement(CREATE_TABLE))
-        {
-            //To do log stuff!
-            preparedStatement.executeUpdate();
-        }
+        if (Bukkit.getPlayer(key) == null)
+            markAsTemp(key);
+        return super.getOrCreateFuture(key);
     }
-
-
 }

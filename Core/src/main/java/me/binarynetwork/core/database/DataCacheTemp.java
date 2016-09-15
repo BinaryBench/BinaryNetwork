@@ -1,33 +1,26 @@
 package me.binarynetwork.core.database;
 
+import com.google.common.cache.CacheBuilder;
+
 import java.util.concurrent.*;
 
 /**
  * Created by Bench on 9/13/2016.
  */
-public abstract class DataCacheWithTemp<K, V> extends DataCache<K, V> {
+public abstract class DataCacheTemp<K, V> extends DataCache<K, V> {
 
     private ScheduledExecutorService scheduler;
     private ConcurrentHashMap<K, ScheduledFuture<?>> tasks = new ConcurrentHashMap<>();
 
-    public DataCacheWithTemp(ScheduledExecutorService scheduler)
+    private int amount;
+    private TimeUnit unit;
+
+    public DataCacheTemp(ScheduledExecutorService scheduler, int amount, TimeUnit unit)
     {
         this.scheduler = scheduler;
-    }
-
-    @Override
-    public V load(K key)
-    {
-        try
-        {
-            return loadValue(key);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
-        markAsTemp(key);
-        return loadTemp(key);
+        CacheBuilder.newBuilder().build();
+        this.amount = amount;
+        this.unit = unit;
     }
 
     @Override
@@ -39,13 +32,19 @@ public abstract class DataCacheWithTemp<K, V> extends DataCache<K, V> {
 
     public void markAsTemp(K key)
     {
+        markAsTemp(key, amount, unit);
+    }
+
+    public void markAsTemp(K key, int amount, TimeUnit unit)
+    {
         ScheduledFuture<?> future = tasks.remove(key);
         if (future != null)
             future.cancel(true);
         tasks.put(key,getScheduler().schedule(() -> {
             removeFromCache(key);
-        }, 1, TimeUnit.MINUTES));
+        }, amount, unit));
     }
+
     public void unmarkAsTemp(K key)
     {
         ScheduledFuture<?> future = tasks.remove(key);
@@ -53,19 +52,13 @@ public abstract class DataCacheWithTemp<K, V> extends DataCache<K, V> {
         {
             CompletableFuture<V> future1 = getFutures().get(key);
             V value = future1.getNow(null);
-            unloadedTemp(key, value);
             future.cancel(true);
         }
     }
 
-    public abstract V loadValue(K key) throws Exception;
-
-    public abstract V loadTemp(K key);
-
-
-    public void unloadedTemp(K key, V value)
+    public boolean isTemp(K key)
     {
-
+        return tasks.containsKey(key);
     }
 
     public ScheduledExecutorService getScheduler()

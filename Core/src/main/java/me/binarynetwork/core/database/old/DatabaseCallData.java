@@ -1,4 +1,6 @@
-package me.binarynetwork.core.database;
+package me.binarynetwork.core.database.old;
+
+import me.binarynetwork.core.database.old.DatabaseCall;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

@@ -1,8 +1,7 @@
 package me.binarynetwork.core.account;
 
-import com.comphenix.protocol.PacketType;
 import me.binarynetwork.core.common.scheduler.Scheduler;
-import me.binarynetwork.core.database.KeyValueDataStorage;
+import me.binarynetwork.core.database.old.KeyValueDataStorage;
 import org.bukkit.entity.Player;
 
 import javax.sql.DataSource;
@@ -11,7 +10,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
@@ -23,9 +21,9 @@ public abstract class PlayerDataStorage<V> extends KeyValueDataStorage<Account, 
 
     public static final int RETRY_TIMES = 10;
 
-    private AccountManager accountManager;
+    private AccountManagerOld accountManager;
 
-    public PlayerDataStorage(DataSource dataSource, ScheduledExecutorService scheduler, AccountManager accountManager, boolean loadOnJoin)
+    public PlayerDataStorage(DataSource dataSource, ScheduledExecutorService scheduler, AccountManagerOld accountManager, boolean loadOnJoin)
     {
         super(dataSource, scheduler);
         this.accountManager = accountManager;
@@ -137,7 +135,7 @@ public abstract class PlayerDataStorage<V> extends KeyValueDataStorage<Account, 
         });
     }
 
-    public AccountManager getAccountManager()
+    public AccountManagerOld getAccountManager()
     {
         return accountManager;
     }

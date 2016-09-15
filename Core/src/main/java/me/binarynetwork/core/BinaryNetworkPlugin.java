@@ -2,16 +2,15 @@ package me.binarynetwork.core;
 
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
+import me.binarynetwork.core.account.AccountManagerOld;
 import me.binarynetwork.core.account.AccountManager;
-import me.binarynetwork.core.account.AccountManagerNew;
 import me.binarynetwork.core.command.CommandManager;
 import me.binarynetwork.core.common.utils.WorldUtil;
 import me.binarynetwork.core.component.SimpleComponentWrapper;
-import me.binarynetwork.core.currency.CurrencyDataCacheNew;
-import me.binarynetwork.core.currency.CurrencyDataStorage;
+import me.binarynetwork.core.currency.CurrencyDataCache;
 import me.binarynetwork.core.currency.CurrencyManager;
 import me.binarynetwork.core.permissions.PermissionManager;
-import me.binarynetwork.core.permissions.RankDataStorage;
+import me.binarynetwork.core.permissions.PermissionManagerWrapper;
 import me.binarynetwork.core.permissions.RankManager;
 import me.binarynetwork.core.permissions.RankPermissionManager;
 import org.bukkit.Bukkit;
@@ -20,12 +19,10 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
-import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ThreadFactory;
 
 /**
  * Created by Bench on 8/31/2016.
@@ -51,8 +48,10 @@ public abstract class BinaryNetworkPlugin extends JavaPlugin implements Listener
     private ProtocolManager protocolManager;
     private ScheduledExecutorService scheduler;
     private AccountManager accountManager;
-    private CurrencyDataCacheNew currencyDataCacheNew;
+    private CurrencyManager currencyManager;
     private CommandManager commandManager;
+    private RankManager rankManager;
+    private RankPermissionManager permissionManager;
 
     @Override
     public final void onEnable()
@@ -65,8 +64,6 @@ public abstract class BinaryNetworkPlugin extends JavaPlugin implements Listener
         //Protocol
         protocolManager = ProtocolLibrary.getProtocolManager();
 
-
-
         //Command
         commandManager = new CommandManager(protocolManager);
 
@@ -74,27 +71,16 @@ public abstract class BinaryNetworkPlugin extends JavaPlugin implements Listener
         this.componentWrapper = new SimpleComponentWrapper();
 
 
-        AccountManagerNew accountManagerNew = new AccountManagerNew(getScheduler());
-
-        new CurrencyDataCacheNew(getScheduler(), accountManagerNew);
-
         //DataStorage
-        //accountManager = new AccountManager(scheduler);
-        //RankManager rankManager = new RankManager(getScheduler(), accountManager);
+        accountManager = new AccountManager(getScheduler());
 
-        //PermissionManager permissionManager = new RankPermissionManager(rankManager, componentWrapper);
+        rankManager = new RankManager(getScheduler(), getAccountManager());
+        //PermissionManager
+        permissionManager = new RankPermissionManager(getRankManager(), getComponentWrapper());
 
-        //currencyManager = new CurrencyManager(scheduler, accountManager, permissionManager, commandManager);
-
-
-
-
-        //new RankDataStorage(getScheduler(), getAccountManager());
+        currencyManager = new CurrencyManager(getScheduler(), getAccountManager(), getPermissionManager(), getCommandManager());
 
 
-
-
-        //new RankPermissionManager(componentWrapper);
 
         registerEvents(this);
 
@@ -104,11 +90,6 @@ public abstract class BinaryNetworkPlugin extends JavaPlugin implements Listener
     }
 
 
-    @EventHandler(priority = EventPriority.HIGH)
-    public void prelogin(AsyncPlayerPreLoginEvent event)
-    {
-
-    }
 
     @Override
     public final void onDisable()
@@ -128,8 +109,15 @@ public abstract class BinaryNetworkPlugin extends JavaPlugin implements Listener
 
     }
 
+    public SimpleComponentWrapper getComponentWrapper()
+    {
+        return componentWrapper;
+    }
 
-
+    public ProtocolManager getProtocolManager()
+    {
+        return protocolManager;
+    }
 
     public ScheduledExecutorService getScheduler()
     {
@@ -141,18 +129,23 @@ public abstract class BinaryNetworkPlugin extends JavaPlugin implements Listener
         return accountManager;
     }
 
+    public CurrencyManager getCurrencyManager()
+    {
+        return currencyManager;
+    }
+
     public CommandManager getCommandManager()
     {
         return commandManager;
     }
 
-    public SimpleComponentWrapper getComponentWrapper()
+    public RankManager getRankManager()
     {
-        return componentWrapper;
+        return rankManager;
     }
 
-    public ProtocolManager getProtocolManager()
+    public RankPermissionManager getPermissionManager()
     {
-        return protocolManager;
+        return permissionManager;
     }
 }

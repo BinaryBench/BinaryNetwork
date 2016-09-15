@@ -1,4 +1,4 @@
-package me.binarynetwork.core.database;
+package me.binarynetwork.core.database.old;
 
 import com.mysql.jdbc.exceptions.MySQLDataException;
 import com.sun.glass.ui.EventLoop;

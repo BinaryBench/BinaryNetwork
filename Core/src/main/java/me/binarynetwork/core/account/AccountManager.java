@@ -2,7 +2,9 @@ package me.binarynetwork.core.account;
 
 import me.binarynetwork.core.BinaryNetworkPlugin;
 import me.binarynetwork.core.common.Log;
+import me.binarynetwork.core.common.format.F;
 import me.binarynetwork.core.common.utils.PlayerUtil;
+import me.binarynetwork.core.common.utils.ServerUtil;
 import me.binarynetwork.core.database.DataSourceManager;
 import me.binarynetwork.core.database.SQLDataCacheTemp;
 import org.bukkit.Bukkit;
@@ -11,6 +13,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
 
 import java.sql.*;
@@ -121,6 +124,13 @@ public class AccountManager extends SQLDataCacheTemp<UUID, Account> implements L
 
     }
 
+    @EventHandler
+    public void onJoin(PlayerJoinEvent event)
+    {
+        Log.debugf("%s account unmarked as temp.", F.possession(event.getPlayer()));
+        unmarkAsTemp(event.getPlayer().getUniqueId());
+    }
+
     @EventHandler(priority = EventPriority.HIGH)
     public void onLeave(PlayerQuitEvent event)
     {
@@ -186,6 +196,7 @@ public class AccountManager extends SQLDataCacheTemp<UUID, Account> implements L
         if (account != null)
             for (AccountListener accountListener : listeners.keySet())
                 accountListener.accountRemoved(account);
+        Log.debugf("%s account is being removed.", F.possession(ServerUtil.getOfflinePlayer(key).getName()));
         super.removeFromCache(key);
     }
 
@@ -193,7 +204,10 @@ public class AccountManager extends SQLDataCacheTemp<UUID, Account> implements L
     protected CompletableFuture<Account> getOrCreateFuture(UUID key)
     {
         if (Bukkit.getPlayer(key) == null)
+        {
             markAsTemp(key);
+            Log.debugf("%s account marked as temp.", F.possession(ServerUtil.getOfflinePlayer(key).getName()));
+        }
         return super.getOrCreateFuture(key);
     }
 }

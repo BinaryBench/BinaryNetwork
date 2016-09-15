@@ -61,6 +61,11 @@ public class ServerUtil {
         return Bukkit.getOfflinePlayer(name);
     }
 
+    public static OfflinePlayer getOfflinePlayer(UUID uuid)
+    {
+        return Bukkit.getOfflinePlayer(uuid);
+    }
+
     public static List<String> getOnlinePlayerNames()
     {
         List<String> names = new ArrayList<>();

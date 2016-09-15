@@ -2,7 +2,9 @@ package me.binarynetwork.core.currency;
 
 import me.binarynetwork.core.account.AccountManager;
 import me.binarynetwork.core.command.CommandWrapper;
+import me.binarynetwork.core.common.scheduler.Scheduler;
 import me.binarynetwork.core.permissions.PermissionManager;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.concurrent.ScheduledExecutorService;
@@ -31,11 +33,14 @@ public class CurrencyManager {
             return null;
         return token.getCurrency(currency);
     }
+
     public void getCurrency(Player player, Currency currency, Consumer<Integer> callback)
     {
-        getCache().get(player, currencyToken -> {
-            callback.accept(currencyToken.getCurrency(currency));
-        });
+        getCache().get(player, currencyToken ->
+            Scheduler.runSync(() ->
+                callback.accept(currencyToken.getCurrency(currency))
+            )
+        );
     }
 
     public boolean setCurrency(Player player, Currency currency, int amount)
@@ -50,7 +55,7 @@ public class CurrencyManager {
     {
         getCache().get(player, currencyToken -> {
             currencyToken.setCurrency(currency, amount);
-            callback.run();
+            Scheduler.runSync(callback);
         });
     }
 

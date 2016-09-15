@@ -4,6 +4,7 @@ import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import me.binarynetwork.core.account.AccountManager;
 import me.binarynetwork.core.command.CommandManager;
+import me.binarynetwork.core.commands.StopCommand;
 import me.binarynetwork.core.common.utils.WorldUtil;
 import me.binarynetwork.core.component.SimpleComponentWrapper;
 import me.binarynetwork.core.currency.CurrencyManager;
@@ -78,6 +79,8 @@ public abstract class BinaryNetworkPlugin extends JavaPlugin implements Listener
         currencyManager = new CurrencyManager(getScheduler(), getAccountManager(), getPermissionManager(), getCommandManager());
 
 
+        //Commands
+        commandManager.addCommand(new StopCommand(permissionWrapper), "stop");
 
         registerEvents(this);
 

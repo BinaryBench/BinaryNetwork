@@ -35,6 +35,8 @@ public class PermissionManagerWrapper implements PermissionManager {
 
     public void setWrappedPermissionManager(PermissionManager permissionManager)
     {
+        if (permissionManager == this)
+            throw new IllegalArgumentException("The permission manager cannot be this wrapper!");
         this.permissionManager = permissionManager;
     }
 

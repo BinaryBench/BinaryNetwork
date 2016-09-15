@@ -69,6 +69,17 @@ public abstract class DataCache<K, V> {
         futures.remove(key);
     }
 
+    public void addToCache(K key, V value)
+    {
+        CompletableFuture<V> future = futures.get(key);
+        if (future != null)
+        {
+            if(future.complete(value))
+                return;
+        }
+        futures.put(key, CompletableFuture.completedFuture(value));
+    }
+
     public Map<K, V> getCacheAsMap()
     {
         Map<K, V> map = new HashMap<K, V>();

@@ -2,23 +2,17 @@ package me.binarynetwork.core;
 
 import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
-import me.binarynetwork.core.account.AccountManagerOld;
 import me.binarynetwork.core.account.AccountManager;
 import me.binarynetwork.core.command.CommandManager;
 import me.binarynetwork.core.common.utils.WorldUtil;
 import me.binarynetwork.core.component.SimpleComponentWrapper;
-import me.binarynetwork.core.currency.CurrencyDataCache;
 import me.binarynetwork.core.currency.CurrencyManager;
-import me.binarynetwork.core.permissions.PermissionManager;
 import me.binarynetwork.core.permissions.PermissionManagerWrapper;
-import me.binarynetwork.core.permissions.RankManager;
+import me.binarynetwork.core.rank.RankManager;
 import me.binarynetwork.core.permissions.RankPermissionManager;
 import org.bukkit.Bukkit;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.EventPriority;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.concurrent.Executors;
@@ -74,9 +68,12 @@ public abstract class BinaryNetworkPlugin extends JavaPlugin implements Listener
         //DataStorage
         accountManager = new AccountManager(getScheduler());
 
-        rankManager = new RankManager(getScheduler(), getAccountManager());
-        //PermissionManager
+        //Permission Stuff
+        PermissionManagerWrapper permissionWrapper = new PermissionManagerWrapper();
+        rankManager = new RankManager(getScheduler(), getAccountManager(), commandManager, permissionWrapper);
         permissionManager = new RankPermissionManager(getRankManager(), getComponentWrapper());
+        permissionWrapper.setWrappedPermissionManager(permissionManager);
+
 
         currencyManager = new CurrencyManager(getScheduler(), getAccountManager(), getPermissionManager(), getCommandManager());
 

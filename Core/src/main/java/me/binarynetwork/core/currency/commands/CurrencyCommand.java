@@ -1,9 +1,11 @@
-package me.binarynetwork.core.currency;
+package me.binarynetwork.core.currency.commands;
 
 import com.comphenix.protocol.PacketType;
 import me.binarynetwork.core.command.Command;
 import me.binarynetwork.core.common.format.F;
 import me.binarynetwork.core.common.utils.*;
+import me.binarynetwork.core.currency.Currency;
+import me.binarynetwork.core.currency.CurrencyManager;
 import me.binarynetwork.core.permissions.PermissionManager;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;

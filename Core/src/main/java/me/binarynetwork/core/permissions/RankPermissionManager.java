@@ -1,22 +1,19 @@
 package me.binarynetwork.core.permissions;
 
-import com.comphenix.protocol.PacketType;
 import me.binarynetwork.core.BinaryNetworkPlugin;
 import me.binarynetwork.core.common.utils.MapUtil;
 import me.binarynetwork.core.common.utils.ServerUtil;
 import me.binarynetwork.core.component.ComponentWrapper;
 import me.binarynetwork.core.component.ListenerComponent;
-import org.apache.commons.lang3.BooleanUtils;
-import org.apache.commons.lang3.tuple.Pair;
+import me.binarynetwork.core.rank.Rank;
+import me.binarynetwork.core.rank.RankManager;
+import me.binarynetwork.core.rank.events.RankUpdateEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
-import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
-import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.event.player.PlayerQuitEvent;
-import org.bukkit.event.server.PluginEnableEvent;
 import org.bukkit.permissions.Permission;
 import org.bukkit.permissions.PermissionAttachment;
 
@@ -101,7 +98,6 @@ public class RankPermissionManager extends ListenerComponent implements Permissi
         {
             rankPermissions.put(rank, getPermissions(rank.getPermissions()));
         }
-
     }
 
     public Map<Permission, Boolean> getPermissions(List<String> permStrings)
@@ -153,6 +149,14 @@ public class RankPermissionManager extends ListenerComponent implements Permissi
         updatePermissions(event.getPlayer());
     }
 
+    @EventHandler
+    public void rankChange(RankUpdateEvent event)
+    {
+        Player player = ServerUtil.getPlayer(event.getUuid());
+        if (player != null)
+            updatePermissions(player);
+    }
+
     @EventHandler(priority = EventPriority.HIGH)
     public void onLeave(PlayerQuitEvent event)
     {
@@ -175,6 +179,12 @@ public class RankPermissionManager extends ListenerComponent implements Permissi
             Map<Permission, Boolean> perms = rankPermissions.get(rank);
             if (perms == null)
                 throw new IllegalStateException("Permissions not set for rank: " + rank.getTag());
+
+            for (String string : attachment.getPermissions().keySet())
+            {
+                attachment.unsetPermission(string);
+            }
+
             for (Map.Entry<Permission, Boolean> entry : perms.entrySet())
             {
                 attachment.setPermission(entry.getKey(), entry.getValue());

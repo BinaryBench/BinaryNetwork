@@ -30,19 +30,29 @@ public abstract class PlayerDataStorage<V> extends KeyValueDataStorage<Account, 
         getAccountManager().addPlayerStorage(this, loadOnJoin);
     }
 
-    public V getIfExists(Player player)
+    public V getIfExists(UUID uuid)
     {
-        Account account = getAccountManager().getIfExists(player.getUniqueId());
+        Account account = getAccountManager().getIfExists(uuid);
         if (account == null)
             return null;
         return getIfExists(account);
     }
 
-    public void get(Player player, Consumer<V> callback)
+    public V getIfExists(Player player)
     {
-        getAccountManager().get(player.getUniqueId(), account -> {
+        return getIfExists(player.getUniqueId());
+    }
+
+    public void get(UUID uuid, Consumer<V> callback)
+    {
+        getAccountManager().get(uuid, account -> {
             get(account, callback);
         });
+    }
+
+    public void get(Player player, Consumer<V> callback)
+    {
+        get(player.getUniqueId(), callback);
     }
 
     @Override

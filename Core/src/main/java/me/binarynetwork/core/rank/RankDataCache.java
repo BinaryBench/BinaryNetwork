@@ -1,7 +1,10 @@
-package me.binarynetwork.core.permissions;
+package me.binarynetwork.core.rank;
 
 import me.binarynetwork.core.account.*;
+import me.binarynetwork.core.common.scheduler.Scheduler;
 import me.binarynetwork.core.database.DataSourceManager;
+import me.binarynetwork.core.rank.events.RankUpdateEvent;
+import org.bukkit.Bukkit;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -113,7 +116,6 @@ public class RankDataCache extends PlayerDataCache<Rank> {
         final Account account = getAccountManager().getIfExists(uuid);
         if (account != null)
             execute(connection -> {
-
                 try (PreparedStatement statement = connection.prepareStatement(INSERT_ONLINE_PLAYER))
                 {
                     statement.setInt(1, account.getId());
@@ -121,6 +123,8 @@ public class RankDataCache extends PlayerDataCache<Rank> {
                     statement.executeUpdate();
                 }
                 callback.accept(true);
+                if (isCached(account))
+                    addToCache(account, rank);
             }, onFail);
         else
             execute(connection -> {
@@ -137,6 +141,18 @@ public class RankDataCache extends PlayerDataCache<Rank> {
                 connection.commit();
                 callback.accept(true);
             }, onFail);
+    }
+
+    @Override
+    public void addToCache(Account key, Rank value)
+    {
+        Rank oldRank = getIfExists(key);
+
+        super.addToCache(key, value);
+
+        Scheduler.runSync(() ->
+            Bukkit.getPluginManager().callEvent(new RankUpdateEvent(key.getUUID(), oldRank, value))
+        );
     }
 
     public void initialize(Connection connection) throws SQLException
@@ -158,11 +174,5 @@ public class RankDataCache extends PlayerDataCache<Rank> {
 
             populateRanksTable.executeBatch();
         }
-    }
-
-    @Override
-    public void accountRemoved(Account account)
-    {
-
     }
 }

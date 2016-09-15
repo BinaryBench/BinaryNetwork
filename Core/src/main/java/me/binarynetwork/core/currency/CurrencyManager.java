@@ -3,8 +3,8 @@ package me.binarynetwork.core.currency;
 import me.binarynetwork.core.account.AccountManager;
 import me.binarynetwork.core.command.CommandWrapper;
 import me.binarynetwork.core.common.scheduler.Scheduler;
+import me.binarynetwork.core.currency.commands.CurrencyCommand;
 import me.binarynetwork.core.permissions.PermissionManager;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
 import java.util.concurrent.ScheduledExecutorService;

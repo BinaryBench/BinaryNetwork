@@ -9,6 +9,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Consumer;
@@ -31,24 +32,42 @@ public abstract class PlayerDataCache<V> extends SQLDataCacheTemp<Account, V> im
 
     public abstract V loadData(ResultSet resultSet) throws SQLException;
 
+    //Get Sync
     public V getSync(Player player)
     {
-        Account account = getAccountManager().getSync(player.getUniqueId());
+        return getSync(player.getUniqueId());
+    }
+    public V getSync(UUID uuid)
+    {
+        Account account = getAccountManager().getSync(uuid);
         if (account == null)
             return null;
         return getSync(account);
     }
+
+    //Get if exists
     public V getIfExists(Player player)
     {
-        Account account = getAccountManager().getIfExists(player.getUniqueId());
+        return getIfExists(player.getUniqueId());
+    }
+    public V getIfExists(UUID uuid)
+    {
+        Account account = getAccountManager().getIfExists(uuid);
         if (account == null)
             return null;
         return getIfExists(account);
     }
+
+    //Get with Callback
     public void get(Player player, Consumer<V> callback)
     {
-        getAccountManager().get(player.getUniqueId(), account ->
-            get(account, callback)
+        get(player.getUniqueId(), callback);
+    }
+
+    public void get(UUID uuid, Consumer<V> callback)
+    {
+        getAccountManager().get(uuid, account ->
+                get(account, callback)
         );
     }
 
@@ -58,7 +77,7 @@ public abstract class PlayerDataCache<V> extends SQLDataCacheTemp<Account, V> im
     {
         try (Statement statement = connection.createStatement())
         {
-            ResultSet resultSet = statement.executeQuery(getQuery(key));
+            ResultSet resultSet = statement.executeQuery(getAccountQuery(key));
             return loadData(resultSet);
         }
     }
@@ -105,6 +124,12 @@ public abstract class PlayerDataCache<V> extends SQLDataCacheTemp<Account, V> im
             getFutures().put(account, future = new CompletableFuture<V>());
 
         future.complete(value);
+    }
+
+    @Override
+    public void accountRemoved(Account account)
+    {
+        removeFromCache(account);
     }
 
     //Getters

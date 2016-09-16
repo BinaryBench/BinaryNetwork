@@ -10,15 +10,19 @@
 classes
 
 # Ignore Server
-Servers/
-!/Servers/*/windowsrun.bat
-!/Servers/*/macrun.sh
-!/Servers/*/linuxrun.sh
-!/Servers/*/eula.txt
-!/Servers/*/spigot-1.8.8.jar
-!/Servers/*/server.properties
-!/Servers/*/BukkitGUIv2.exe
-!/Servers/Bungee/config.yml
+Servers/*/*
+
+
+# !Servers/Hub/eula.txt
+!Servers/*/windowsrun.bat
+!Servers/*/macrun.sh
+!Servers/*/linuxrun.sh
+!Servers/*/eula.txt
+!Servers/*/spigot-1.8.8.jar
+!Servers/*/server.properties
+!Servers/*/BukkitGUIv2.exe
+!Servers/*/config.yml
+
 
 # Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
 !gradle-wrapper.jar
@@ -33,8 +37,5 @@ Servers/
 # IntelliJ project files
 .idea
 *.iml
-
-
-
 
 

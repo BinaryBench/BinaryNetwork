@@ -60,6 +60,9 @@ public class AccountManager extends SQLDataCacheTemp<UUID, Account> implements L
     @EventHandler
     public void preLogin(AsyncPlayerPreLoginEvent event)
     {
+        if (!UUIDUtil.isOnlineUUID(event.getUniqueId()))
+            return;
+
         Account account = getSync(event.getUniqueId());
 
         StringBuilder sb = new StringBuilder();

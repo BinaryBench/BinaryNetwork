@@ -3,6 +3,14 @@ allprojects {
     version '0.0.1-SNAPSHOT'
 }
 
+project.ext {
+    bukkitProjects = subprojects.findAll{
+        it.name == 'Core' ||
+        it.name == 'Game' ||
+        it.name == 'Hub'
+    }
+}
+
 subprojects {
     apply plugin: 'java'
     apply plugin: 'idea'
@@ -12,13 +20,10 @@ subprojects {
 
     repositories {
         mavenCentral()
-        maven { url "http://repo.bukkit.org/content/groups/public/" }
     }
 
     dependencies {
         testCompile group: 'junit', name: 'junit', version: '4.11'
-
-        compile fileTree(include: ['*.jar'], dir: '../Libraries')
     }
 
     idea {
@@ -26,6 +31,15 @@ subprojects {
             downloadJavadoc = true
             downloadSources = true
         }
+    }
+
+}
+
+configure(project.bukkitProjects) {
+    // insert your custom configuration code
+
+    dependencies {
+        compile fileTree(include: ['*.jar'], dir: '../Libraries')
     }
 
 }

@@ -1,0 +1,25 @@
+libsDirName = '../../Servers/Bungee/plugins'
+
+repositories {
+    maven {
+        url "https://oss.sonatype.org/content/repositories/snapshots"
+    }
+}
+
+configurations {
+    includeInJar
+}
+
+dependencies {
+    includeInJar(project(':Core')) {
+        transitive = false
+    }
+
+    includeInJar group: 'net.md-5', name: 'bungeecord-api', version: '1.10-SNAPSHOT'
+
+    configurations.compile.extendsFrom(configurations.includeInJar)
+}
+
+jar {
+    from configurations.includeInJar.collect { zipTree it }
+}

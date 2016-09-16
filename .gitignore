@@ -13,7 +13,6 @@ classes
 Servers/*/*
 
 
-# !Servers/Hub/eula.txt
 !Servers/*/windowsrun.bat
 !Servers/*/macrun.sh
 !Servers/*/linuxrun.sh
@@ -22,7 +21,7 @@ Servers/*/*
 !Servers/*/server.properties
 !Servers/*/BukkitGUIv2.exe
 !Servers/*/config.yml
-
+!/Servers/*/spigot.yml
 
 # Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
 !gradle-wrapper.jar
@@ -37,5 +36,6 @@ Servers/*/*
 # IntelliJ project files
 .idea
 *.iml
+
 
 

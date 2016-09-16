@@ -1,5 +1,6 @@
-player_limit: -1
-ip_forward: false
+ip_forward: true
+network_compression_threshold: 256
+stats: e09d4552-4a8b-4598-91c5-8b0edb00c6aa
 permissions:
   default:
   - bungeecord.command.server
@@ -9,34 +10,38 @@ permissions:
   - bungeecord.command.end
   - bungeecord.command.ip
   - bungeecord.command.reload
-timeout: 30000
-log_commands: false
-online_mode: true
+groups:
+  BinaryBeauty:
+  - admin
 servers:
-  lobby:
-    motd: '&1Just another BungeeCord - Forced Host'
-    address: localhost:25565
+  hub:
+    motd: '&1BinaryNetwork Hub - Forced Host'
+    address: localhost:25564
     restricted: false
+  game:
+    motd: '&1BinaryNetwork Game - Forced Host'
+    address: localhost:25563
+    restricted: false
+timeout: 30000
 listeners:
-- query_port: 25577
-  motd: '&1Another Bungee server'
+- query_port: 25566
+  motd: '&1BinaryNetwork'
   priorities:
-  - lobby
+  - hub
+  - game
   bind_local_address: true
   tab_list: GLOBAL_PING
   query_enabled: false
-  host: 0.0.0.0:25577
+  host: 0.0.0.0:25566
   forced_hosts:
     pvp.md-5.net: pvp
   max_players: 1
   tab_size: 60
   ping_passthrough: false
   force_default_server: false
+player_limit: -1
+online_mode: false
+log_commands: false
 disabled_commands:
 - disabledcommandhere
-network_compression_threshold: 256
-groups:
-  md_5:
-  - admin
 connection_throttle: 4000
-stats: e09d4552-4a8b-4598-91c5-8b0edb00c6aa

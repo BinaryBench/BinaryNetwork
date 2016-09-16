@@ -206,6 +206,7 @@ public class AccountManager extends SQLDataCacheTemp<UUID, Account> implements L
         if (Bukkit.getPlayer(key) == null)
         {
             markAsTemp(key);
+            //Log.debug(ServerUtil.getOfflinePlayer(key).getName());
             Log.debugf("%s account marked as temp.", F.possession(ServerUtil.getOfflinePlayer(key).getName()));
         }
         return super.getOrCreateFuture(key);

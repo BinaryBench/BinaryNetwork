@@ -1,6 +1,5 @@
 package me.binarynetwork.core.command;
 
-import me.binarynetwork.core.common.Log;
 import me.binarynetwork.core.permissions.PermissionManager;
 import org.bukkit.command.CommandSender;
 
@@ -22,7 +21,6 @@ public abstract class BaseCommand implements Command {
     @Override
     public boolean hasPermission(CommandSender sender, String[] args)
     {
-        Log.debugf("Checking sender %s permissions for stop command", sender.getName());
         return getPermissionManager().hasPermission(sender, getPermission());
     }
 

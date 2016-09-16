@@ -83,7 +83,13 @@ public class RankManager implements Listener{
 
     public void getRank(Player player, Consumer<Rank> callback)
     {
-        getRankDataCache().get(player, rank -> Scheduler.runSync(() -> callback.accept(rank)));
+        Rank rank = getRankIfExists(player);
+        if (rank != null)
+        {
+            callback.accept(rank);
+            return;
+        }
+        getRankDataCache().get(player, consumedRank -> Scheduler.runSync(() -> callback.accept(consumedRank)));
     }
 
     private RankDataCache getRankDataCache()

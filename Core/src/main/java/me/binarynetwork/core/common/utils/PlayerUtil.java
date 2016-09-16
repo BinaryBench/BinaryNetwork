@@ -1,11 +1,13 @@
 package me.binarynetwork.core.common.utils;
 
-
-import com.comphenix.protocol.PacketType;
-import net.md_5.bungee.api.connection.ProxiedPlayer;
+import com.google.common.io.ByteArrayDataOutput;
+import com.google.common.io.ByteStreams;
+import me.binarynetwork.core.BinaryNetworkPlugin;
+import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.potion.PotionEffect;
 
 /**
@@ -171,12 +173,17 @@ public class PlayerUtil {
             return null;
     }
 
-    public static ProxiedPlayer getProxyPlayer(CommandSender sender)
+    public static void sendToServer(Player player, String server)
     {
-        if (sender instanceof ProxiedPlayer)
-            return (ProxiedPlayer) sender;
-        else
-            return null;
+        Plugin plugin = BinaryNetworkPlugin.getPlugin();
+        if (!Bukkit.getServer().getMessenger().isOutgoingChannelRegistered(plugin, "BungeeCord"))
+            Bukkit.getServer().getMessenger().registerOutgoingPluginChannel(plugin, "BungeeCord");
+
+        ByteArrayDataOutput out = ByteStreams.newDataOutput();
+        out.writeUTF("Connect");
+        out.writeUTF(server);
+        player.sendPluginMessage(plugin, "BungeeCord", out.toByteArray());
     }
+
 
 }

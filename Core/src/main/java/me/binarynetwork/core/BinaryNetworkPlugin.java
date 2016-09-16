@@ -9,6 +9,7 @@ import me.binarynetwork.core.common.utils.WorldUtil;
 import me.binarynetwork.core.component.SimpleComponentWrapper;
 import me.binarynetwork.core.currency.CurrencyManager;
 import me.binarynetwork.core.permissions.PermissionManagerWrapper;
+import me.binarynetwork.core.portal.commands.ServerCommand;
 import me.binarynetwork.core.rank.RankManager;
 import me.binarynetwork.core.permissions.RankPermissionManager;
 import org.bukkit.Bukkit;
@@ -81,7 +82,7 @@ public abstract class BinaryNetworkPlugin extends JavaPlugin implements Listener
 
         //Commands
         commandManager.addCommand(new StopCommand(permissionWrapper), "stop");
-
+        commandManager.addCommand(new ServerCommand(permissionManager, "hub"), "hub", "leave");
         registerEvents(this);
 
         WorldUtil.purgeTemporaryWorlds();

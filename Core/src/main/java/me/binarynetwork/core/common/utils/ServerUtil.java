@@ -1,11 +1,13 @@
 package me.binarynetwork.core.common.utils;
 
+import me.binarynetwork.core.BinaryNetworkPlugin;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
+import org.bukkit.plugin.Plugin;
 
 import java.util.*;
 
@@ -85,5 +87,10 @@ public class ServerUtil {
     public static Collection<? extends Player> getOnlinePlayers()
     {
         return Bukkit.getOnlinePlayers();
+    }
+
+    public static Plugin getPlugin()
+    {
+        return BinaryNetworkPlugin.getPlugin();
     }
 }

@@ -4,6 +4,8 @@ stats: e09d4552-4a8b-4598-91c5-8b0edb00c6aa
 groups:
   BinaryBeauty:
   - admin
+  BinaryBench:
+  - admin
 servers:
   hub:
     motd: '&1BinaryNetwork Hub - Forced Host'
@@ -30,11 +32,10 @@ listeners:
   max_players: 1
   tab_size: 60
   ping_passthrough: false
-  force_default_server: false
+  force_default_server: true
 permissions:
   default:
   - bungeecord.command.server
-  - bungeecord.command.list
   admin:
   - bungeecord.command.alert
   - bungeecord.command.end

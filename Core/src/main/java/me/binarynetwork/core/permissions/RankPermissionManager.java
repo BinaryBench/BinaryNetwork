@@ -1,6 +1,7 @@
 package me.binarynetwork.core.permissions;
 
 import me.binarynetwork.core.BinaryNetworkPlugin;
+import me.binarynetwork.core.common.Log;
 import me.binarynetwork.core.common.utils.MapUtil;
 import me.binarynetwork.core.common.utils.ServerUtil;
 import me.binarynetwork.core.component.ComponentWrapper;
@@ -52,7 +53,6 @@ public class RankPermissionManager extends ListenerComponent implements Permissi
             // if never seen this command before add command to bukkit and reload known commands
             addPermission(permission);
         }
-
         return player.hasPermission(permission);
     }
 
@@ -175,6 +175,7 @@ public class RankPermissionManager extends ListenerComponent implements Permissi
             attachment = player.addAttachment(BinaryNetworkPlugin.getPlugin());
             attachments.put(player.getUniqueId(), attachment);
         }
+
         rankManager.getRank(player, rank -> {
             Map<Permission, Boolean> perms = rankPermissions.get(rank);
             if (perms == null)

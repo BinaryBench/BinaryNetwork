@@ -11,6 +11,9 @@ classes
 
 # Ignore Server
 Servers/*/*
+!Servers/*/plugins/
+!Servers/*/plugins/*.jar
+Servers/*/plugins/*/
 
 
 !Servers/*/windowsrun.bat
@@ -21,8 +24,18 @@ Servers/*/*
 !Servers/*/server.properties
 !Servers/*/BukkitGUIv2.exe
 !Servers/*/config.yml
-!/Servers/*/spigot.yml
-!/Servers/*/bukkit.yml
+!Servers/*/spigot.yml
+!Servers/*/bukkit.yml
+
+# Don't ignore plugin folders
+!Servers/*/plugins/Game/
+!Servers/*/plugins/Hub/
+!Servers/*/plugins/BungeePlugin/
+
+# Do ignore plugin jars
+Servers/*/plugins/Game-*.jar
+Servers/*/plugins/Hub-*.jar
+Servers/*/plugins/BungeePlugin-*.jar
 
 # Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
 !gradle-wrapper.jar

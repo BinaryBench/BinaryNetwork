@@ -1,0 +1,7 @@
+VoidLevel: 30
+Storm: false
+SpawnPoints:
+ - 0.5,57,-4.5
+Games:
+ - Runner
+ - Spleef

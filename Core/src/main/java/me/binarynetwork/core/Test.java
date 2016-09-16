@@ -1,11 +1,12 @@
 package me.binarynetwork.core;
 
+import me.binarynetwork.core.common.utils.ServerUtil;
 import me.binarynetwork.core.component.SimpleComponentWrapper;
 import me.binarynetwork.core.component.components.NoDamage;
+import me.binarynetwork.core.currency.Currency;
+import org.apache.commons.lang3.tuple.Pair;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -14,12 +15,13 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Test {
     public static void main(String[] args)
     {
-        Map<String, Integer> map = new ConcurrentHashMap<>();
+        Object object = new Object();
 
-        map.put("moo", 1);
+        Set<Pair<Object, Currency>> pairs = new HashSet<>();
 
-        int i = map.get("");
+        pairs.add(Pair.of(object, Currency.COSMETIC));
 
-        System.out.println(i);
+        System.out.printf("Contains: %s", pairs.contains(Pair.of(object, Currency.COSMETIC)));
+
     }
 }

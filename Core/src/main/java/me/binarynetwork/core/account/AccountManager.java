@@ -5,6 +5,7 @@ import me.binarynetwork.core.common.Log;
 import me.binarynetwork.core.common.format.F;
 import me.binarynetwork.core.common.utils.PlayerUtil;
 import me.binarynetwork.core.common.utils.ServerUtil;
+import me.binarynetwork.core.common.utils.UUIDUtil;
 import me.binarynetwork.core.database.DataSourceManager;
 import me.binarynetwork.core.database.SQLDataCacheTemp;
 import org.bukkit.Bukkit;
@@ -160,18 +161,19 @@ public class AccountManager extends SQLDataCacheTemp<UUID, Account> implements L
 
     public Account loadAccount(UUID key, Connection connection) throws SQLException
     {
-        try (PreparedStatement statement = connection.prepareStatement(SELECT_ACCOUNT))
-        {
-            statement.setString(1, key.toString());
-            ResultSet resultSet = statement.executeQuery();
-
-            if (resultSet.next())
+        if (UUIDUtil.isOnlineUUID(key))
+            try (PreparedStatement statement = connection.prepareStatement(SELECT_ACCOUNT))
             {
-                Account account = new Account(resultSet.getInt("id"), key);
-                System.err.println("Loaded account: " + account.toString());
-                return account;
+                statement.setString(1, key.toString());
+                ResultSet resultSet = statement.executeQuery();
+
+                if (resultSet.next())
+                {
+                    Account account = new Account(resultSet.getInt("id"), key);
+                    System.err.println("Loaded account: " + account.toString());
+                    return account;
+                }
             }
-        }
         return null;
     }
 

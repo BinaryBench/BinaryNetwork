@@ -10,7 +10,7 @@ import java.util.UUID;
  * Created by Bench on 9/16/2016.
  */
 public class UUIDUtil {
-    public static boolean isOnline(@Nonnull UUID uuid)
+    public static boolean isOnlineUUID(@Nonnull UUID uuid)
     {
         return uuid.version() == 4;
     }

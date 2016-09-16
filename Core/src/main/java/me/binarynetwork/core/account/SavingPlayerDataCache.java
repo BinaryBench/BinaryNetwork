@@ -66,7 +66,6 @@ public abstract class SavingPlayerDataCache<V> extends PlayerDataCache<V> {
 
         execute(connection -> {
             int successes = saveData(connection, Collections.singletonMap(key, value));
-            Log.debugf("Successes: %d", successes);
             failure.accept(successes != 1);
         });
         return true;

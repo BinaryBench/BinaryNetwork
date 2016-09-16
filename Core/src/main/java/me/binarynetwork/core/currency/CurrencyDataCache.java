@@ -6,13 +6,13 @@ import me.binarynetwork.core.account.AccountManager;
 import me.binarynetwork.core.account.SavingPlayerDataCache;
 import me.binarynetwork.core.common.Log;
 import me.binarynetwork.core.database.DataSourceManager;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Consumer;
 
@@ -95,7 +95,9 @@ public class CurrencyDataCache extends SavingPlayerDataCache<CurrencyToken> {
     {
         try(PreparedStatement preparedStatement = connection.prepareStatement(INSERT_INTO_PLAYER_CURRENCIES_ON_DUPLICATE_KEY))
         {
+            Set<Pair<Account, Currency>> skip = new HashSet<>();
 
+            int successCount = 0;
             for (Map.Entry<Account, CurrencyToken> accountsEntry : key.entrySet())
             {
                 for (Map.Entry<Currency, Integer> currencyEntry : accountsEntry.getValue().getNewCurrencies().entrySet())
@@ -103,8 +105,17 @@ public class CurrencyDataCache extends SavingPlayerDataCache<CurrencyToken> {
                     int newAmount = currencyEntry.getValue();
                     int initialAmount = accountsEntry.getValue().getInitialCurrencies().getOrDefault(currencyEntry.getKey(), 0);
 
+                    int change = newAmount - initialAmount;
+
+                    if (change == 0)
+                    {
+                        skip.add(Pair.of(accountsEntry.getKey(), currencyEntry.getKey()));
+                        continue;
+                    }
+
+
                     preparedStatement.setInt(1, accountsEntry.getKey().getId());
-                    preparedStatement.setInt(2, newAmount - initialAmount);
+                    preparedStatement.setInt(2, change);
                     preparedStatement.setString(3, currencyEntry.getKey().getId());
                     preparedStatement.addBatch();
                 }
@@ -112,21 +123,26 @@ public class CurrencyDataCache extends SavingPlayerDataCache<CurrencyToken> {
 
             int[] affectedRows = preparedStatement.executeBatch();
             int i = 0;
-            int successCount = 0;
-
 
 
             for (Map.Entry<Account, CurrencyToken> accountsEntry : key.entrySet())
             {
+                boolean success = true;
                 for (Map.Entry<Currency, Integer> currencyEntry : accountsEntry.getValue().getNewCurrencies().entrySet())
                 {
-                    if (affectedRows[i] > 0)
+                    if (skip.contains(Pair.of(accountsEntry.getKey(), currencyEntry.getKey())))
                     {
-                        accountsEntry.getValue().resetInitialCurrency(currencyEntry.getKey());
-                        successCount++;
+                        continue;
                     }
+
+                    if (affectedRows[i] > 0)
+                        accountsEntry.getValue().resetInitialCurrency(currencyEntry.getKey());
+                    else
+                        success = false;
                     i++;
                 }
+                if (success)
+                    successCount++;
             }
 
             return successCount;

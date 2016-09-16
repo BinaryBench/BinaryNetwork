@@ -1,6 +1,15 @@
 ip_forward: true
 network_compression_threshold: 256
 stats: e09d4552-4a8b-4598-91c5-8b0edb00c6aa
+permissions:
+  default:
+  - bungeecord.command.server
+  - bungeecord.command.list
+  admin:
+  - bungeecord.command.alert
+  - bungeecord.command.end
+  - bungeecord.command.ip
+  - bungeecord.command.reload
 groups:
   BinaryBeauty:
   - admin
@@ -14,7 +23,6 @@ servers:
     address: localhost:25563
     restricted: false
 timeout: 30000
-player_limit: -1
 listeners:
 - query_port: 25566
   motd: '&1BinaryNetwork'
@@ -31,15 +39,7 @@ listeners:
   tab_size: 60
   ping_passthrough: false
   force_default_server: false
-permissions:
-  default:
-  - bungeecord.command.server
-  - bungeecord.command.list
-  admin:
-  - bungeecord.command.alert
-  - bungeecord.command.end
-  - bungeecord.command.ip
-  - bungeecord.command.reload
+player_limit: -1
 online_mode: true
 log_commands: false
 disabled_commands:

@@ -11,6 +11,7 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /**
  * Created by Bench on 9/14/2016.
@@ -25,7 +26,7 @@ public abstract class SavingPlayerDataCache<V> extends PlayerDataCache<V> {
         enableAutoSave(1, TimeUnit.MINUTES);
     }
 
-    public abstract void saveData(Connection connection, Map<Account, V> key, Consumer<Integer> successes);
+    public abstract int saveData(Connection connection, Map<Account, V> key);
 
     //Save management
     public boolean enableAutoSave(int amount, TimeUnit unit)
@@ -54,15 +55,19 @@ public abstract class SavingPlayerDataCache<V> extends PlayerDataCache<V> {
         });
     }
 
-    public boolean save(Account key, Consumer<Boolean> success)
+    public boolean save(Account key, Consumer<Boolean> failure)
     {
+        if (key.isTemp())
+            return true;
+
         V value = getIfExists(key);
         if (value == null)
             return false;
+
         execute(connection -> {
-            saveData(connection, Collections.singletonMap(key, value), integer -> {
-                success.accept(integer < 1);
-            });
+            int successes = saveData(connection, Collections.singletonMap(key, value));
+            Log.debugf("Successes: %d", successes);
+            failure.accept(successes != 1);
         });
         return true;
     }
@@ -75,10 +80,12 @@ public abstract class SavingPlayerDataCache<V> extends PlayerDataCache<V> {
         });
     }
 
-    public void saveData(Consumer<Integer> successes)
+    public void saveData(Consumer<Integer> failures)
     {
+        Map<Account, V> map = getCacheAsMap(entry -> !entry.getKey().isTemp());
+        int amount = map.size();
         execute(connection -> {
-            saveData(connection, getCacheAsMap(), successes);
+            failures.accept(saveData(connection, map) - amount);
         });
     }
 

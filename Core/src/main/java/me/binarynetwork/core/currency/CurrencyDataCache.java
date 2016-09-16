@@ -91,7 +91,7 @@ public class CurrencyDataCache extends SavingPlayerDataCache<CurrencyToken> {
     }
 
     @Override
-    public void saveData(Connection connection, Map<Account, CurrencyToken> key, Consumer<Integer> successes)
+    public int saveData(Connection connection, Map<Account, CurrencyToken> key)
     {
         try(PreparedStatement preparedStatement = connection.prepareStatement(INSERT_INTO_PLAYER_CURRENCIES_ON_DUPLICATE_KEY))
         {
@@ -129,12 +129,12 @@ public class CurrencyDataCache extends SavingPlayerDataCache<CurrencyToken> {
                 }
             }
 
-            successes.accept(successCount);
+            return successCount;
         }
         catch (SQLException e)
         {
             e.printStackTrace();
-            successes.accept(0);
+            return 0;
         }
     }
 

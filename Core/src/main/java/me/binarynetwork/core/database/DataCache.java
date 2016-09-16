@@ -1,11 +1,16 @@
 package me.binarynetwork.core.database;
 
+import me.binarynetwork.core.account.Account;
+
+import java.util.AbstractMap;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
+import java.util.logging.Filter;
 
 /**
  * Created by Bench on 9/13/2016.
@@ -82,7 +87,7 @@ public abstract class DataCache<K, V> {
 
     public Map<K, V> getCacheAsMap()
     {
-        Map<K, V> map = new HashMap<K, V>();
+        Map<K, V> map = new HashMap<>();
         for (Map.Entry<K, CompletableFuture<V>> entry : futures.entrySet())
         {
             V value = entry.getValue().getNow(null);
@@ -91,6 +96,20 @@ public abstract class DataCache<K, V> {
         }
         return map;
     }
+
+    public Map<K, V> getCacheAsMap(Predicate<Map.Entry<K, V>> predicate)
+    {
+        Map<K, V> map = new HashMap<>();
+        for (Map.Entry<K, CompletableFuture<V>> entry : futures.entrySet())
+        {
+            V value = entry.getValue().getNow(null);
+            if (value != null && predicate.test(new AbstractMap.SimpleEntry<>(entry.getKey(), value)))
+                map.put(entry.getKey(), value);
+        }
+        return map;
+    }
+
+
     public int getCacheSize()
     {
         return getFutures().size();

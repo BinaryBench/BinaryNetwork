@@ -15,6 +15,11 @@ public class Account {
         this.uuid = uuid;
     }
 
+    public boolean isTemp()
+    {
+        return getId() < 0;
+    }
+
     public int getId()
     {
         return id;

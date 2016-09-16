@@ -37,5 +37,12 @@ public class Main extends BinaryNetworkPlugin {
         Log.debugf("UUIDs: %s - %s", event.getUniqueId(), fetchedUUID);
         Log.debugf("Working: %s", event.getUniqueId().equals(fetchedUUID));
         Log.debugf("Ip: %s", event.getAddress());
+
+        if (fetchedUUID == null)
+            return;
+
+        Log.debugf("Offline: %s", (event.getUniqueId().version() == 4 ? "Online" : "Offline"));
+        Log.debugf("Online: %s", (fetchedUUID.version() == 4 ? "Online" : "Offline"));
+
     }
 }

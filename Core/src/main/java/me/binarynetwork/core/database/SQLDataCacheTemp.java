@@ -67,7 +67,7 @@ public abstract class SQLDataCacheTemp<K, V> extends DataCacheTemp<K, V> {
                 {
                     return callable.call(connection);
                 }
-                catch (SQLException e)
+                catch (Exception e)
                 {
                     if (!connection.getAutoCommit())
                         connection.rollback();
@@ -75,7 +75,7 @@ public abstract class SQLDataCacheTemp<K, V> extends DataCacheTemp<K, V> {
                     break;
                 }
             }
-            catch (Exception e)
+            catch (SQLException e)
             {
                 e.printStackTrace();
             }

@@ -1,5 +1,6 @@
 package me.binarynetwork.core.common.utils;
 
+import me.binarynetwork.core.fixes.WorldMemoryFix;
 import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
@@ -191,7 +192,7 @@ public class WorldUtil {
 
         world.setAutoSave(false);
 
-        if (Bukkit.getServer().unloadWorld(world, false)) {
+        if (WorldUtil.unloadWorld(world, false)) {
             System.out.print("Successfully unloaded " + world.getName());
         } else {
             System.err.print("Bukkit cowardly refused to unload the world: " + world.getName());
@@ -307,18 +308,20 @@ public class WorldUtil {
         }
     }
 
-    public static void unloadWorld(World world, boolean save)
+    public static boolean unloadWorld(World world, boolean save)
     {
         if (world == null)
-            return;
+            return true;
 
         for (Player player:world.getPlayers())
             player.kickPlayer("#BlameBukkit");
 
-        if (!Bukkit.getServer().unloadWorld(world, save))
+        if (!WorldMemoryFix.unload(world, save))
         {
             System.out.println("Bukkit cowardly refused to unload the world: " + world.getName());
+            return false;
         }
+        return true;
     }
 
     //THIS IS A HACK AND SHOULD PROBABLY BE REDONE AT SOME POINT!

@@ -8,14 +8,14 @@ import java.util.StringJoiner;
  */
 public class StringUtil {
 
-    public static String spaceJoin(String string, String... strings)
+    public static String spaceJoin(String... strings)
     {
-        return join("", " ", "", string, strings);
+        return join("", " ", "", strings);
     }
 
-    public static String join(String left, String between, String right, String option, String... options)
+
+    public static String join(String left, String between, String right, String... strings)
     {
-        List<String> strings = ListUtil.append(option, options);
         StringJoiner sj = new StringJoiner(between, left, right);
         for (String string : strings)
             sj.add(string);

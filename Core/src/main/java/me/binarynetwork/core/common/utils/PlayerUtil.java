@@ -1,9 +1,11 @@
 package me.binarynetwork.core.common.utils;
 
+import com.comphenix.protocol.PacketType;
 import com.google.common.io.ByteArrayDataOutput;
 import com.google.common.io.ByteStreams;
 import me.binarynetwork.core.BinaryNetworkPlugin;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -183,6 +185,11 @@ public class PlayerUtil {
         out.writeUTF("Connect");
         out.writeUTF(server);
         player.sendPluginMessage(plugin, "BungeeCord", out.toByteArray());
+    }
+
+    public static void teleport(Player player, Location location)
+    {
+        player.teleport(location);
     }
 
 

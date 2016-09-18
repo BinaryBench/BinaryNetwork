@@ -1,5 +1,7 @@
 package me.binarynetwork.core.common.utils;
 
+import net.lingala.zip4j.core.ZipFile;
+import net.lingala.zip4j.exception.ZipException;
 import org.apache.commons.io.IOUtils;
 
 import javax.annotation.Nonnull;
@@ -121,5 +123,20 @@ public class FileUtil {
         } finally {
             StreamUtil.closeQuietly(outputStream);
         }
+    }
+
+    public static boolean unZip(File sourceDir, File outputFolder)
+    {
+        try
+        {
+            ZipFile zipFile = new ZipFile(sourceDir);
+            zipFile.extractAll(outputFolder.getAbsolutePath());
+            return true;
+        }
+        catch (ZipException e)
+        {
+            e.printStackTrace();
+        }
+        return false;
     }
 }

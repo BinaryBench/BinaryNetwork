@@ -6,6 +6,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.Plugin;
 
@@ -18,7 +19,7 @@ public class ServerUtil {
 
     public static void shutdown(String shutdownMessage)
     {
-        shutdown(shutdownMessage, shutdownMessage);
+        shutdown(shutdownMessage, "Bye bye");
     }
 
     public static void shutdown(String shutdownMessage, String kickMessage)
@@ -92,5 +93,14 @@ public class ServerUtil {
     public static Plugin getPlugin()
     {
         return BinaryNetworkPlugin.getPlugin();
+    }
+
+    public static void registerEvents(Listener listener)
+    {
+        Bukkit.getPluginManager().registerEvents(listener, getPlugin());
+    }
+    public static void unregisterEvents(Listener listener)
+    {
+        HandlerList.unregisterAll(listener);
     }
 }

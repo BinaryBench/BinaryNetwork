@@ -45,14 +45,14 @@ public class F {
         return English.plural(string, amount);
     }
 
-    public static String optionalArgument(String string, String... strings)
+    public static String optionalArgument(String... strings)
     {
-        return StringUtil.join("[", " | ", "]", string, strings);
+        return StringUtil.join("[", " | ", "]", strings);
     }
 
-    public static String requiredArgument(String string, String... strings)
+    public static String requiredArgument(String... strings)
     {
-        return StringUtil.join("<", " | ", ">", string, strings);
+        return StringUtil.join("<", " | ", ">", strings);
     }
 
 }

@@ -212,7 +212,8 @@ public class AccountManager extends SQLDataCacheTemp<UUID, Account> implements L
         {
             markAsTemp(key);
             //Log.debug(ServerUtil.getOfflinePlayer(key).getName());
-            Log.debugf("%s account marked as temp.", F.possession(ServerUtil.getOfflinePlayer(key).getName()));
+            String name = ServerUtil.getOfflinePlayer(key).getName();
+            Log.debugf("%s account marked as temp.", F.possession(name != null ? name : "Unknown"));
         }
         return super.getOrCreateFuture(key);
     }

@@ -4,9 +4,7 @@ import com.comphenix.protocol.ProtocolLibrary;
 import com.comphenix.protocol.ProtocolManager;
 import me.binarynetwork.core.account.AccountManager;
 import me.binarynetwork.core.command.CommandManager;
-import me.binarynetwork.core.commands.GameModeCommand;
-import me.binarynetwork.core.commands.StopCommand;
-import me.binarynetwork.core.commands.TeleportCommand;
+import me.binarynetwork.core.commands.DefaultCommandManager;
 import me.binarynetwork.core.common.utils.PlayerUtil;
 import me.binarynetwork.core.common.utils.ServerUtil;
 import me.binarynetwork.core.common.utils.WorldUtil;
@@ -90,10 +88,11 @@ public abstract class BinaryNetworkPlugin extends JavaPlugin implements Listener
 
 
         //Commands
-        commandManager.addCommand(new StopCommand(permissionWrapper), "stop");
-        commandManager.addCommand(new TeleportCommand(permissionWrapper), "teleport", "tp");
-        commandManager.addCommand(new ServerCommand(permissionManager, "hub"), "hub", "leave");
-        commandManager.addCommand(new GameModeCommand(permissionWrapper, GameMode.CREATIVE), "Creative", "gmc");
+        //commandManager.addCommand(new StopCommand(permissionWrapper), "stop");
+        //commandManager.addCommand(new TeleportCommand(permissionWrapper), "teleport", "tp");
+        //commandManager.addCommand(new ServerCommand(permissionManager, "hub"), "hub", "leave");
+        //commandManager.addCommand(new GameModeCommand(permissionWrapper, GameMode.CREATIVE), "Creative", "gmc");
+        new DefaultCommandManager(commandManager, permissionWrapper);
         registerEvents(this);
 
         WorldUtil.purgeTemporaryWorlds(getScheduler());

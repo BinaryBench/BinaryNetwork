@@ -70,9 +70,13 @@ public class RankPermissionManager extends ListenerComponent implements Permissi
     {
         if (registeredPermissions.containsKey(permissionString.toLowerCase()))
             return;
-        Permission permission = new Permission(permissionString.toLowerCase());
-        Bukkit.getPluginManager().addPermission(permission);
-        registeredPermissions.put(permission.getName().toLowerCase(), permission);
+        reloadPermissions();
+        if (!registeredPermissions.containsKey(permissionString.toLowerCase()))
+        {
+            Permission permission = new Permission(permissionString.toLowerCase());
+            Bukkit.getPluginManager().addPermission(permission);
+            registeredPermissions.put(permission.getName().toLowerCase(), permission);
+        }
         reloadRankPermissions();
         for (Player player : ServerUtil.getOnlinePlayers())
         {

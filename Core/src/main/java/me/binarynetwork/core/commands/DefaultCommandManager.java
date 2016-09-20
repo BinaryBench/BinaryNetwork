@@ -1,6 +1,7 @@
 package me.binarynetwork.core.commands;
 
 import me.binarynetwork.core.command.CommandWrapper;
+import me.binarynetwork.core.command.DummyCommand;
 import me.binarynetwork.core.component.world.WorldConfiguration;
 import me.binarynetwork.core.permissions.PermissionManager;
 import org.apache.commons.lang.WordUtils;
@@ -23,12 +24,14 @@ public class DefaultCommandManager {
         add(new TeleportCommand(), "Teleport", "tp");
         add(new OpCommand(), "op");
         add(new GameModeCommand(), "Gamemode", "gm");
-
+        commandWrapper.addCommand(new DummyCommand(true, true), "XAmpp");
+        commandWrapper.addCommand(new DummyCommand(true, true), "XAMP");
         for (GameMode gameMode : GameMode.values())
         {
             commandWrapper.addCommand(new me.binarynetwork.core.commands.GameModeCommand(permissionManager, gameMode),
                     WordUtils.capitalizeFully(gameMode.name()),
-                    "gm" + gameMode.name().substring(0,1).toLowerCase());
+                    "gm" + gameMode.name().substring(0,1).toLowerCase()
+            );
         }
 
         add(new TellCommand(), "Tell", "msg", "Message");

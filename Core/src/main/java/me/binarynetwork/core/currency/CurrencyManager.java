@@ -22,7 +22,9 @@ public class CurrencyManager {
         this.cache = new CurrencyDataCache(scheduler, accountManager);
         for (Currency currency : Currency.values())
         {
-            commandWrapper.addCommand(new CurrencyCommand(currency, this, permissionManager), currency.getDisplayName(), currency.toString(), currency.getId());
+            commandWrapper.addCommand(new CurrencyCommand(currency, this, permissionManager),
+                    currency.getDisplayName()
+            );
         }
     }
 

@@ -1,12 +1,16 @@
 package me.binarynetwork.core.fixes;
 
 import net.minecraft.server.v1_8_R3.*;
+import org.bukkit.Bukkit;
 import org.bukkit.craftbukkit.v1_8_R3.CraftWorld;
 import org.bukkit.craftbukkit.v1_8_R3.util.LongObjectHashMap;
 
 import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 /**
  * Created by Bench on 9/17/2016.
@@ -60,23 +64,35 @@ public class WorldMemoryFix {
         }
     }
 
-    public static boolean unload(org.bukkit.World world, boolean save)
+    public static boolean unload(org.bukkit.World world, ScheduledExecutorService scheduler, boolean save, Consumer<Boolean> callback)
     {
         ChunkProviderServer chunkProviderServer = ((CraftWorld) world).getHandle().chunkProviderServer;
 
-        for (org.bukkit.Chunk chunk : world.getLoadedChunks())
+        //for (org.bukkit.Chunk chunk : world.getLoadedChunks())
+            //world.unloadChunk(chunk.getX(), chunk.getZ(), save, false);
+
+
+        if (!Bukkit.unloadWorld(world, save))
         {
-            world.unloadChunk(chunk.getX(), chunk.getZ(), false, false);
+            callback.accept(false);
+            return false;
         }
 
-        try
+        scheduler.schedule(() ->
         {
-            clearChunkPS(chunkProviderServer);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
+            try
+            {
+                clearChunkPS(chunkProviderServer);
+                callback.accept(true);
+            }
+            catch (Exception e)
+            {
+                e.printStackTrace();
+                callback.accept(false);
+            }
+
+        }, 10, TimeUnit.SECONDS);
+
         return true;
     }
 
@@ -103,7 +119,7 @@ public class WorldMemoryFix {
 
             tileEntities.set(chunk, null);
 
-            org.bukkit.Chunk bukkitC = (org.bukkit.Chunk) bukkitChunk.get(chunk);
+            //org.bukkit.Chunk bukkitC = (org.bukkit.Chunk) bukkitChunk.get(chunk);
             bukkitChunk.set(chunk, null);
         }
 

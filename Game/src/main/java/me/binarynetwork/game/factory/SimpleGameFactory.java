@@ -1,8 +1,10 @@
 package me.binarynetwork.game.factory;
 
+import me.binarynetwork.core.common.utils.ServerUtil;
 import me.binarynetwork.core.component.Component;
 import me.binarynetwork.core.component.SimpleComponentWrapper;
 import me.binarynetwork.core.playerholder.PlayerHolder;
+import me.binarynetwork.game.games.SpleefRunner;
 import me.binarynetwork.game.games.runner.RunnerGame;
 import me.binarynetwork.game.games.spleef.SpleefGame;
 import me.binarynetwork.game.lobby.LobbyWorldComponent;
@@ -36,10 +38,9 @@ public class SimpleGameFactory implements GameFactory {
         {
             case 0: return new SpleefGame(playerHolder, scheduler, lobbyWorldComponent, onEnd);
             case 1: return new RunnerGame(playerHolder, scheduler, lobbyWorldComponent, onEnd);
-            case 2: return new SimpleComponentWrapper();
+            case 2: return new SpleefRunner(playerHolder, scheduler, lobbyWorldComponent, onEnd);
             default: counter = 0;
                 return getGame(onEnd);
         }
-
     }
 }

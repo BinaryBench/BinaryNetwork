@@ -1,5 +1,6 @@
 package me.binarynetwork.core.common.utils;
 
+import me.binarynetwork.core.common.Log;
 import me.binarynetwork.core.fixes.WorldMemoryFix;
 import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
@@ -11,8 +12,10 @@ import org.bukkit.plugin.Plugin;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 /**
  * Created by Bench on 8/30/2016.
@@ -192,27 +195,29 @@ public class WorldUtil {
 
         world.setAutoSave(false);
 
-        if (WorldUtil.unloadWorld(world, false)) {
-            System.out.print("Successfully unloaded " + world.getName());
-        } else {
-            System.err.print("Bukkit cowardly refused to unload the world: " + world.getName());
-            return false;
-        }
-
-        executorService.schedule(() -> {
+        if (WorldUtil.unloadWorld(world, executorService, false, (aBoolean) -> {
+            if (aBoolean)
+                Log.infof("Successfully finished unloading %s", world.getName());
+            else
+                Log.infof("Failed to unload %s", world.getName());
 
             try {
                 FileUtils.deleteDirectory(file);
                 System.out.print("Successfully deleted " + world.getName());
                 if (runAfter != null)
                     Bukkit.getScheduler().runTask(plugin, runAfter);
-
-            } catch (Exception e) {
+            }
+            catch (Exception e)
+            {
                 System.out.print("COULD NOT DELETE " + world.getName() + "!");
                 e.printStackTrace();
             }
-
-        }, 4, TimeUnit.SECONDS);
+        })) {
+            System.out.print("Successfully started to unload " + world.getName());
+        } else {
+            System.err.print("Bukkit cowardly refused to unload the world: " + world.getName());
+            return false;
+        }
 
         return true;
     }
@@ -308,7 +313,7 @@ public class WorldUtil {
         }
     }
 
-    public static boolean unloadWorld(World world, boolean save)
+    public static boolean unloadWorld(World world, ScheduledExecutorService scheduler, boolean save, Consumer<Boolean> callback)
     {
         if (world == null)
             return true;
@@ -316,7 +321,7 @@ public class WorldUtil {
         for (Player player:world.getPlayers())
             player.kickPlayer("#BlameBukkit");
 
-        if (!WorldMemoryFix.unload(world, save))
+        if (!WorldMemoryFix.unload(world, scheduler, save, callback))
         {
             System.out.println("Bukkit cowardly refused to unload the world: " + world.getName());
             return false;
@@ -333,16 +338,7 @@ public class WorldUtil {
             File worldFile = WorldUtil.getWorldFile(world);
             if (worldFile.isDirectory())
             {
-                try
-                {
-                    if (!new File(worldFile, TEMP_FILE_NAME).createNewFile())
-                    {
-                        System.err.println("Unable to create temporary file in file " + worldFile);
-                    }
-                } catch (IOException e)
-                {
-                    e.printStackTrace();
-                }
+                markAsTemp(worldFile);
             }
         }
         return world;
@@ -351,25 +347,31 @@ public class WorldUtil {
     /**
      * Deletes all temporary worlds.  BE CAREFUL, WORLDS MAY STILL BE IN USE!
      */
-    public static void purgeTemporaryWorlds()
+    public static void purgeTemporaryWorlds(ScheduledExecutorService scheduler)
     {
         File[] files = Bukkit.getWorldContainer().listFiles();
         if (files == null)
             return;
-        for (File file : files)
-        {
-            if (file.isDirectory() && new File(file, TEMP_FILE_NAME).exists())
-            {
-                WorldUtil.unloadWorld(getWorld(file.getName()), false);
-                try
-                {
-                    FileUtils.deleteDirectory(file);
-                } catch (IOException e)
-                {
-                    e.printStackTrace();
-                }
 
+        List<File> tempFiles = new ArrayList<>();
+
+        for (File file : files)
+            if (file.isDirectory() && new File(file, TEMP_FILE_NAME).exists())
+                WorldUtil.deleteWorld(file.getName(), scheduler, ServerUtil.getPlugin());
+    }
+
+    public static void markAsTemp(File worldFile)
+    {
+        try
+        {
+            if (!new File(worldFile, TEMP_FILE_NAME).createNewFile())
+            {
+                System.err.println("Unable to create temporary file in file " + worldFile);
             }
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
         }
     }
 

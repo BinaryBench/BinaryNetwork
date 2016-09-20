@@ -18,16 +18,16 @@ public enum Rank {
             "!server.stop"
     ),
     MODERATOR("mod", "Mod",ChatColor.GOLD + "Mod",
-            ""
+            "portal.command"
     ),
     BUILDER("build", "Builder", ChatColor.DARK_GRAY + "Builder",
-            ""
+            "portal.command"
     ),
     BERRY("berry", "Berry",ChatColor.DARK_PURPLE + "Berry",
-            ""
+            "portal.command"
     ),
     DEFAULT("default", "Default", null,
-            ""
+            "portal.command"
     );
 
 

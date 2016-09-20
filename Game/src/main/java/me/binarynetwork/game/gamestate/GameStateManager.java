@@ -69,7 +69,12 @@ public class GameStateManager extends BaseComponent {
 
         isStateChanging = false;
         if (backloggedState != null)
-            backloggedState.run();
+        {
+            Runnable backlogged = backloggedState;
+            backloggedState = null;
+            backlogged.run();
+        }
+
 
 
 

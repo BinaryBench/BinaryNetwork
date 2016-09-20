@@ -1,5 +1,6 @@
 package me.binarynetwork.game.arena;
 
+import me.binarynetwork.core.common.utils.ServerUtil;
 import me.binarynetwork.core.component.BaseComponent;
 import me.binarynetwork.core.component.Component;
 import me.binarynetwork.game.factory.GameFactory;
@@ -50,6 +51,7 @@ public class Arena implements Component, Runnable {
         currentGame.disable();
         currentGame = getGameFactory().getGame(this);
         currentGame.enable();
+        ServerUtil.broadcast("Game " + currentGame.getClass().getSimpleName());
     }
 
 

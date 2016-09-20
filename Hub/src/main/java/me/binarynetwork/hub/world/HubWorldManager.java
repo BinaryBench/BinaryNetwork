@@ -10,6 +10,7 @@ import me.binarynetwork.core.component.SimpleComponentWrapper;
 import me.binarynetwork.core.component.components.NoBlockBreak;
 import me.binarynetwork.core.component.components.NoBlockPlace;
 import me.binarynetwork.core.component.components.NoDamage;
+import me.binarynetwork.core.component.components.WeatherComponent;
 import me.binarynetwork.core.component.world.WorldManager;
 import me.binarynetwork.core.playerholder.PlayerHolder;
 import me.binarynetwork.hub.world.respawn.RespawnManager;
@@ -81,7 +82,8 @@ public class HubWorldManager implements Listener, Supplier<World>, Predicate<Wor
                 respawnManager,
                 new NoDamage(playerHolder),
                 new NoBlockPlace(playerHolder),
-                new NoBlockBreak(playerHolder));
+                new NoBlockBreak(playerHolder),
+                new WeatherComponent(this));
 
     }
 

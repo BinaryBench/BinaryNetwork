@@ -7,6 +7,8 @@ import me.binarynetwork.core.command.CommandManager;
 import me.binarynetwork.core.commands.GameModeCommand;
 import me.binarynetwork.core.commands.StopCommand;
 import me.binarynetwork.core.commands.TeleportCommand;
+import me.binarynetwork.core.common.utils.PlayerUtil;
+import me.binarynetwork.core.common.utils.ServerUtil;
 import me.binarynetwork.core.common.utils.WorldUtil;
 import me.binarynetwork.core.component.SimpleComponentWrapper;
 import me.binarynetwork.core.currency.CurrencyManager;
@@ -18,6 +20,7 @@ import me.binarynetwork.core.rank.RankManager;
 import me.binarynetwork.core.permissions.RankPermissionManager;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -93,7 +96,7 @@ public abstract class BinaryNetworkPlugin extends JavaPlugin implements Listener
         commandManager.addCommand(new GameModeCommand(permissionWrapper, GameMode.CREATIVE), "Creative", "gmc");
         registerEvents(this);
 
-        WorldUtil.purgeTemporaryWorlds();
+        WorldUtil.purgeTemporaryWorlds(getScheduler());
         componentWrapper.enable();
         enable();
     }
@@ -103,9 +106,14 @@ public abstract class BinaryNetworkPlugin extends JavaPlugin implements Listener
     @Override
     public final void onDisable()
     {
+        for (Player player : ServerUtil.getOnlinePlayers())
+        {
+            PlayerUtil.sendToServer(player, "hub");
+        }
         disable();
         componentWrapper.disable();
-        WorldUtil.purgeTemporaryWorlds();
+        //Causes worlds not to delete every now and then
+        WorldUtil.purgeTemporaryWorlds(getScheduler());
     }
 
     public void enable()

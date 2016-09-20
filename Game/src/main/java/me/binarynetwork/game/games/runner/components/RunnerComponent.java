@@ -1,5 +1,6 @@
 package me.binarynetwork.game.games.runner.components;
 
+import me.binarynetwork.core.common.Log;
 import me.binarynetwork.core.common.scheduler.SyncRunnable;
 import me.binarynetwork.core.component.BaseComponent;
 import me.binarynetwork.core.playerholder.PlayerHolder;
@@ -46,6 +47,7 @@ public class RunnerComponent extends BaseComponent implements SyncRunnable {
     @Override
     public void onEnable()
     {
+        Log.debugf("Enabling runner");
         this.scheduledFuture = getScheduledExecutorService().scheduleAtFixedRate(this, 200, 200, TimeUnit.MILLISECONDS);
     }
 

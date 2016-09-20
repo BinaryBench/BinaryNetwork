@@ -1,14 +1,16 @@
-package me.binarynetwork.game.games.runner;
+package me.binarynetwork.game.games;
 
 import me.binarynetwork.core.common.utils.FallingBlockKiller;
-import me.binarynetwork.core.component.SimpleComponentWrapper;
 import me.binarynetwork.core.component.RunComponent;
+import me.binarynetwork.core.component.SimpleComponentWrapper;
 import me.binarynetwork.core.component.components.*;
 import me.binarynetwork.core.component.runnables.GameModeRunnable;
+import me.binarynetwork.core.component.world.SimpleWorldComponent;
 import me.binarynetwork.core.playerholder.PlayerHolder;
 import me.binarynetwork.game.countdown.TempCountdown;
 import me.binarynetwork.game.countdown.TempPlayerCountdown;
 import me.binarynetwork.game.games.runner.components.RunnerComponent;
+import me.binarynetwork.game.games.spleef.components.SpleefComponent;
 import me.binarynetwork.game.gamestate.GameState;
 import me.binarynetwork.game.gamestate.GameStateManager;
 import me.binarynetwork.game.lobby.LobbyComponent;
@@ -18,25 +20,25 @@ import me.binarynetwork.game.spawn.runnables.SpawnAtRunnable;
 import me.binarynetwork.game.spectate.GameModeSpectateComponent;
 import me.binarynetwork.game.spectate.components.DeathSpectate;
 import me.binarynetwork.game.spectate.components.JoinSpectate;
-import me.binarynetwork.core.component.world.SimpleWorldComponent;
 import me.binarynetwork.game.victorycondition.LMSVictoryCondition;
 import org.bukkit.GameMode;
 
+import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.concurrent.ScheduledExecutorService;
 
 /**
- * Created by Bench on 9/3/2016.
+ * Created by Bench on 9/20/2016.
  */
-public class RunnerGame extends SimpleComponentWrapper {
-    public static final String NAME = "Runner";
+public class SpleefRunner extends SimpleComponentWrapper {
+    public static final String NAME = "Spleef";
 
     GameStateManager manager;
     GameModeSpectateComponent spectateManager;
     SimpleWorldComponent worldManager;
     SimpleSpawnManager spawnManager;
 
-    public RunnerGame(PlayerHolder playerHolder, ScheduledExecutorService scheduler, LobbyWorldComponent lobbyWorldComponent, Runnable onEnd)
+    public SpleefRunner(PlayerHolder playerHolder, ScheduledExecutorService scheduler, LobbyWorldComponent lobbyWorldComponent, Runnable onEnd)
     {
         worldManager = new SimpleWorldComponent(scheduler, NAME, onEnd);
         manager = new GameStateManager(onEnd);
@@ -60,7 +62,7 @@ public class RunnerGame extends SimpleComponentWrapper {
                 new DeathSpectate(spectateManager),
 
                 //Keep playerdata in world
-                //new KeepInWorld(playerHolder, worldManager),
+                new KeepInWorld(playerHolder, worldManager),
 
                 //Standard-ish stuff
                 new NoBlockBreak(playerHolder),
@@ -68,10 +70,10 @@ public class RunnerGame extends SimpleComponentWrapper {
                 new NoDropItem(playerHolder),
                 new NoPickUpItem(playerHolder),
                 new NoHunger(playerHolder),
-                new VoidKiller(spectateManager.getNonSpectateHolder(), worldManager),
+                new VoidKiller(spectateManager.getNonSpectateHolder(), worldManager)//,
 
                 //This Game
-                new NoDamage(playerHolder)
+                //new NoDamage(playerHolder)
 
         ), GameState.PRE_GAME, GameState.GAME, GameState.POST_GAME);
 
@@ -79,9 +81,13 @@ public class RunnerGame extends SimpleComponentWrapper {
         manager.add(new RunComponent(new SpawnAtRunnable(spawnManager, spectateManager.getNonSpectateHolder())), GameState.PRE_GAME);
         manager.add(new RunComponent(new GameModeRunnable(spectateManager.getNonSpectateHolder(), GameMode.SURVIVAL)), GameState.PRE_GAME);
 
-
         // Runner Game
-        manager.add(new RunnerComponent(spectateManager.getNonSpectateHolder(), scheduler), GameState.GAME);
+        manager.add(
+                Arrays.asList(
+                    new SpleefComponent(spectateManager.getNonSpectateHolder(), worldManager),
+                    new RunnerComponent(spectateManager.getNonSpectateHolder(), scheduler)
+                ),
+                GameState.GAME);
         manager.add(new FallingBlockKiller(worldManager), GameState.GAME, GameState.POST_GAME);
 
 

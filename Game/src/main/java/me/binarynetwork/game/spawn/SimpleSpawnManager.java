@@ -1,11 +1,13 @@
 package me.binarynetwork.game.spawn;
 
+import me.binarynetwork.core.common.Log;
 import me.binarynetwork.core.common.utils.LocationUtil;
 import me.binarynetwork.core.common.utils.ServerUtil;
 import me.binarynetwork.core.component.ListenerComponent;
 import me.binarynetwork.core.playerholder.PlayerHolder;
 import me.binarynetwork.core.component.world.WorldManager;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -20,7 +22,7 @@ import java.util.List;
 public class SimpleSpawnManager extends ListenerComponent implements SpawnManager {
     private WorldManager worldManager;
     private PlayerHolder playerHolder;
-    private List<Location> locations = new ArrayList<>();
+    private List<Location> locations;
 
     public SimpleSpawnManager(WorldManager worldManager, PlayerHolder playerHolder)
     {
@@ -28,18 +30,34 @@ public class SimpleSpawnManager extends ListenerComponent implements SpawnManage
         this.playerHolder = playerHolder;
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler
     public void onWorldLoad(WorldLoadEvent event)
     {
+        Log.debugf("event called!");
         if (!worldManager.test(event.getWorld()))
             return;
 
-        YamlConfiguration mapdata = worldManager.getConfig("mapdata");
+        loadLocations(event.getWorld());
+    }
 
+    @Override
+    public void onEnable()
+    {
+        World world = worldManager.get();
+        if (world != null)
+            loadLocations(world);
+    }
+
+    public void loadLocations(World world)
+    {
+
+        locations = new ArrayList<>();
+
+        YamlConfiguration mapdata = worldManager.getConfig("mapdata");
 
         for (String stringLocation : mapdata.getStringList("SpawnPoints"))
         {
-            Location l = LocationUtil.toLocation(event.getWorld(), stringLocation);
+            Location l = LocationUtil.toLocation(world, stringLocation);
 
             if (l != null)
                 locations.add(l);
@@ -55,7 +73,7 @@ public class SimpleSpawnManager extends ListenerComponent implements SpawnManage
     @Override
     public Location getSpawn(Player player)
     {
-        if (locations == null)
+        if (locations == null || locations.isEmpty())
             ServerUtil.shutdown("No locations, (probably because the world wasn't loaded.)");
 
         Location bestLoc = null;
@@ -71,6 +89,8 @@ public class SimpleSpawnManager extends ListenerComponent implements SpawnManage
             }
             if (shortestPlayerDistance > bestDistance)
                 bestLoc = loc;
+
+
         }
 
         return bestLoc;

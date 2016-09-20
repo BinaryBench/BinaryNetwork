@@ -1,6 +1,7 @@
 package me.binarynetwork.core.component.world;
 
 import me.binarynetwork.core.BinaryNetworkPlugin;
+import me.binarynetwork.core.common.Log;
 import me.binarynetwork.core.common.utils.*;
 import me.binarynetwork.core.component.ListenerComponent;
 import org.bukkit.Bukkit;
@@ -100,6 +101,7 @@ public class SimpleWorldComponent extends ListenerComponent implements WorldMana
     public void onEnable()
     {
         WorldUtil.deleteWorld(getWorldName(), getScheduler(), BinaryNetworkPlugin.getPlugin(), () -> {
+            Log.debugf("loading world!");
             this.world = WorldUtil.createTemporaryWorld(getSaveFile(), getWorldName());
             if (world != null)
                 this.world.setAutoSave(false);

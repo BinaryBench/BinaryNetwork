@@ -99,12 +99,10 @@ public class CommandManager extends SimpleCommandWrapper implements Listener {
 
         if (hasPermission(commandSender, args))
         {
-            System.out.println("Has permission");
             boolean success = executeCommand(commandSender, args);
 
             if (success)
                 return;
-            System.out.println("Command failed");
 
             String usageMessage = getUsage(commandSender, args);
 
@@ -115,7 +113,7 @@ public class CommandManager extends SimpleCommandWrapper implements Listener {
             }
         }
 
-        commandSender.sendMessage("Use /help to see commands!");
+        commandSender.sendMessage(getUsage(commandSender, new String[]{}));
 
     }
 
@@ -187,7 +185,15 @@ public class CommandManager extends SimpleCommandWrapper implements Listener {
 
         StringJoiner sj = new StringJoiner("\n", "", "");
         for (Map.Entry<Command, List<String>> commands : permitted.entrySet())
-            sj.add(commands.getValue().get(0) + " " + commands.getKey().getUsage(sender, args));
+        {
+            StringBuilder sb = new StringBuilder(commands.getValue().get(0));
+
+            String commandUsage = commands.getKey().getUsage(sender, args);
+            if (commandUsage!=null)
+                sb.append(" ").append(commandUsage);
+            sj.add(sb.toString());
+        }
+
         return sj.toString();
     }
 

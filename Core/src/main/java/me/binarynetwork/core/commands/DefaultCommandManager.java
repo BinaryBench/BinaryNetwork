@@ -1,8 +1,6 @@
 package me.binarynetwork.core.commands;
 
 import me.binarynetwork.core.command.CommandWrapper;
-import me.binarynetwork.core.command.DummyCommand;
-import me.binarynetwork.core.component.world.WorldConfiguration;
 import me.binarynetwork.core.permissions.PermissionManager;
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.GameMode;
@@ -24,8 +22,6 @@ public class DefaultCommandManager {
         add(new TeleportCommand(), "Teleport", "tp");
         add(new OpCommand(), "op");
         add(new GameModeCommand(), "Gamemode", "gm");
-        commandWrapper.addCommand(new DummyCommand(true, true), "XAmpp");
-        commandWrapper.addCommand(new DummyCommand(true, true), "XAMP");
         for (GameMode gameMode : GameMode.values())
         {
             commandWrapper.addCommand(new me.binarynetwork.core.commands.GameModeCommand(permissionManager, gameMode),
@@ -43,6 +39,6 @@ public class DefaultCommandManager {
 
     public void add(VanillaCommand vanillaCommand, String alias, String... aliases)
     {
-        commandWrapper.addCommand(new WrapVanillaCommand(permissionManager, vanillaCommand), alias, aliases);
+        commandWrapper.addCommand(new VanillaCommandWrapper(permissionManager, vanillaCommand), alias, aliases);
     }
 }

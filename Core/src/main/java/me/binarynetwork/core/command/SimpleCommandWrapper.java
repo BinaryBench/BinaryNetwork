@@ -1,5 +1,6 @@
 package me.binarynetwork.core.command;
 
+import me.binarynetwork.core.common.Log;
 import me.binarynetwork.core.common.utils.ListUtil;
 import org.apache.commons.lang.ArrayUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -179,7 +180,7 @@ public class SimpleCommandWrapper implements CommandWrapper, Command {
     {
         Map<Command, List<String>> permitted = getPermittedCommands(sender, args);
         if (permitted.isEmpty())
-            return null;
+            return "";
 
         StringJoiner sj = new StringJoiner(" | ", "<", ">");
         for (List<String> commands : permitted.values())

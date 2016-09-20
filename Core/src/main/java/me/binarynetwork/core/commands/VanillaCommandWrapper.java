@@ -1,7 +1,10 @@
 package me.binarynetwork.core.commands;
 
 import me.binarynetwork.core.command.BaseCommand;
+import me.binarynetwork.core.common.utils.StringUtil;
+import me.binarynetwork.core.common.wrappers.CommandSenderWrapper;
 import me.binarynetwork.core.permissions.PermissionManager;
+import org.bukkit.ChatColor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.defaults.VanillaCommand;
 
@@ -11,11 +14,11 @@ import java.util.List;
  * Created by Bench on 9/20/2016.
  */
 @SuppressWarnings("deprecated")
-public class WrapVanillaCommand extends BaseCommand {
+public class VanillaCommandWrapper extends BaseCommand {
 
     private VanillaCommand wrapped;
 
-    public WrapVanillaCommand(PermissionManager permissionManager, VanillaCommand wrapped)
+    public VanillaCommandWrapper(PermissionManager permissionManager, VanillaCommand wrapped)
     {
         super(permissionManager, "minecraft.command." + wrapped.getName());
         this.wrapped = wrapped;
@@ -25,7 +28,7 @@ public class WrapVanillaCommand extends BaseCommand {
     @Override
     public boolean executeCommand(CommandSender sender, String[] args)
     {
-        return wrapped.execute(sender, wrapped.getLabel(), args);
+        return wrapped.execute(getWrapper(sender), wrapped.getLabel(), args);
     }
 
     @Override
@@ -46,5 +49,19 @@ public class WrapVanillaCommand extends BaseCommand {
             usage = arr[1];
         }
         return usage;
+    }
+
+    private CommandSender getWrapper(CommandSender sender)
+    {
+        return new CommandSenderWrapper(sender)
+        {
+            @Override
+            public void sendMessage(String s)
+            {
+                if (ChatColor.stripColor(s).toLowerCase().startsWith("Usage: ".toLowerCase()))
+                    return;
+                super.sendMessage(s);
+            }
+        };
     }
 }

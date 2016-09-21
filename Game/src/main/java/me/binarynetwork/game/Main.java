@@ -2,6 +2,7 @@ package me.binarynetwork.game;
 
 import me.binarynetwork.core.BinaryNetworkPlugin;
 import me.binarynetwork.core.common.utils.ServerUtil;
+import me.binarynetwork.core.component.world.PlayerDataPurgeComponent;
 import me.binarynetwork.game.arena.Arena;
 import me.binarynetwork.game.factory.SimpleGameFactory;
 import me.binarynetwork.game.lobby.LobbyWorldComponent;
@@ -26,6 +27,8 @@ public class Main extends BinaryNetworkPlugin implements Listener {
     @Override
     public void enable()
     {
+        getComponentWrapper().addComponent(new PlayerDataPurgeComponent(world -> true, getScheduler()));
+
         gamePlayerHolder = new SimpleGamePlayerHolder();
         lobbyWorldComponent = new LobbyWorldComponent(getScheduler(), () -> ServerUtil.shutdown("An error occurred in the lobbyWorldComponent"));
         SimpleGameFactory gameFactory = new SimpleGameFactory(gamePlayerHolder, getScheduler(), lobbyWorldComponent);

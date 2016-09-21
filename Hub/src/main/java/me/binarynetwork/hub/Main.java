@@ -4,6 +4,7 @@ import me.binarynetwork.core.BinaryNetworkPlugin;
 import me.binarynetwork.core.common.Log;
 import me.binarynetwork.core.common.utils.FileUtil;
 import me.binarynetwork.core.common.utils.WorldUtil;
+import me.binarynetwork.core.component.world.PlayerDataPurgeComponent;
 import me.binarynetwork.hub.world.HubWorldManager;
 import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
@@ -21,6 +22,7 @@ public class Main extends BinaryNetworkPlugin {
     public void enable()
     {
         new HubWorldManager(getServerPlayerHolder());
+        getComponentWrapper().addComponent(new PlayerDataPurgeComponent(world -> true, getScheduler()));
     }
 
     @EventHandler

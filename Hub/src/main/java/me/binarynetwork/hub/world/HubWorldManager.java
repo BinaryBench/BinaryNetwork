@@ -82,10 +82,12 @@ public class HubWorldManager implements Listener, Supplier<World>, Predicate<Wor
         getWrapper().addComponent(
                 respawnManager,
                 new NoDamage(playerHolder),
-                new NoBlockPlace(playerHolder),
-                new NoBlockBreak(playerHolder),
+                new NoBlockPlace(player -> !player.getGameMode().equals(GameMode.CREATIVE)),
+                new NoBlockBreak(player -> !player.getGameMode().equals(GameMode.CREATIVE)),
                 new WeatherComponent(this),
-                new NoHunger(playerHolder));
+                new NoHunger(playerHolder)
+
+        );
 
     }
 

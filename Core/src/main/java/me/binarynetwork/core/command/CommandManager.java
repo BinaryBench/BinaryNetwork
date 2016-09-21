@@ -121,15 +121,36 @@ public class CommandManager extends SimpleCommandWrapper implements Listener {
     public List<String> tabComplete(CommandSender sender, String[] args)
     {
         List<String> tabComplete = super.tabComplete(sender, args);
+
         if (tabComplete == null || tabComplete.isEmpty())
             return tabComplete;
+
         Set<String> hs = new LinkedHashSet<>();
         hs.addAll(tabComplete);
         tabComplete.clear();
 
-        String label = args[0];
+        String label = args[args.length - 1];
         if (label.startsWith("/"))
             label = label.substring(1);
+
+        TabType tabType;
+        String lastChar = "";
+        if (label.length() > 1)
+            lastChar = label.substring(label.length()-1);
+
+
+
+        if (args.length > 1 && args[0].equals(args[0].toUpperCase()))
+            tabType = TabType.UPPER_CASE;
+        else if (!label.isEmpty() && label.equals(label.toLowerCase()))
+            tabType = TabType.LOWER_CASE;
+        else if (label.equals(WordUtils.capitalizeFully(label)) || lastChar.equals(lastChar.toLowerCase()) || label.length() <= 2)
+            tabType = TabType.CAPITALIZED;
+        else if (label.equals(label.toUpperCase()))
+            tabType = TabType.UPPER_CASE;
+        else
+            tabType = TabType.APPEND;
+
 
         for (String completion : hs)
         {
@@ -140,33 +161,24 @@ public class CommandManager extends SimpleCommandWrapper implements Listener {
                 completion = completion.substring(1);
             }
 
-            if (label.equals(label.toLowerCase()))
+            switch (tabType)
             {
-                toAdd.append(completion.toLowerCase());
-            }
-            else
-            {
-                String lastChar = label.substring(label.length()-1);
-                if (label.equals(WordUtils.capitalizeFully(label)) || lastChar.equals(lastChar.toLowerCase()) || label.length() <= 2)
-                {
-                    toAdd.append(WordUtils.capitalizeFully(completion));
-                }
-                else if (label.equals(label.toUpperCase()))
-                {
+                case LOWER_CASE:
+                    toAdd.append(completion.toLowerCase());
+                    break;
+                case UPPER_CASE:
                     toAdd.append(completion.toUpperCase());
-                }
-                else
-                {
-                    toAdd.append(label);
-                    toAdd.append(completion.substring(label.length()));
-                }
+                    break;
+                case CAPITALIZED:
+                    toAdd.append(WordUtils.capitalizeFully(completion));
+                    break;
+                default:
+                    toAdd.append(label).append(completion.substring(label.length()));
+                    break;
             }
             tabComplete.add(toAdd.toString());
         }
 
-
-        if (args[0].endsWith("g") || args[0].endsWith("gm"))
-            PlayerUtil.message(sender, "Tab options: " + tabComplete);
         return tabComplete;
     }
 
@@ -212,4 +224,11 @@ public class CommandManager extends SimpleCommandWrapper implements Listener {
         return message.split(" ", -1);
     }
 
+    private enum TabType
+    {
+        LOWER_CASE,
+        CAPITALIZED,
+        UPPER_CASE,
+        APPEND;
+    }
 }

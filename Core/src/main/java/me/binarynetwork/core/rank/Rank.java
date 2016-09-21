@@ -15,19 +15,23 @@ public enum Rank {
     ),
     DEV("dev", "Dev",ChatColor.RED + "Dev",
             "*",
-            "!server.stop"
+            "minecraft.command.*"
     ),
     MODERATOR("mod", "Mod",ChatColor.GOLD + "Mod",
-            "portal.command"
+            "portal.command",
+            "minecraft.command.tell"
     ),
     BUILDER("build", "Builder", ChatColor.DARK_GRAY + "Builder",
-            "portal.command"
+            "portal.command",
+            "minecraft.command.tell"
     ),
     BERRY("berry", "Berry",ChatColor.DARK_PURPLE + "Berry",
-            "portal.command"
+            "portal.command",
+            "minecraft.command.tell"
     ),
     DEFAULT("default", "Default", null,
-            "portal.command"
+            "portal.command",
+            "minecraft.command.tell"
     );
 
 

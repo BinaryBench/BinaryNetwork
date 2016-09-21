@@ -1,7 +1,9 @@
 package me.binarynetwork.game.lobby;
 
 import me.binarynetwork.core.BinaryNetworkPlugin;
-import me.binarynetwork.core.common.utils.*;
+import me.binarynetwork.core.common.utils.FileUtil;
+import me.binarynetwork.core.common.utils.ServerUtil;
+import me.binarynetwork.core.common.utils.WorldUtil;
 import me.binarynetwork.core.component.SimpleComponentWrapper;
 import me.binarynetwork.core.component.components.NoBlockBreak;
 import me.binarynetwork.core.component.components.NoBlockPlace;
@@ -12,7 +14,7 @@ import org.bukkit.World;
 import org.bukkit.entity.Player;
 
 import java.io.File;
-import java.util.*;
+import java.util.Arrays;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
@@ -20,7 +22,7 @@ import java.util.function.Supplier;
 /**
  * Created by Bench on 9/3/2016.
  */
-public class LobbyWorldComponent extends SimpleComponentWrapper implements Supplier<World>, Predicate<World> {
+public class LobbyWorldComponentOld extends SimpleComponentWrapper implements Supplier<World>, Predicate<World> {
 
     public static final String LOBBY_WORLD_NAME = "LobbyWorld";
 
@@ -31,12 +33,12 @@ public class LobbyWorldComponent extends SimpleComponentWrapper implements Suppl
     private World world;
     private Runnable somethingWentWrong;
 
-    public LobbyWorldComponent(ScheduledExecutorService scheduler)
+    public LobbyWorldComponentOld(ScheduledExecutorService scheduler)
     {
         this(scheduler, () -> ServerUtil.shutdown("#BukkitsFault"));
     }
 
-    public LobbyWorldComponent(ScheduledExecutorService scheduler, Runnable somethingWentWrong)
+    public LobbyWorldComponentOld(ScheduledExecutorService scheduler, Runnable somethingWentWrong)
     {
         this.scheduler = scheduler;
         this.somethingWentWrong = somethingWentWrong;
@@ -86,8 +88,8 @@ public class LobbyWorldComponent extends SimpleComponentWrapper implements Suppl
             {
                 this.world.setAutoSave(false);
                 Arrays.asList("doFireTick", "doMobSpawning", "mobGriefing", "naturalRegeneration").forEach(string -> world.setGameRuleValue(string, "false"));
+                world.setGameRuleValue("randomTickSpeed", "0");
             }
-
         });
     }
 

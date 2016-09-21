@@ -1,13 +1,7 @@
 name: Game
 version: 0.0.1
 description: This is the Game plugin for BinaryNetwork!
+load: STARTUP
 author: BinaryBench
 main: me.binarynetwork.game.Main
 depend: [ProtocolLib]
-
-commands:
-  test:
-    description: This test test's your test-test!
-    aliases: [combust_me, combustMe]
-    usage: Test test test test test test test test.
-

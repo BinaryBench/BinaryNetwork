@@ -96,7 +96,7 @@ public class LobbyComponent extends SimpleComponentWrapper implements Runnable, 
     public Location getSpawn()
     {
         double x = RandomUtil.randomDouble(-1, 2);
-        double y = 60;
+        double y = 80;
         double z = RandomUtil.randomDouble(-1, 2);
 
         return new Location(getWorld(), x, y, z);

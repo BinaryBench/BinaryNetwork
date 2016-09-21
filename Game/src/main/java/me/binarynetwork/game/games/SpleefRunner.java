@@ -14,7 +14,6 @@ import me.binarynetwork.game.games.spleef.components.SpleefComponent;
 import me.binarynetwork.game.gamestate.GameState;
 import me.binarynetwork.game.gamestate.GameStateManager;
 import me.binarynetwork.game.lobby.LobbyComponent;
-import me.binarynetwork.game.lobby.LobbyWorldComponent;
 import me.binarynetwork.game.spawn.SimpleSpawnManager;
 import me.binarynetwork.game.spawn.runnables.SpawnAtRunnable;
 import me.binarynetwork.game.spectate.GameModeSpectateComponent;
@@ -22,10 +21,11 @@ import me.binarynetwork.game.spectate.components.DeathSpectate;
 import me.binarynetwork.game.spectate.components.JoinSpectate;
 import me.binarynetwork.game.victorycondition.LMSVictoryCondition;
 import org.bukkit.GameMode;
+import org.bukkit.World;
 
-import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.function.Supplier;
 
 /**
  * Created by Bench on 9/20/2016.
@@ -38,7 +38,7 @@ public class SpleefRunner extends SimpleComponentWrapper {
     SimpleWorldComponent worldManager;
     SimpleSpawnManager spawnManager;
 
-    public SpleefRunner(PlayerHolder playerHolder, ScheduledExecutorService scheduler, LobbyWorldComponent lobbyWorldComponent, Runnable onEnd)
+    public SpleefRunner(PlayerHolder playerHolder, ScheduledExecutorService scheduler, Supplier<World> lobbyWorldComponent, Runnable onEnd)
     {
         worldManager = new SimpleWorldComponent(scheduler, NAME, onEnd);
         manager = new GameStateManager(onEnd);

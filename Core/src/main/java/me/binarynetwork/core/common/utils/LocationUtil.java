@@ -4,6 +4,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 
+import java.time.LocalTime;
+
 /**
  * Created by Bench on 9/3/2016.
  */
@@ -157,5 +159,12 @@ public class LocationUtil {
     public static Location addWorld(World world, Location loc)
     {
         return new Location(world, loc.getX(), loc.getY(), loc.getZ(), loc.getYaw(), loc.getPitch());
+    }
+
+    public static Location centerOnBlock(Location loc)
+    {
+        loc.setX(Math.floor(loc.getX()) + 0.5);
+        loc.setZ(Math.floor(loc.getZ()) + 0.5);
+        return loc;
     }
 }

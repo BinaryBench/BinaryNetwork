@@ -1,10 +1,11 @@
 package me.binarynetwork.game.games.runner;
 
 import me.binarynetwork.core.common.utils.FallingBlockKiller;
-import me.binarynetwork.core.component.SimpleComponentWrapper;
 import me.binarynetwork.core.component.RunComponent;
+import me.binarynetwork.core.component.SimpleComponentWrapper;
 import me.binarynetwork.core.component.components.*;
 import me.binarynetwork.core.component.runnables.GameModeRunnable;
+import me.binarynetwork.core.component.world.SimpleWorldComponent;
 import me.binarynetwork.core.playerholder.PlayerHolder;
 import me.binarynetwork.game.countdown.TempCountdown;
 import me.binarynetwork.game.countdown.TempPlayerCountdown;
@@ -12,18 +13,18 @@ import me.binarynetwork.game.games.runner.components.RunnerComponent;
 import me.binarynetwork.game.gamestate.GameState;
 import me.binarynetwork.game.gamestate.GameStateManager;
 import me.binarynetwork.game.lobby.LobbyComponent;
-import me.binarynetwork.game.lobby.LobbyWorldComponent;
 import me.binarynetwork.game.spawn.SimpleSpawnManager;
 import me.binarynetwork.game.spawn.runnables.SpawnAtRunnable;
 import me.binarynetwork.game.spectate.GameModeSpectateComponent;
 import me.binarynetwork.game.spectate.components.DeathSpectate;
 import me.binarynetwork.game.spectate.components.JoinSpectate;
-import me.binarynetwork.core.component.world.SimpleWorldComponent;
 import me.binarynetwork.game.victorycondition.LMSVictoryCondition;
 import org.bukkit.GameMode;
+import org.bukkit.World;
 
 import java.util.Arrays;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.function.Supplier;
 
 /**
  * Created by Bench on 9/3/2016.
@@ -36,7 +37,7 @@ public class RunnerGame extends SimpleComponentWrapper {
     SimpleWorldComponent worldManager;
     SimpleSpawnManager spawnManager;
 
-    public RunnerGame(PlayerHolder playerHolder, ScheduledExecutorService scheduler, LobbyWorldComponent lobbyWorldComponent, Runnable onEnd)
+    public RunnerGame(PlayerHolder playerHolder, ScheduledExecutorService scheduler, Supplier<World> lobbyWorldComponent, Runnable onEnd)
     {
         worldManager = new SimpleWorldComponent(scheduler, NAME, onEnd);
         manager = new GameStateManager(onEnd);

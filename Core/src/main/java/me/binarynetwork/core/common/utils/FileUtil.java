@@ -2,6 +2,7 @@ package me.binarynetwork.core.common.utils;
 
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
+import net.lingala.zip4j.util.Zip4jUtil;
 import org.apache.commons.io.IOUtils;
 
 import javax.annotation.Nonnull;
@@ -130,6 +131,8 @@ public class FileUtil {
         try
         {
             ZipFile zipFile = new ZipFile(sourceDir);
+            if (!zipFile.isValidZipFile())
+                return false;
             zipFile.extractAll(outputFolder.getAbsolutePath());
             return true;
         }
@@ -139,4 +142,5 @@ public class FileUtil {
         }
         return false;
     }
+
 }

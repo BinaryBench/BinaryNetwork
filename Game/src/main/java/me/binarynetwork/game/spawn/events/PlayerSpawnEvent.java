@@ -1,6 +1,5 @@
 package me.binarynetwork.game.spawn.events;
 
-import me.binarynetwork.game.lobby.LobbyWorldComponent;
 import me.binarynetwork.game.spawn.SpawnManager;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;

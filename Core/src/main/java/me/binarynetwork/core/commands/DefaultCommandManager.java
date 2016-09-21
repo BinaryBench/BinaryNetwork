@@ -1,6 +1,7 @@
 package me.binarynetwork.core.commands;
 
 import me.binarynetwork.core.command.CommandWrapper;
+import me.binarynetwork.core.common.Log;
 import me.binarynetwork.core.permissions.PermissionManager;
 import org.apache.commons.lang.WordUtils;
 import org.bukkit.GameMode;
@@ -39,6 +40,9 @@ public class DefaultCommandManager {
 
     public void add(VanillaCommand vanillaCommand, String alias, String... aliases)
     {
+        Log.debugf("Is CommandWrapper null: %s", commandWrapper == null);
+        Log.debugf("Is permissionManader null: %s", permissionManager == null);
+
         commandWrapper.addCommand(new VanillaCommandWrapper(permissionManager, vanillaCommand), alias, aliases);
     }
 }

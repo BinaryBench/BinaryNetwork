@@ -4,23 +4,21 @@ import me.binarynetwork.core.playerholder.events.PlayerAddEvent;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by Bench on 8/28/2016.
  */
 public class BasePlayerHolder implements PlayerHolder {
 
-    private List<Player> players;
+    private Set<Player> players;
 
     public BasePlayerHolder()
     {
-        this(new ArrayList<>());
+        this(new HashSet<>());
     }
 
-    public BasePlayerHolder(List<Player> players)
+    public BasePlayerHolder(Set<Player> players)
     {
         this.players = players;
     }

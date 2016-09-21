@@ -5,6 +5,8 @@ import com.comphenix.protocol.ProtocolManager;
 import me.binarynetwork.core.account.AccountManager;
 import me.binarynetwork.core.command.CommandManager;
 import me.binarynetwork.core.commands.DefaultCommandManager;
+import me.binarynetwork.core.common.Log;
+import me.binarynetwork.core.common.scheduler.Scheduler;
 import me.binarynetwork.core.common.utils.PlayerUtil;
 import me.binarynetwork.core.common.utils.ServerUtil;
 import me.binarynetwork.core.common.utils.WorldUtil;
@@ -57,6 +59,12 @@ public abstract class BinaryNetworkPlugin extends JavaPlugin implements Listener
     private RankPermissionManager permissionManager;
 
     @Override
+    public final void onLoad()
+    {
+        this.load();
+    }
+
+    @Override
     public final void onEnable()
     {
         plugin = this;
@@ -74,6 +82,7 @@ public abstract class BinaryNetworkPlugin extends JavaPlugin implements Listener
         this.componentWrapper = new SimpleComponentWrapper();
         this.serverPlayerHolder = new ServerPlayerHolder();
 
+
         //DataStorage
         accountManager = new AccountManager(getScheduler());
 
@@ -83,21 +92,20 @@ public abstract class BinaryNetworkPlugin extends JavaPlugin implements Listener
         permissionManager = new RankPermissionManager(getRankManager(), getComponentWrapper());
         permissionWrapper.setWrappedPermissionManager(permissionManager);
 
-
         currencyManager = new CurrencyManager(getScheduler(), getAccountManager(), getPermissionManager(), getCommandManager());
 
-
         //Commands
-        //commandManager.addCommand(new StopCommand(permissionWrapper), "stop");
-        //commandManager.addCommand(new TeleportCommand(permissionWrapper), "teleport", "tp");
-        //commandManager.addCommand(new ServerCommand(permissionManager, "hub"), "hub", "leave");
-        //commandManager.addCommand(new GameModeCommand(permissionWrapper, GameMode.CREATIVE), "Creative", "gmc");
-        new DefaultCommandManager(commandManager, permissionWrapper);
-        registerEvents(this);
+        new DefaultCommandManager(commandManager, permissionManager);
 
         WorldUtil.purgeTemporaryWorlds(getScheduler());
         componentWrapper.enable();
         enable();
+        Scheduler.runSync(this::postWorld);
+    }
+
+    public void postWorld()
+    {
+        Log.debugf("PostWorld");
     }
 
 
@@ -111,8 +119,12 @@ public abstract class BinaryNetworkPlugin extends JavaPlugin implements Listener
         }
         disable();
         componentWrapper.disable();
-        //Causes worlds not to delete every now and then
         WorldUtil.purgeTemporaryWorlds(getScheduler());
+    }
+
+    public void load()
+    {
+
     }
 
     public void enable()

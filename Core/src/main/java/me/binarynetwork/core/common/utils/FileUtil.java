@@ -1,5 +1,6 @@
 package me.binarynetwork.core.common.utils;
 
+import me.binarynetwork.core.common.Log;
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 import net.lingala.zip4j.util.Zip4jUtil;
@@ -41,6 +42,22 @@ public class FileUtil {
                     return file;
 
         return new File(parent, child);
+    }
+
+    public static List<File> getSubDirectoriesThatStartWith(File parent, String search)
+    {
+        List<File> returnList = new ArrayList<>();
+        File[] files = parent.listFiles();
+        if (files == null)
+            return returnList;
+        for (File file: files)
+        {
+            Log.debugf(file.getName());
+            if (file.getName().toLowerCase().startsWith(search))
+                returnList.add(file);
+        }
+        return returnList;
+
     }
 
     public static List<String> loadTextFile(File file)

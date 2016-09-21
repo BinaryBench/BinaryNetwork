@@ -5,6 +5,7 @@ import com.comphenix.protocol.ProtocolManager;
 import me.binarynetwork.core.account.AccountManager;
 import me.binarynetwork.core.command.CommandManager;
 import me.binarynetwork.core.commands.DefaultCommandManager;
+import me.binarynetwork.core.commands.commands.BackGroundCommand;
 import me.binarynetwork.core.common.Log;
 import me.binarynetwork.core.common.scheduler.Scheduler;
 import me.binarynetwork.core.common.utils.PlayerUtil;
@@ -96,6 +97,8 @@ public abstract class BinaryNetworkPlugin extends JavaPlugin implements Listener
 
         //Commands
         new DefaultCommandManager(commandManager, permissionManager);
+
+        getCommandManager().addCommand(new BackGroundCommand(permissionWrapper), "Background", "bg");
 
         WorldUtil.purgeTemporaryWorlds(getScheduler());
         componentWrapper.enable();

@@ -15,6 +15,7 @@ import java.util.function.Consumer;
 /**
  * Created by Bench on 9/17/2016.
  */
+@SuppressWarnings("deprecated")
 public class WorldMemoryFix {
     private static final Class<World> worldServerClass = World.class;
     private static final Class<ChunkProviderServer> chunkProviderServerClass = ChunkProviderServer.class;

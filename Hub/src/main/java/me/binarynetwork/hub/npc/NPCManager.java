@@ -119,7 +119,6 @@ public class NPCManager implements Listener {
     {
         map.put(createEntity(new FrozenZombie(location.getWorld()), location, ChatColor.GOLD + "Join " + StringUtils.capitalize(server) + " server"), player -> {
             PlayerUtil.sendToServer(player, server.toLowerCase());
-            PlayerUtil.message(player, "sending to server...");
         });
     }
 

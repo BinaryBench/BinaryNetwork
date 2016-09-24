@@ -13,7 +13,9 @@ import org.bukkit.command.defaults.TeleportCommand;
 /**
  * Created by Bench on 9/20/2016.
  */
+@SuppressWarnings("deprecated")
 public class DefaultCommandManager {
+
     private CommandWrapper commandWrapper;
     private PermissionManager permissionManager;
     public DefaultCommandManager(CommandWrapper commandWrapper, PermissionManager permissionManager)
@@ -41,9 +43,6 @@ public class DefaultCommandManager {
 
     public void add(VanillaCommand vanillaCommand, String alias, String... aliases)
     {
-        Log.debugf("Is CommandWrapper null: %s", commandWrapper == null);
-        Log.debugf("Is permissionManader null: %s", permissionManager == null);
-
         commandWrapper.addCommand(new VanillaCommandWrapper(permissionManager, vanillaCommand), alias, aliases);
     }
 }

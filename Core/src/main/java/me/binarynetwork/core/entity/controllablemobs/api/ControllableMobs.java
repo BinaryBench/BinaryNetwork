@@ -34,134 +34,14 @@ public final class ControllableMobs {
 		throw new AssertionError();
 	}
 	
-	
-	/**
-	 * Retrieves whether the specified entity has already been assigned.
-	 * 
-	 * @param entity to check for a {@link ControllableMob} instance
-	 * @return whether the entity has been assigned ({@link ControllableMob} instance is available)
-	 * @deprecated use {@link #isUnderControl(LivingEntity)} instead
-	 */
-	@Deprecated
-	public static boolean isAssigned(LivingEntity entity) {
-		return isUnderControl(entity);
-	}
-	
-	/**
-	 * Retrieves a {@link ControllableMob} instance for an entity that had been assigned previously.
-	 * 
-	 * @param entity which is already under control
-	 * @return the {@link ControllableMob} you can use to control the entity
-	 * @throws IllegalStateException when the entity has not been assigned yet
-	 * @deprecated use {@link #getControl(LivingEntity)} instead
-	 */
-	@Deprecated
-	public static <E extends LivingEntity> ControllableMob<E> get(E entity) throws IllegalStateException {
-		return getControl(entity);
-	}
-	
-	/**
-	 * Simply retrieves a {@link ControllableMob} instance if the passed entity has been assigned, or assigns the entity if not.
-	 * Combines {@link ControllableMobs#get(LivingEntity)} and {@link ControllableMobs#assign(LivingEntity)}.
-	 * 
-	 * @param entity which you want to control
-	 * @return the {@link ControllableMob} you can use to control the entity
-	 * @throws InvalidEntityException when the entity is null or can't be controlled
-	 * @deprecated use {@link #getOrPutUnderControl(LivingEntity)} instead
-	 */
-	@Deprecated
-	public static <E extends LivingEntity> ControllableMob<E> getOrAssign(E entity) throws InvalidEntityException {
-		return getOrPutUnderControl(entity);
-	}
-	
-	/**
-	 * Simply retrieves a {@link ControllableMob} instance if the passed entity has been assigned, or assigns the entity if not.
-	 * Combines {@link ControllableMobs#get(LivingEntity)} and {@link ControllableMobs#assign(LivingEntity, boolean)}
-	 * Clearing the AI is only being performed when clearAI is true and the entity is being assigned for the first time.
-	 * 
-	 * @param entity which you want to control
-	 * @param clearAI a boolean indicating whether default behaviors should be removed (true) or not (false).
-	 * @return the {@link ControllableMob} you can use to control the entity
-	 * @throws InvalidEntityException when the entity is null or can't be controlled
-	 * @deprecated use {@link #getOrPutUnderControl(LivingEntity, boolean)} instead
-	 */
-	@Deprecated
-	public static <E extends LivingEntity> ControllableMob<E> getOrAssign(E entity, boolean clearAI) throws InvalidEntityException {
-		return getOrPutUnderControl(entity, clearAI);
-	}
-	
-	/**
-	 * Simply puts the entity under your control.
-	 * Will not change any default behaviors, the entity will continue to act normally.
-	 * 
-	 * @param entity an instance of a subclass of LivingEntity - the entity you want to control
-	 * @return the {@link ControllableMob} you can use to control the entity
-	 * @throws InvalidEntityException when the entity is null or can't be controlled
-	 * @throws IllegalStateException when the entity is already being controlled
-	 * @deprecated use {@link #putUnderControl(LivingEntity)} instead
-	 */
-	@Deprecated
-	public static <E extends LivingEntity> ControllableMob<E> assign(E entity) throws IllegalStateException, InvalidEntityException {
-		return putUnderControl(entity);
-	}
-	
-	/**
-	 * Simply puts the entity under your control, optionally clearing its AI.
-	 * If you decide to clear its AI, the entity will stop moving and attacking and stand still until you order it to execute any actions.
-	 * 
-	 * @param entity entity an instance of a subclass of LivingEntity - the entity you want to control
-	 * @param clearAI a boolean indicating whether default behaviors should be removed (true) or not (false)
-	 * @return the {@link ControllableMob} you can use to control the entity
-	 * @throws InvalidEntityException when the entity is null or can't be controlled
-	 * @throws IllegalStateException when the entity is already being controlled
-	 * @deprecated use {@link #putUnderControl(LivingEntity, boolean)} instead
-	 */
-	@Deprecated
-	public static <E extends LivingEntity> ControllableMob<E> assign(E entity, boolean clearAI) throws IllegalStateException, InvalidEntityException {
-		return putUnderControl(entity, clearAI);
-	}
-	
-	/**
-	 * Releases the entity from control and restores default behaviors.
-	 * All actions will be stopped immediately, all custom AI behaviors will be removed and default attributes and behaviors will be restored. Frees memory.
-	 * After having this method called, nothing will show that the entity was once controlled.
-	 * 
-	 * @see ControllableMobs#unassign(ControllableMob, boolean)
-	 * @param controllableMob the controller which should be unassigned
-	 * @throws IllegalStateException when the controllableMob is already unassigned
-	 * @deprecated use {@link #releaseControl(ControllableMob)} instead
-	 */
-	@Deprecated
-	public static void unassign(ControllableMob<?> controllableMob) throws IllegalStateException {
-		releaseControl(controllableMob);
-	}
-	
-	/**
-	 * Releases the entity from control and restores default behaviors.
-	 * All actions will be stopped immediately, all custom AI behaviors will be removed and default behaviors (and attributes, if specified) will be restored. Frees memory.
-	 * After having this method called, nothing will show that the entity was once controlled.
-	 * 
-	 * @param controllableMob the controller which should be unassigned
-	 * @param resetAttributes whether to also reset attributes (movement speed, attack damage, etc.) to their default values. Removes custom modifiers. Default ist true.
-	 * @throws IllegalStateException when the controllableMob is already unassigned
-	 * @deprecated use {@link #releaseControl(ControllableMob, boolean)} instead
-	 */
-	@Deprecated
-	public static void unassign(ControllableMob<?> controllableMob, boolean resetAttributes) throws IllegalStateException {
-		releaseControl(controllableMob, resetAttributes);
-	}
-	
-	
-	
-	
-	
+
 	/**
 	 * Retrieves whether the specified entity has already been assigned.
 	 * 
 	 * @param entity to check for a {@link ControllableMob} instance
 	 * @return whether the entity has been put under control ({@link ControllableMob} instance is available)
 	 */
-	public static boolean isUnderControl(LivingEntity entity) {
+	public static boolean isControlled(LivingEntity entity) {
 		return entities.containsKey(entity);
 	}
 	
@@ -182,22 +62,22 @@ public final class ControllableMobs {
 	
 	/**
 	 * Simply retrieves a {@link ControllableMob} instance if the passed entity has been put under control, or puts it under control.
-	 * Combines {@link ControllableMobs#getControl(LivingEntity)} and {@link ControllableMobs#putUnderControl(LivingEntity)}.
+	 * Combines {@link ControllableMobs#getControl(LivingEntity)} and {@link ControllableMobs#control(LivingEntity)}.
 	 * 
 	 * @param entity which you want to control
 	 * @return the {@link ControllableMob} you can use to control the entity
 	 * @throws InvalidEntityException when the entity is null or can't be controlled
 	 */
 	@SuppressWarnings("unchecked")
-	public static <E extends LivingEntity> ControllableMob<E> getOrPutUnderControl(E entity) throws InvalidEntityException {
+	public static <E extends LivingEntity> ControllableMob<E> getOrControl(E entity) throws InvalidEntityException {
 		if(entities.containsKey(entity)) return (ControllableMob<E>) entities.get(entity);
-		else return putUnderControl(entity);
+		else return control(entity);
 	}
 	
 	
 	/**
 	 * Simply retrieves a {@link ControllableMob} instance if the passed entity has been put under control, or puts it under control.
-	 * Combines {@link ControllableMobs#getControl(LivingEntity)} and {@link ControllableMobs#putUnderControl(LivingEntity, boolean)}
+	 * Combines {@link ControllableMobs#getControl(LivingEntity)} and {@link ControllableMobs#control(LivingEntity, boolean)}
 	 * Clearing the AI is only being performed when clearAI is true and the entity is being assigned for the first time.
 	 * 
 	 * @param entity which you want to control
@@ -206,12 +86,11 @@ public final class ControllableMobs {
 	 * @throws InvalidEntityException when the entity is null or can't be controlled
 	 */
 	@SuppressWarnings("unchecked")
-	public static <E extends LivingEntity> ControllableMob<E> getOrPutUnderControl(E entity, boolean clearAI) throws InvalidEntityException {
+	public static <E extends LivingEntity> ControllableMob<E> getOrControl(E entity, boolean clearAI) throws InvalidEntityException {
 		if(entities.containsKey(entity)) return (ControllableMob<E>) entities.get(entity);
-		else return putUnderControl(entity, clearAI);
+		else return control(entity, clearAI);
 	}
-	
-	
+
 	/**
 	 * Simply puts the entity under your control.
 	 * Will not change any default behaviors, the entity will continue to act normally.
@@ -221,41 +100,40 @@ public final class ControllableMobs {
 	 * @throws InvalidEntityException when the entity is null or can't be controlled
 	 * @throws IllegalStateException when the entity is already being controlled
 	 */
-	public static <E extends LivingEntity> ControllableMob<E> putUnderControl(E entity) throws IllegalStateException, InvalidEntityException {
-		return putUnderControl(entity, false);
+	public static <E extends LivingEntity> ControllableMob<E> control(E entity) throws IllegalStateException, InvalidEntityException {
+		return control(entity, false);
 	}
-	
-	
+
 	/**
 	 * Simply puts the entity under your control, optionally clearing its AI.
 	 * If you decide to clear its AI, the entity will stop moving and attacking and stand still until you order it to execute any actions.
-	 * 
+	 *
 	 * @param entity an instance of a subclass of LivingEntity - the entity you want to control
 	 * @param clearAI a boolean indicating whether default behaviors should be removed (true) or not (false)
 	 * @return the {@link ControllableMob} you can use to control the entity
 	 * @throws InvalidEntityException when the entity is null or can't be controlled
 	 * @throws IllegalStateException when the entity is already being controlled
 	 */
-	public static <E extends LivingEntity> ControllableMob<E> putUnderControl(E entity, boolean clearAI) throws IllegalStateException, InvalidEntityException {
-		if(entity==null) throw new InvalidEntityException("entity must not be null",entity);
+	public static <E extends LivingEntity> ControllableMob<E> control(E entity, boolean clearAI) throws IllegalStateException, InvalidEntityException {
+		if(entity==null) throw new InvalidEntityException("entity must not be null",null);
 		EntityLiving notchEntity = ((CraftLivingEntity) entity).getHandle();
 		if(!(notchEntity instanceof EntityInsentient)) throw new InvalidEntityException("the entity "+entity.toString()+" can't be controlled",entity);
 		if(entities.containsKey(entity)) throw new IllegalStateException("entity "+entity.toString()+" is already a controlled entity");
-		
+
 		ControllableMob<E> controllableMob = new CraftControllableMob<E>(entity, (EntityInsentient) notchEntity);
 		if(clearAI) controllableMob.getAI().clear();
-		
+
 		entities.put(entity,controllableMob);
 		return controllableMob;
 	}
-	
-	
+
+
+
 	/**
 	 * Releases the entity from control and restores default behaviors.
 	 * All actions will be stopped immediately, all custom AI behaviors will be removed and default attributes and behaviors will be restored. Frees memory.
 	 * After having this method called, nothing will show that the entity was once controlled.
-	 * 
-	 * @see ControllableMobs#unassign(ControllableMob, boolean)
+	 *
 	 * @param controllableMob the controller which should be unassigned
 	 * @throws IllegalStateException when the controllableMob is already unassigned
 	 */

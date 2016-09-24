@@ -32,7 +32,7 @@ import java.util.concurrent.ScheduledExecutorService;
 /**
  * Created by Bench on 8/31/2016.
  */
-public abstract class BinaryNetworkPlugin extends JavaPlugin implements Listener{
+public abstract class BinaryNetworkPlugin extends JavaPlugin {
 
     private static BinaryNetworkPlugin plugin;
     public static BinaryNetworkPlugin getPlugin()
@@ -103,12 +103,17 @@ public abstract class BinaryNetworkPlugin extends JavaPlugin implements Listener
         WorldUtil.purgeTemporaryWorlds(getScheduler());
         componentWrapper.enable();
         enable();
-        Scheduler.runSync(this::postWorld);
+        Scheduler.runSync(this::onPostWorld);
+    }
+
+    public final void onPostWorld()
+    {
+        this.postWorld();
     }
 
     public void postWorld()
     {
-        Log.debugf("PostWorld");
+
     }
 
 

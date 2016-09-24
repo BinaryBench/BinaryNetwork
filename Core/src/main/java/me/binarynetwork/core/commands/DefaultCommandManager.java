@@ -36,6 +36,7 @@ public class DefaultCommandManager {
         add(new ToggleDownfallCommand(), "ToggleDownfall", "tdf");
         add(new KickCommand(), "Kick");
         add(new StopCommand(), "Stop");
+        add(new GiveCommand(), "Give");
     }
 
     public void add(VanillaCommand vanillaCommand, String alias, String... aliases)

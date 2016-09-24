@@ -10,6 +10,7 @@ import me.binarynetwork.core.entity.EntityManager;
 import me.binarynetwork.core.entity.controllablemobs.api.ControllableMob;
 import me.binarynetwork.core.entity.controllablemobs.api.ControllableMobs;
 import me.binarynetwork.core.entity.custom.CustomEntity;
+import me.binarynetwork.core.entity.custom.base.CustomZombie;
 import me.binarynetwork.core.entity.custom.types.frozen.FrozenSkeleton;
 import me.binarynetwork.core.entity.custom.types.frozen.FrozenVillager;
 import me.binarynetwork.core.entity.custom.types.frozen.FrozenZombie;
@@ -17,17 +18,23 @@ import me.binarynetwork.core.portal.commands.ServerCommand;
 import me.binarynetwork.hub.respawn.RespawnManager;
 import me.binarynetwork.hub.respawn.respawns.DiagonalRespawn;
 import me.binarynetwork.hub.world.HubWorldManager;
+import net.minecraft.server.v1_8_R3.EntityTypes;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
 import org.bukkit.World;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDamageEvent;
+import org.bukkit.event.entity.EntityDeathEvent;
+import org.bukkit.event.entity.ItemDespawnEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.metadata.FixedMetadataValue;
+import org.bukkit.potion.PotionEffect;
+import org.bukkit.potion.PotionEffectType;
 
 /**
  * Created by Bench on 8/31/2016.
@@ -93,7 +100,7 @@ public class Hub extends BinaryNetworkPlugin implements Listener {
 
 
 
-    //@EventHandler
+    @EventHandler
     public void onBlockRightClick(PlayerInteractEvent event) {
         if(event.getAction()== Action.RIGHT_CLICK_BLOCK) {
 
@@ -102,7 +109,12 @@ public class Hub extends BinaryNetworkPlugin implements Listener {
             World world = loc.getWorld();
             switch (event.getPlayer().getItemInHand().getType())
             {
-                case ROTTEN_FLESH: entity = new FrozenZombie(world); break;
+                case ROTTEN_FLESH: entity = new CustomZombie(world) {
+                    @Override
+                    public void burn()
+                    {
+                    }
+                }; break;
                 case BONE: entity = new FrozenSkeleton(world); break;
                 case EMERALD: entity = new FrozenVillager(world); break;
                 default: return;
@@ -110,12 +122,13 @@ public class Hub extends BinaryNetworkPlugin implements Listener {
 
             LivingEntity livingEntity = (LivingEntity) EntityManager.spawnCustom(loc, entity.getEntity()).getBukkitEntity();
             ControllableMob<LivingEntity> controllableMob = ControllableMobs.control(livingEntity);
-
             controllableMob.getAI().clear();
-            //controllableMob.getAI().addBehavior()
 
-            event.getPlayer().sendMessage("Entity: " + controllableMob.getEntity().getClass().getSimpleName());
-            //controllableMob.getAI().clear();
+
+            EntityManager.setName(livingEntity, livingEntity.getClass().getSimpleName());
+
         }
     }
+
+
 }

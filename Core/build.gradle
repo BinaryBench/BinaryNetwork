@@ -1,3 +1,7 @@
+repositories {
+    mavenLocal()
+}
+
 configurations {
     includeInJar
 }
@@ -13,7 +17,8 @@ dependencies {
     // https://mvnrepository.com/artifact/net.java.dev.jna/jna-platform
     includeInJar group: 'net.java.dev.jna', name: 'jna-platform', version: '4.0.0'
 
-
+    // Local repo
+    //includeInJar group: 'de.ntcomputer', name: 'controllable-mobs-api', version: '0.0.1-SNAPSHOT'
 
 
     configurations.compile.extendsFrom(configurations.includeInJar)

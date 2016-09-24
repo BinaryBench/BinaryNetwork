@@ -1,0 +1,61 @@
+package me.binarynetwork.core.entity.controllablemobs.api.ai;
+
+import org.bukkit.entity.LivingEntity;
+
+import me.binarynetwork.core.entity.controllablemobs.api.ControllableMob;
+import me.binarynetwork.core.entity.controllablemobs.api.ai.behaviors.AIBehavior;
+
+/**
+ * An interface representing one part of the entity's AI.<br>
+ * It can be used to examine and control this part.<br>
+ * You can obtain an instance by calling {@link me.binarynetwork.core.entity.controllablemobs.api.ControllableMobAI#addBehavior(AIBehavior)}.
+ * 
+ * @author Cybran
+ * @version v4
+ *
+ */
+public interface AIPart<E extends LivingEntity, B extends AIBehavior<? super E>> {
+	
+	/**
+	 * @return the controllable mob which this AI part is assigned to
+	 */
+	public ControllableMob<E> getControllableMob();
+	
+	/**
+	 * Unattaches the AI part from the {@link me.binarynetwork.core.entity.controllablemobs.api.ControllableMob}.<br>
+	 * This will remove the {@link me.binarynetwork.core.entity.controllablemobs.api.ai.behaviors.AIBehavior} represented by this part from the entity.
+	 * If active, the AI parts execution will be stopped immediately.<br>
+	 * Later you can re-attach this part at any time by calling {@link AIPart#reattach()} 
+	 */
+	public void unattach();
+	
+	/**
+	 * Re-Attaches the AI part to its {@link me.binarynetwork.core.entity.controllablemobs.api.ControllableMob}.<br>
+	 * The {@link me.binarynetwork.core.entity.controllablemobs.api.ai.behaviors.AIBehavior} represented by this part will affect the entity again.
+	 * 
+	 * @throws IllegalStateException if you try to re-attach the part after the {@link me.binarynetwork.core.entity.controllablemobs.api.ControllableMob} has been unassigned
+	 */
+	public void reattach() throws IllegalStateException;
+	
+	/**
+	 * @return whether you added this AI part (true) or it is a default part of the entity (false). 
+	 */
+	public boolean isCustomized();
+	
+	/**
+	 * @return the {@link me.binarynetwork.core.entity.controllablemobs.api.ai.behaviors.AIBehavior} represented by this AI part
+	 */
+	public B getBehavior();
+	
+	/**
+	 * @return the current AI parts state.
+	 */
+	public AIState getState();
+	
+	/**
+	 * @return the type of this AI part.
+	 */
+	public AIType getType();
+	
+
+}

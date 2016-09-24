@@ -18,7 +18,8 @@ public class FrozenSkeleton extends CustomSkeleton {
     }
 
     @Override
-    public void burn()
+    public void m()
     {
+            super.m();
     }
 }

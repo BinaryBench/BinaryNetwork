@@ -20,22 +20,9 @@ public class CustomZombie extends EntityZombie implements CustomEntity {
     }
 
     @Override
-    public void m()
-    {
-        this.burn();
-    }
-
-    @Override
     public void collide(Entity entity)
     {
         this.collide(entity.getBukkitEntity());
-    }
-
-
-
-    public void burn()
-    {
-        super.m();
     }
 
     public void collide(org.bukkit.entity.Entity entity)

@@ -19,14 +19,4 @@ public class CustomVillager extends EntityVillager implements CustomEntity {
         CustomEntityManager.registerEntity(getClass(), EntityVillager.class);
     }
 
-    @Override
-    public void collide(Entity entity)
-    {
-        this.collide(entity.getBukkitEntity());
-    }
-
-    public void collide(org.bukkit.entity.Entity entity)
-    {
-        super.collide(((CraftEntity) entity).getHandle());
-    }
 }

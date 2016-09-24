@@ -15,6 +15,7 @@ import me.binarynetwork.core.entity.custom.types.frozen.FrozenSkeleton;
 import me.binarynetwork.core.entity.custom.types.frozen.FrozenVillager;
 import me.binarynetwork.core.entity.custom.types.frozen.FrozenZombie;
 import me.binarynetwork.core.portal.commands.ServerCommand;
+import me.binarynetwork.hub.npc.NPCManager;
 import me.binarynetwork.hub.respawn.RespawnManager;
 import me.binarynetwork.hub.respawn.respawns.DiagonalRespawn;
 import me.binarynetwork.hub.world.HubWorldManager;
@@ -51,7 +52,8 @@ public class Hub extends BinaryNetworkPlugin implements Listener {
 
 
 
-
+        //NPC
+        new NPCManager(hubWorldManager);
 
         //Respawn
         RespawnManager respawnManager = new RespawnManager(getServerPlayerHolder(), hubWorldManager, this::spawnPlayer);
@@ -109,12 +111,7 @@ public class Hub extends BinaryNetworkPlugin implements Listener {
             World world = loc.getWorld();
             switch (event.getPlayer().getItemInHand().getType())
             {
-                case ROTTEN_FLESH: entity = new CustomZombie(world) {
-                    @Override
-                    public void burn()
-                    {
-                    }
-                }; break;
+                case ROTTEN_FLESH: entity = new FrozenZombie(world); break;
                 case BONE: entity = new FrozenSkeleton(world); break;
                 case EMERALD: entity = new FrozenVillager(world); break;
                 default: return;
@@ -122,7 +119,7 @@ public class Hub extends BinaryNetworkPlugin implements Listener {
 
             LivingEntity livingEntity = (LivingEntity) EntityManager.spawnCustom(loc, entity.getEntity()).getBukkitEntity();
             ControllableMob<LivingEntity> controllableMob = ControllableMobs.control(livingEntity);
-            controllableMob.getAI().clear();
+            //controllableMob.getAI().clear();
 
 
             EntityManager.setName(livingEntity, livingEntity.getClass().getSimpleName());

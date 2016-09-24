@@ -19,26 +19,4 @@ public class CustomSkeleton extends EntitySkeleton implements CustomEntity {
         CustomEntityManager.registerEntity(getClass(), EntitySkeleton.class);
     }
 
-    @Override
-    public void m()
-    {
-        this.burn();
-    }
-
-    @Override
-    public void collide(Entity entity)
-    {
-        this.collide(entity.getBukkitEntity());
-    }
-
-
-    public void burn()
-    {
-        super.m();
-    }
-
-    public void collide(org.bukkit.entity.Entity entity)
-    {
-        super.collide(((CraftEntity) entity).getHandle());
-    }
 }

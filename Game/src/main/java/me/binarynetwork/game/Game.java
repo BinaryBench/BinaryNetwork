@@ -19,7 +19,7 @@ import org.bukkit.event.player.PlayerQuitEvent;
 /**
  * Created by Bench on 8/31/2016.
  */
-public class Main extends BinaryNetworkPlugin implements Listener {
+public class Game extends BinaryNetworkPlugin implements Listener {
 
     private Arena arena;
     private GamePlayerHolder gamePlayerHolder;

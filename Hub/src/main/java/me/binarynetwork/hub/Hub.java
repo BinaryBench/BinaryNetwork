@@ -32,7 +32,7 @@ import org.bukkit.event.player.PlayerLoginEvent;
 /**
  * Created by Bench on 8/31/2016.
  */
-public class Main extends BinaryNetworkPlugin implements Listener {
+public class Hub extends BinaryNetworkPlugin implements Listener {
 
     private HubWorldManager hubWorldManager;
 

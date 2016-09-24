@@ -8,7 +8,6 @@ import me.binarynetwork.core.component.SimpleComponentWrapper;
 import me.binarynetwork.core.component.components.NoBlockBreak;
 import me.binarynetwork.core.component.components.NoBlockPlace;
 import me.binarynetwork.core.component.components.WeatherComponent;
-import me.binarynetwork.game.Main;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
 import org.bukkit.entity.Player;
@@ -96,7 +95,7 @@ public class LobbyWorldComponentOld extends SimpleComponentWrapper implements Su
     @Override
     public void onDisable()
     {
-        Bukkit.getScheduler().runTaskLater(Main.getPlugin(), () ->
+        Bukkit.getScheduler().runTaskLater(ServerUtil.getPlugin(), () ->
                 WorldUtil.deleteWorld(getWorld(), getScheduler(), BinaryNetworkPlugin.getPlugin()), 60);
     }
 

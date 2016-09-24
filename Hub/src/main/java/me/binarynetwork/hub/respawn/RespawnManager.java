@@ -1,8 +1,8 @@
-package me.binarynetwork.hub.world.respawn;
+package me.binarynetwork.hub.respawn;
 
 import me.binarynetwork.core.BinaryNetworkPlugin;
 import me.binarynetwork.core.component.BaseComponent;
-import me.binarynetwork.core.playerholder.PlayerHolder;
+import me.binarynetwork.core.playerholder.PlayerContainer;
 import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -11,7 +11,7 @@ import org.bukkit.entity.Player;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 
 /**
@@ -21,16 +21,16 @@ public class RespawnManager extends BaseComponent implements Runnable {
 
     private int id;
 
-    private PlayerHolder playerHolder;
+    private PlayerContainer playerContainer;
     private Predicate<World> worldPredicate;
 
     private List<RespawnModule> modules;
-    private Consumer<Pair<Player, Location>> respawn;
+    private BiConsumer<Player, Location> respawn;
 
 
-    public RespawnManager(PlayerHolder playerHolder, Predicate<World> worldPredicate, Consumer<Pair<Player, Location>> respawn)
+    public RespawnManager(PlayerContainer playerContainer, Predicate<World> worldPredicate, BiConsumer<Player, Location> respawn)
     {
-        this.playerHolder = playerHolder;
+        this.playerContainer = playerContainer;
         this.worldPredicate = worldPredicate;
         this.respawn = respawn;
         this.modules = new LinkedList<>();
@@ -59,7 +59,7 @@ public class RespawnManager extends BaseComponent implements Runnable {
     @Override
     public void run()
     {
-        for (Player player : getPlayerHolder())
+        for (Player player : getPlayerContainer())
         {
             for (RespawnModule respawnModule : modules)
             {
@@ -69,7 +69,7 @@ public class RespawnManager extends BaseComponent implements Runnable {
                 {
                     if (check.getLeft() != null)
                     {
-                        getRespawn().accept(Pair.of(player, check.getLeft()));
+                        getRespawn().accept(player, check.getLeft());
                         break;
                     }
 
@@ -86,9 +86,9 @@ public class RespawnManager extends BaseComponent implements Runnable {
     }
 
 
-    public PlayerHolder getPlayerHolder()
+    public PlayerContainer getPlayerContainer()
     {
-        return playerHolder;
+        return playerContainer;
     }
 
     public Predicate<World> getWorldPredicate()
@@ -96,7 +96,7 @@ public class RespawnManager extends BaseComponent implements Runnable {
         return worldPredicate;
     }
 
-    public Consumer<Pair<Player, Location>> getRespawn()
+    public BiConsumer<Player, Location> getRespawn()
     {
         return respawn;
     }

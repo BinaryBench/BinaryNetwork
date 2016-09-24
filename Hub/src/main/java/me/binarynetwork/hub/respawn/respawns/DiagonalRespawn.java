@@ -1,8 +1,6 @@
-package me.binarynetwork.hub.world.respawn.respawns;
+package me.binarynetwork.hub.respawn.respawns;
 
-import me.binarynetwork.core.common.Log;
-import me.binarynetwork.core.common.utils.MapUtil;
-import me.binarynetwork.hub.world.respawn.RespawnModule;
+import me.binarynetwork.hub.respawn.RespawnModule;
 import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Location;
 import org.bukkit.World;

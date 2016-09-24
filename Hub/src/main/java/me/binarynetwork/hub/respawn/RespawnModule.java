@@ -1,4 +1,4 @@
-package me.binarynetwork.hub.world.respawn;
+package me.binarynetwork.hub.respawn;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.bukkit.Location;

@@ -127,7 +127,19 @@ public final class ControllableMobs {
 		return controllableMob;
 	}
 
-
+    /**
+     * Releases the entity from control and restores default behaviors.
+     * All actions will be stopped immediately, all custom AI behaviors will be removed and default attributes and behaviors will be restored. Frees memory.
+     * After having this method called, nothing will show that the entity was once controlled.
+     *
+     * @param livingEntity the entity
+     */
+	public static void releaseIfControlled(LivingEntity livingEntity)
+    {
+        ControllableMob<LivingEntity> controllableMob = getOrControl(livingEntity);
+        if (controllableMob != null)
+            releaseControl(controllableMob, true);
+    }
 
 	/**
 	 * Releases the entity from control and restores default behaviors.

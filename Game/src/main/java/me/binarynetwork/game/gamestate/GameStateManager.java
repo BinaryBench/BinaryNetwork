@@ -1,5 +1,6 @@
 package me.binarynetwork.game.gamestate;
 
+import me.binarynetwork.core.common.Log;
 import me.binarynetwork.core.common.utils.ListUtil;
 import me.binarynetwork.core.component.BaseComponent;
 import me.binarynetwork.core.component.Component;
@@ -97,6 +98,7 @@ public class GameStateManager extends BaseComponent {
         return () -> setCurrentState(state);
     }
 
+    //Add
 
     public boolean add(Component component, Object state, Object... states)
     {
@@ -122,12 +124,20 @@ public class GameStateManager extends BaseComponent {
     {
         boolean modified = false;
 
-        states.remove(DEAD_STATE);
+        if (states.remove(DEAD_STATE))
+            Log.debug("You cannot add components to the DEAD_STATE");
 
         for (Component component : componentsToAdd)
         {
-            if (components.put(component, states) != states)
+            Collection<Object> enabledStates = components.get(component);
+            if (enabledStates == null)
+                components.put(component, enabledStates = new HashSet<>());
+
+            if (enabledStates.addAll(states))
                 modified = true;
+
+            if (states.contains(getCurrentState()))
+                component.enable();
         }
 
         return modified;
@@ -137,7 +147,6 @@ public class GameStateManager extends BaseComponent {
     public boolean add(Map<Component, Collection<Object>> map)
     {
         boolean modified = false;
-
         for (Entry<Component, Collection<Object>> entry : map.entrySet())
         {
             if (add(entry.getKey(), entry.getValue()))
@@ -145,6 +154,69 @@ public class GameStateManager extends BaseComponent {
         }
         return modified;
     }
+
+
+
+    //Remove
+
+
+
+    public boolean remove(Component component, Object state, Object... states)
+    {
+        return remove(Collections.singleton(component), ListUtil.append(state, states));
+    }
+
+    public boolean remove(Component component, Collection<Object> states)
+    {
+        return remove(Collections.singleton(component), states);
+    }
+
+    public boolean remove(Collection<Component> components, Object state, Object... states)
+    {
+        return remove(components, ListUtil.append(state, states));
+    }
+
+    public boolean remove(Collection<Component> components, Object[] states)
+    {
+        return remove(components, Arrays.asList(states));
+    }
+
+    public boolean remove(Collection<Component> componentsToRemove, Collection<Object> states)
+    {
+        boolean modified = false;
+
+        for (Component component : componentsToRemove)
+        {
+            Collection<Object> enabledStates = components.get(component);
+            if (enabledStates == null)
+                components.put(component, enabledStates = new HashSet<>());
+
+            if (enabledStates.removeAll(states))
+                modified = true;
+
+            if (states.contains(getCurrentState()))
+                component.disable();
+
+            if (enabledStates.isEmpty())
+                components.remove(component);
+        }
+
+        return modified;
+    }
+
+    public boolean remove(Map<Component, Collection<Object>> map)
+    {
+        boolean modified = false;
+        for (Entry<Component, Collection<Object>> entry : map.entrySet())
+        {
+            if (remove(entry.getKey(), entry.getValue()))
+                modified = true;
+        }
+        return modified;
+    }
+
+
+
 
     public boolean remove(Component component)
     {
@@ -156,8 +228,21 @@ public class GameStateManager extends BaseComponent {
         boolean modified = false;
 
         for (Component component : componentsToRemove)
+        {
+            Collection<Object> enabledStates = components.get(component);
+
+            if (enabledStates == null)
+                continue;
+
+            if (enabledStates.contains(getCurrentState()))
+                component.disable();
+
             if (components.remove(component) != null)
                 modified = true;
+
+
+        }
+
 
         return modified;
     }

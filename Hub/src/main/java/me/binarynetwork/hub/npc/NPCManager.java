@@ -11,6 +11,7 @@ import me.binarynetwork.core.entity.controllablemobs.api.ai.behaviors.AIPlayerTr
 import me.binarynetwork.core.entity.controllablemobs.api.ai.behaviors.AIRandomLookaround;
 import me.binarynetwork.core.entity.custom.CustomEntity;
 import me.binarynetwork.core.entity.custom.types.frozen.FrozenZombie;
+import me.binarynetwork.core.npc.ServerNPC;
 import org.apache.commons.lang.StringUtils;
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
@@ -39,17 +40,11 @@ public class NPCManager implements Listener {
 
     private Predicate<World> worldPredicate;
 
-    private Map<Entity, Consumer<Player>> map;
-
     public NPCManager(Predicate<World> worldPredicate)
     {
         this.worldPredicate = worldPredicate;
-        map = new HashMap<>();
         ServerUtil.registerEvents(this);
     }
-
-
-
 
     @EventHandler
     public void onLoad(WorldLoadEvent event)
@@ -58,48 +53,11 @@ public class NPCManager implements Listener {
             createEntities(event.getWorld());
     }
 
-    @EventHandler
-    public void combust(EntityCombustEvent event)
-    {
-        if (map.containsKey(event.getEntity()))
-            event.setCancelled(true);
-    }
-
-    @EventHandler
-    public void interact(PlayerInteractEntityEvent event)
-    {
-        if (map.containsKey(event.getRightClicked()))
-        {
-            interact(event.getPlayer(), event.getRightClicked());
-            event.setCancelled(true);
-        }
-
-    }
-
-    @EventHandler
-    public void punch(EntityDamageByEntityEvent event)
-    {
-        if (event.getDamager() instanceof Player && map.containsKey(event.getEntity()))
-        {
-            event.setCancelled(true);
-            interact((Player) event.getDamager(), event.getEntity());
-        }
-    }
-
-    private void interact(Player player, Entity entity)
-    {
-        Consumer<Player> consumer = map.get(entity);
-        if (consumer != null)
-            consumer.accept(player);
-    }
-
 
     private void createEntities(World world)
     {
-        BiConsumer<Double, Double> consumer = (x, z) ->
-        {
-            serverEntity("game", new Location(world, x, 80, z));
-        };
+        BiConsumer<Double, Double> consumer = (x, z) -> serverEntity("game", new Location(world, x, 80, z));
+
         double[] first = new double[]{2.5, -1.5};
         double[] second = new double[]{12.5, -11.5};
 
@@ -117,9 +75,7 @@ public class NPCManager implements Listener {
 
     public void serverEntity(String server, Location location)
     {
-        map.put(createEntity(new FrozenZombie(location.getWorld()), location, ChatColor.GOLD + "Join " + StringUtils.capitalize(server) + " server"), player -> {
-            PlayerUtil.sendToServer(player, server.toLowerCase());
-        });
+        new ServerNPC(new FrozenZombie(location.getWorld()), location, server);
     }
 
     private Entity createEntity(CustomEntity customEntity, Location location, String name)

@@ -1,6 +1,9 @@
 package me.binarynetwork.core.entity;
 
+import me.binarynetwork.core.common.Log;
 import me.binarynetwork.core.common.utils.ServerUtil;
+import me.binarynetwork.core.entity.controllablemobs.api.ControllableMob;
+import me.binarynetwork.core.entity.controllablemobs.api.ControllableMobs;
 import me.binarynetwork.core.entity.custom.CustomEntity;
 import me.binarynetwork.core.entity.custom.CustomEntityManager;
 import net.minecraft.server.v1_8_R3.*;
@@ -15,6 +18,7 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.ItemDespawnEvent;
+import org.bukkit.event.world.ChunkLoadEvent;
 import org.bukkit.event.world.ChunkUnloadEvent;
 import org.bukkit.material.MaterialData;
 import org.bukkit.metadata.FixedMetadataValue;
@@ -101,7 +105,7 @@ public class EntityManager {
 
     //Name
 
-    public static void setName(Entity entity, String name)
+    public static void setName(LivingEntity entity, String name)
     {
         ArmorStand namedArmorStand = getNamed(entity);
         if (namedArmorStand != null)
@@ -109,6 +113,8 @@ public class EntityManager {
             namedArmorStand.setCustomName(name);
             return;
         }
+
+
 
         ArmorStand armorStand = (ArmorStand) EntityManager.spawn(entity.getLocation(), EntityType.ARMOR_STAND);
         armorStand.setVisible(false);
@@ -118,31 +124,57 @@ public class EntityManager {
         armorStand.setSmall(true);
 
 
+
         Slime slime = (Slime) EntityManager.spawn(entity.getLocation(), EntityType.SLIME);
         slime.setSize(-1);
         slime.setMaximumNoDamageTicks(Integer.MAX_VALUE);
         slime.setNoDamageTicks(Integer.MAX_VALUE);
         slime.addPotionEffect(new PotionEffect(PotionEffectType.INVISIBILITY, Integer.MAX_VALUE, Integer.MAX_VALUE, true, false));
 
+        //clear ai
+        ControllableMobs.control(slime, true);
+
         slime.setMetadata(NAME_META_TAG, new FixedMetadataValue(ServerUtil.getPlugin(), entity));
         armorStand.setMetadata(NAME_META_TAG, new FixedMetadataValue(ServerUtil.getPlugin(), entity));
+
+
+        entity.setRemoveWhenFarAway(false);
+        armorStand.setRemoveWhenFarAway(false);
+        slime.setRemoveWhenFarAway(false);
+
 
         entity.setPassenger(slime);
         slime.setPassenger(armorStand);
 
-        ServerUtil.registerEvents(new  Listener(){
+        ServerUtil.registerEvents(new Listener(){
 
             @EventHandler
             public void onDamage(EntityDamageEvent event)
             {
-                if (!event.getEntity().equals(slime))
+                checkIfDead();
+                if (!event.getEntity().equals(slime) && !event.getEntity().equals(armorStand))
                     return;
                 event.setCancelled(true);
+            }
+
+            //this is not working!
+            @EventHandler
+            public void chunk(ChunkUnloadEvent event)
+            {
+                for (Entity entity1 : event.getChunk().getEntities())
+                {
+                    if (entity1.equals(entity))
+                    {
+                        remove();
+                        return;
+                    }
+                }
             }
 
             @EventHandler
             public void onDeath(EntityDeathEvent event)
             {
+                checkIfDead();
                 if (!event.getEntity().equals(entity))
                     return;
                 remove();
@@ -150,6 +182,7 @@ public class EntityManager {
             @EventHandler
             public void onDespawn(ItemDespawnEvent event)
             {
+                checkIfDead();
                 if (!event.getEntity().equals(entity))
                     return;
                 remove();
@@ -157,15 +190,23 @@ public class EntityManager {
             @EventHandler
             public void dismount(EntityDismountEvent event)
             {
+                checkIfDead();
                 if (!event.getDismounted().equals(slime) && !event.getDismounted().equals(armorStand))
                     return;
                 remove();
+            }
+
+            public void checkIfDead()
+            {
+                if (slime.isDead() || armorStand.isDead())
+                    remove();
             }
 
             public void remove()
             {
                 slime.remove();
                 armorStand.remove();
+                ServerUtil.unregisterEvents(this);
             }
         });
     }

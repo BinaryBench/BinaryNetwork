@@ -1,5 +1,7 @@
 package me.binarynetwork.core.common.utils;
 
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.List;
 import java.util.StringJoiner;
 
@@ -21,4 +23,10 @@ public class StringUtil {
             sj.add(string);
         return sj.toString();
     }
+
+    public static String capitalize(String string)
+    {
+        return StringUtils.capitalize(string);
+    }
+
 }

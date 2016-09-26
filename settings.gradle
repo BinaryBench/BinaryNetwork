@@ -1,3 +1,4 @@
 rootProject.name = 'BinaryNetwork'
 include 'BungeePlugin', 'Core', 'Game', 'Hub'
+include 'Build'
 

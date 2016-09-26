@@ -46,7 +46,7 @@ public class VoidKiller extends BaseComponent implements Runnable {
     @Override
     public void onEnable()
     {
-        this.id = Bukkit.getScheduler().runTaskTimer(BinaryNetworkPlugin.getPlugin(), this, 2, 2).getTaskId();
+        this.id = Bukkit.getScheduler().runTaskTimer(ServerUtil.getPlugin(), this, 2, 2).getTaskId();
     }
 
     @Override

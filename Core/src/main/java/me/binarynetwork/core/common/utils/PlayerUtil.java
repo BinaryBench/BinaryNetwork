@@ -177,7 +177,7 @@ public class PlayerUtil {
 
     public static void sendToServer(Player player, String server)
     {
-        Plugin plugin = BinaryNetworkPlugin.getPlugin();
+        Plugin plugin = ServerUtil.getPlugin();
         if (!Bukkit.getServer().getMessenger().isOutgoingChannelRegistered(plugin, "BungeeCord"))
             Bukkit.getServer().getMessenger().registerOutgoingPluginChannel(plugin, "BungeeCord");
 

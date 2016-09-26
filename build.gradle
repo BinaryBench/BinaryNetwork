@@ -5,9 +5,7 @@ allprojects {
 
 project.ext {
     bukkitProjects = subprojects.findAll{
-        it.name == 'Core' ||
-        it.name == 'Game' ||
-        it.name == 'Hub'
+        it.name != 'BungeePlugin'
     }
 }
 

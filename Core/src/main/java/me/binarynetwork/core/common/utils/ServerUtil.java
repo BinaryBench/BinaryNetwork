@@ -17,6 +17,13 @@ import java.util.*;
  */
 public class ServerUtil {
 
+    private static Plugin plugin;
+
+    public static void init(Plugin plugin)
+    {
+        ServerUtil.plugin = plugin;
+    }
+
     public static void shutdown(String shutdownMessage)
     {
         shutdown(shutdownMessage, "Bye bye");
@@ -92,13 +99,14 @@ public class ServerUtil {
 
     public static Plugin getPlugin()
     {
-        return BinaryNetworkPlugin.getPlugin();
+        return plugin;
     }
 
     public static void registerEvents(Listener listener)
     {
         Bukkit.getPluginManager().registerEvents(listener, getPlugin());
     }
+
     public static void unregisterEvents(Listener listener)
     {
         HandlerList.unregisterAll(listener);

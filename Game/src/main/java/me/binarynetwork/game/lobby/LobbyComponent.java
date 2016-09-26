@@ -3,6 +3,7 @@ package me.binarynetwork.game.lobby;
 import me.binarynetwork.core.BinaryNetworkPlugin;
 import me.binarynetwork.core.common.utils.PlayerUtil;
 import me.binarynetwork.core.common.utils.RandomUtil;
+import me.binarynetwork.core.common.utils.ServerUtil;
 import me.binarynetwork.core.component.SimpleComponentWrapper;
 import me.binarynetwork.core.component.components.*;
 import me.binarynetwork.core.playerholder.PlayerHolder;
@@ -47,9 +48,9 @@ public class LobbyComponent extends SimpleComponentWrapper implements Runnable, 
     public void onEnable()
     {
         getPlayerHolder().forEach(this::spawnPlayer);
-        this.id = Bukkit.getScheduler().runTaskTimer(BinaryNetworkPlugin.getPlugin(), this, 2, 2).getTaskId();
+        this.id = Bukkit.getScheduler().runTaskTimer(ServerUtil.getPlugin(), this, 2, 2).getTaskId();
 
-        BinaryNetworkPlugin.registerEvents(this);
+        ServerUtil.registerEvents(this);
     }
 
     @Override
@@ -57,7 +58,7 @@ public class LobbyComponent extends SimpleComponentWrapper implements Runnable, 
     {
         Bukkit.getScheduler().cancelTask(this.id);
 
-        BinaryNetworkPlugin.unregisterEvents(this);
+        ServerUtil.unregisterEvents(this);
 
     }
 

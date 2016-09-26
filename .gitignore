@@ -6,7 +6,8 @@
 
 # Build files
 .gradle
-*/build
+*/build/
+!Build/test
 classes
 
 # Ignore Server
@@ -50,6 +51,3 @@ Servers/*/plugins/BungeePlugin-*.jar
 # IntelliJ project files
 .idea
 *.iml
-
-
-

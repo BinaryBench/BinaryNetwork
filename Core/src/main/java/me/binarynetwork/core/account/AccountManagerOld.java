@@ -1,6 +1,7 @@
 package me.binarynetwork.core.account;
 
 import me.binarynetwork.core.BinaryNetworkPlugin;
+import me.binarynetwork.core.common.utils.ServerUtil;
 import me.binarynetwork.core.database.DataSourceManager;
 import me.binarynetwork.core.database.old.KeyValueDataStorage;
 import org.bukkit.event.EventHandler;
@@ -36,7 +37,7 @@ public class AccountManagerOld extends KeyValueDataStorage<UUID, Account> implem
     public AccountManagerOld(ScheduledExecutorService scheduler)
     {
         super(DataSourceManager.PLAYER_DATA, scheduler);
-        BinaryNetworkPlugin.registerEvents(this);
+        ServerUtil.registerEvents(this);
     }
 
 

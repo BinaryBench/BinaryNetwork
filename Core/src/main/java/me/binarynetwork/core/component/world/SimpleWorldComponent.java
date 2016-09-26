@@ -38,7 +38,7 @@ public class SimpleWorldComponent extends ListenerComponent implements WorldMana
     {
         this.scheduler = scheduler;
         this.somethingWentWrong = somethingWentWrong;
-        File dataFolder = BinaryNetworkPlugin.getPlugin().getDataFolder();
+        File dataFolder = ServerUtil.getPlugin().getDataFolder();
 
         if (!dataFolder.isDirectory())
         {
@@ -100,7 +100,7 @@ public class SimpleWorldComponent extends ListenerComponent implements WorldMana
     @Override
     public void onEnable()
     {
-        WorldUtil.deleteWorld(getWorldName(), getScheduler(), BinaryNetworkPlugin.getPlugin(), () -> {
+        WorldUtil.deleteWorld(getWorldName(), getScheduler(), ServerUtil.getPlugin(), () -> {
             Log.debugf("loading world!");
             this.world = WorldUtil.createTemporaryWorld(getSaveFile(), getWorldName());
             if (world != null)
@@ -111,8 +111,8 @@ public class SimpleWorldComponent extends ListenerComponent implements WorldMana
     @Override
     public void onDisable()
     {
-        Bukkit.getScheduler().runTaskLater(BinaryNetworkPlugin.getPlugin(), () ->
-                WorldUtil.deleteWorld(getWorld(), getScheduler(), BinaryNetworkPlugin.getPlugin()), 60);
+        Bukkit.getScheduler().runTaskLater(ServerUtil.getPlugin(), () ->
+                WorldUtil.deleteWorld(getWorld(), getScheduler(), ServerUtil.getPlugin()), 60);
     }
 
     public YamlConfiguration getConfig(String configName)

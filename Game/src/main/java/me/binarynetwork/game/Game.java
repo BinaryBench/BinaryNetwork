@@ -39,7 +39,7 @@ public class Game extends BinaryNetworkPlugin implements Listener {
         gamePlayerHolder = new SimpleGamePlayerHolder();
         SimpleGameFactory gameFactory = new SimpleGameFactory(gamePlayerHolder, getScheduler(), lobbyWorldComponent);
         arena = new Arena(gameFactory);
-        registerEvents(this);
+        ServerUtil.registerEvents(this);
         arena.enable();
     }
 

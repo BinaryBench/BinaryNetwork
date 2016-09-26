@@ -1,6 +1,7 @@
 package me.binarynetwork.game.playerholder;
 
 import me.binarynetwork.core.BinaryNetworkPlugin;
+import me.binarynetwork.core.common.utils.ServerUtil;
 import me.binarynetwork.game.playerholder.events.PlayerCanJoinGameEvent;
 import me.binarynetwork.game.playerholder.events.PlayerJoinGameEvent;
 import me.binarynetwork.game.playerholder.events.PlayerQuitGameEvent;
@@ -22,7 +23,7 @@ public class SimpleGamePlayerHolder implements GamePlayerHolder, Listener {
 
     public SimpleGamePlayerHolder()
     {
-        BinaryNetworkPlugin.registerEvents(this);
+        ServerUtil.registerEvents(this);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package me.binarynetwork.core.common.scheduler;
 
 import me.binarynetwork.core.BinaryNetworkPlugin;
+import me.binarynetwork.core.common.utils.ServerUtil;
 import org.bukkit.Bukkit;
 
 /**
@@ -14,17 +15,17 @@ public class Scheduler {
 
     public static void runSync(Runnable runnable)
     {
-        Bukkit.getScheduler().runTask(BinaryNetworkPlugin.getPlugin(), runnable);
+        Bukkit.getScheduler().runTask(ServerUtil.getPlugin(), runnable);
     }
 
     public static void runAsync(Runnable runnable, long ticks)
     {
-        Bukkit.getScheduler().runTaskLaterAsynchronously(BinaryNetworkPlugin.getPlugin(), runnable, ticks);
+        Bukkit.getScheduler().runTaskLaterAsynchronously(ServerUtil.getPlugin(), runnable, ticks);
     }
 
     public static void runAsync(Runnable runnable)
     {
-        Bukkit.getScheduler().runTaskAsynchronously(BinaryNetworkPlugin.getPlugin(), runnable);
+        Bukkit.getScheduler().runTaskAsynchronously(ServerUtil.getPlugin(), runnable);
     }
 
 }

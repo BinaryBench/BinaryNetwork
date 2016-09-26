@@ -176,7 +176,7 @@ public class RankPermissionManager extends ListenerComponent implements Permissi
         }
         else
         {
-            attachment = player.addAttachment(BinaryNetworkPlugin.getPlugin());
+            attachment = player.addAttachment(ServerUtil.getPlugin());
             attachments.put(player.getUniqueId(), attachment);
         }
 

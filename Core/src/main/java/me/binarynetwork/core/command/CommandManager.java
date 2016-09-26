@@ -10,6 +10,7 @@ import com.comphenix.protocol.events.PacketEvent;
 import me.binarynetwork.core.BinaryNetworkPlugin;
 import me.binarynetwork.core.common.Log;
 import me.binarynetwork.core.common.utils.PlayerUtil;
+import me.binarynetwork.core.common.utils.ServerUtil;
 import me.binarynetwork.core.common.utils.StreamUtil;
 import me.binarynetwork.core.common.utils.StringUtil;
 import org.apache.commons.lang.WordUtils;
@@ -29,11 +30,13 @@ import java.util.stream.Collectors;
  */
 public class CommandManager extends SimpleCommandWrapper implements Listener {
 
+    private volatile boolean allowDefaultCommands;
+
     public CommandManager(ProtocolManager protocolManager)
     {
-        BinaryNetworkPlugin.registerEvents(this);
+        ServerUtil.registerEvents(this);
         protocolManager.addPacketListener(
-                new PacketAdapter(BinaryNetworkPlugin.getPlugin(),
+                new PacketAdapter(ServerUtil.getPlugin(),
                         ListenerPriority.NORMAL,
                         PacketType.Play.Client.TAB_COMPLETE) {
 
@@ -47,19 +50,23 @@ public class CommandManager extends SimpleCommandWrapper implements Listener {
 
                             if (message.startsWith("/"))
                             {
-                                Player player = event.getPlayer();
-
                                 event.setCancelled(true);
+
+                                Player player = event.getPlayer();
 
                                 String[] args = getArgs(message);
 
                                 List<String> completions = tabComplete(player, args);
 
+
                                 if (completions == null)
+                                {
+                                    if (allowDefaultCommands)
+                                        event.setCancelled(false);
                                     return;
+                                }
 
                                 PacketContainer returnPacket = protocolManager.createPacket(PacketType.Play.Server.TAB_COMPLETE);
-                                Log.debugf("Tab: %s", completions);
 
                                 returnPacket.getStringArrays().write(0, completions.toArray(new String[0]));
 
@@ -71,6 +78,8 @@ public class CommandManager extends SimpleCommandWrapper implements Listener {
                                 {
                                     e.printStackTrace();
                                 }
+
+
                             }
                         }
                     }
@@ -230,5 +239,10 @@ public class CommandManager extends SimpleCommandWrapper implements Listener {
         CAPITALIZED,
         UPPER_CASE,
         APPEND;
+    }
+
+    public void setAllowDefaultCommands(boolean allowDefaultCommands)
+    {
+        this.allowDefaultCommands = allowDefaultCommands;
     }
 }

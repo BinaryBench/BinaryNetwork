@@ -1,6 +1,7 @@
 package me.binarynetwork.hub.respawn;
 
 import me.binarynetwork.core.BinaryNetworkPlugin;
+import me.binarynetwork.core.common.utils.ServerUtil;
 import me.binarynetwork.core.component.BaseComponent;
 import me.binarynetwork.core.playerholder.PlayerContainer;
 import org.apache.commons.lang3.tuple.Pair;
@@ -44,7 +45,7 @@ public class RespawnManager extends BaseComponent implements Runnable {
     @Override
     public void onEnable()
     {
-        this.id = Bukkit.getScheduler().runTaskTimer(BinaryNetworkPlugin.getPlugin(), this, 2, 2).getTaskId();
+        this.id = Bukkit.getScheduler().runTaskTimer(ServerUtil.getPlugin(), this, 2, 2).getTaskId();
     }
 
     @Override

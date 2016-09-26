@@ -28,7 +28,7 @@ public class RankManager implements Listener{
     {
         this.rankDataCache = new RankDataCache(scheduler, accountManager);
         commandWrapper.addCommand(new RankCommand(this, permissionManager), "rank");
-        BinaryNetworkPlugin.registerEvents(this);
+        ServerUtil.registerEvents(this);
     }
 
     @EventHandler

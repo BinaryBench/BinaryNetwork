@@ -21,11 +21,16 @@ import me.binarynetwork.core.rank.RankManager;
 import me.binarynetwork.core.permissions.RankPermissionManager;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
+import org.bukkit.configuration.Configuration;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.HandlerList;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -34,22 +39,7 @@ import java.util.concurrent.ScheduledExecutorService;
  */
 public abstract class BinaryNetworkPlugin extends JavaPlugin {
 
-    private static BinaryNetworkPlugin plugin;
-    public static BinaryNetworkPlugin getPlugin()
-    {
-        return plugin;
-    }
-    public static void registerEvents(Listener listener)
-    {
-        Bukkit.getPluginManager().registerEvents(listener, getPlugin());
-    }
-    public static void unregisterEvents(Listener listener)
-    {
-        HandlerList.unregisterAll(listener);
-    }
-
     private PlayerHolder serverPlayerHolder;
-
     private SimpleComponentWrapper componentWrapper;
     private ProtocolManager protocolManager;
     private ScheduledExecutorService scheduler;
@@ -68,7 +58,7 @@ public abstract class BinaryNetworkPlugin extends JavaPlugin {
     @Override
     public final void onEnable()
     {
-        plugin = this;
+        ServerUtil.init(this);
         getDataFolder().mkdirs();
         //Scheduler
         scheduler = Executors.newScheduledThreadPool(10);
@@ -98,12 +88,19 @@ public abstract class BinaryNetworkPlugin extends JavaPlugin {
         //Commands
         new DefaultCommandManager(commandManager, permissionManager);
 
-        getCommandManager().addCommand(new BackGroundCommand(permissionWrapper), "Background", "bg");
+        //getCommandManager().addCommand(new BackGroundCommand(permissionWrapper), "Background", "bg");
 
         WorldUtil.purgeTemporaryWorlds(getScheduler());
         componentWrapper.enable();
         enable();
         Scheduler.runSync(this::onPostWorld);
+        YamlConfiguration.loadConfiguration(new InputStream() {
+            @Override
+            public int read() throws IOException
+            {
+                return 0;
+            }
+        });
     }
 
     public final void onPostWorld()

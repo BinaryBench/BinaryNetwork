@@ -2,6 +2,7 @@ package me.binarynetwork.game.countdown;
 
 import com.comphenix.protocol.PacketType;
 import me.binarynetwork.core.BinaryNetworkPlugin;
+import me.binarynetwork.core.common.utils.ServerUtil;
 import me.binarynetwork.core.playerholder.PlayerHolder;
 import me.binarynetwork.core.playerholder.events.PlayerAddEvent;
 import me.binarynetwork.core.playerholder.events.PlayerRemoveEvent;
@@ -63,14 +64,14 @@ public class TempPlayerCountdown extends TempCountdown implements Listener {
     @Override
     public void onEnable()
     {
-        BinaryNetworkPlugin.registerEvents(this);
+        ServerUtil.registerEvents(this);
         this.checkCountdown(getPlayerHolder().getPlayers().size());
     }
 
     @Override
     public void onDisable()
     {
-        BinaryNetworkPlugin.unregisterEvents(this);
+        ServerUtil.unregisterEvents(this);
         super.onDisable();
     }
 

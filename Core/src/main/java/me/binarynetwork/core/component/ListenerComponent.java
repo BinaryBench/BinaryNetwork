@@ -1,6 +1,7 @@
 package me.binarynetwork.core.component;
 
 import me.binarynetwork.core.BinaryNetworkPlugin;
+import me.binarynetwork.core.common.utils.ServerUtil;
 import org.bukkit.event.Listener;
 
 /**
@@ -13,7 +14,7 @@ public abstract class ListenerComponent extends BaseComponent implements Listene
     {
         if (super.enable())
         {
-            BinaryNetworkPlugin.registerEvents(this);
+            ServerUtil.registerEvents(this);
             return true;
         }
         return false;
@@ -24,7 +25,7 @@ public abstract class ListenerComponent extends BaseComponent implements Listene
     {
         if (super.disable())
         {
-            BinaryNetworkPlugin.unregisterEvents(this);
+            ServerUtil.unregisterEvents(this);
             return true;
         }
         return false;

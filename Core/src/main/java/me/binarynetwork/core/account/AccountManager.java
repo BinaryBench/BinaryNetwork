@@ -44,7 +44,7 @@ public class AccountManager extends SQLDataCacheTemp<UUID, Account> implements L
     public AccountManager(ScheduledExecutorService scheduler)
     {
         super(scheduler, DataSourceManager.PLAYER_DATA);
-        BinaryNetworkPlugin.registerEvents(this);
+        ServerUtil.registerEvents(this);
     }
 
     public void  addListener(AccountListener listener, boolean listenToJoin)

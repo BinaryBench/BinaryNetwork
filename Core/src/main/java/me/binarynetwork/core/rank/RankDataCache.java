@@ -23,7 +23,6 @@ public class RankDataCache extends PlayerDataCache<Rank> {
     public RankDataCache(ScheduledExecutorService scheduler, AccountManager accountManager)
     {
         super(DataSourceManager.PLAYER_DATA, scheduler, accountManager, true);
-        execute(this::initialize);
     }
 
     public static final String CREATE_RANKS_TABLE =
@@ -155,7 +154,7 @@ public class RankDataCache extends PlayerDataCache<Rank> {
         );
     }
 
-    public void initialize(Connection connection) throws SQLException
+    public void init(Connection connection) throws SQLException
     {
         try (PreparedStatement createRanksTable = connection.prepareStatement(CREATE_RANKS_TABLE);
              PreparedStatement createPlayerRanksTable = connection.prepareStatement(CREATE_PLAYER_RANKS_TABLE);

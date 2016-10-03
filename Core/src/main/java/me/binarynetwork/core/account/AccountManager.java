@@ -47,6 +47,15 @@ public class AccountManager extends SQLDataCacheTemp<UUID, Account> implements L
         ServerUtil.registerEvents(this);
     }
 
+    @Override
+    public void init(Connection connection) throws SQLException
+    {
+        try (Statement statement = connection.createStatement())
+        {
+            statement.execute(CREATE_TABLE);
+        }
+    }
+
     public void  addListener(AccountListener listener, boolean listenToJoin)
     {
         listeners.put(listener, listenToJoin);

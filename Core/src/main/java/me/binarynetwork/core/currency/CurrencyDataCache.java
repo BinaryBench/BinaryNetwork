@@ -50,7 +50,6 @@ public class CurrencyDataCache extends SavingPlayerDataCache<CurrencyToken> {
     public CurrencyDataCache(ScheduledExecutorService scheduler, AccountManager accountManager)
     {
         super(DataSourceManager.PLAYER_DATA, scheduler, accountManager, true);
-        execute(this::initialize);
     }
 
     @Override
@@ -154,8 +153,8 @@ public class CurrencyDataCache extends SavingPlayerDataCache<CurrencyToken> {
         }
     }
 
-
-    public void initialize(Connection connection) throws SQLException
+    @Override
+    public void init(Connection connection) throws SQLException
     {
         try (PreparedStatement createRanksTable = connection.prepareStatement(CREATE_CURRENCIES_TABLE);
              PreparedStatement createPlayerRanksTable = connection.prepareStatement(CREATE_PLAYER_CURRENCIES_TABLE);

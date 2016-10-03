@@ -2,6 +2,7 @@ package me.binarynetwork.core.database;
 
 import com.avaje.ebeaninternal.api.SpiUpdatePlan;
 import me.binarynetwork.core.common.Log;
+import me.binarynetwork.core.common.utils.ServerUtil;
 import org.bukkit.Bukkit;
 
 import javax.sql.DataSource;
@@ -24,11 +25,17 @@ public abstract class SQLDataCacheTemp<K, V> extends DataCacheTemp<K, V> {
     {
         super(scheduler, 1, TimeUnit.MINUTES);
         this.dataSource = dataSource;
+        execute(this::init, () ->
+        {
+            ServerUtil.shutdown("Unable to initialize " + getClass().getSimpleName());
+        });
     }
 
     public abstract V loadValue(K key, Connection connection) throws SQLException;
 
     public abstract V sqlFailure(K key);
+
+    public abstract void init(Connection connection) throws SQLException;
 
     @Override
     public V load(K key)

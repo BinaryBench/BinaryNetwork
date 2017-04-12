@@ -1,13 +1,7 @@
 package me.binarynetwork.core;
 
-import me.binarynetwork.core.common.utils.ServerUtil;
-import me.binarynetwork.core.component.SimpleComponentWrapper;
-import me.binarynetwork.core.component.components.NoDamage;
-import me.binarynetwork.core.currency.Currency;
-import org.apache.commons.lang3.tuple.Pair;
-
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 
 /**
  * Created by Bench on 9/4/2016.
@@ -15,13 +9,16 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Test {
     public static void main(String[] args)
     {
-        Object object = new Object();
+        System.out.println("moo");
 
-        Set<Pair<Object, Currency>> pairs = new HashSet<>();
+        BiMap<Integer, String> biMap = HashBiMap.create();
 
-        pairs.add(Pair.of(object, Currency.COSMETIC));
+        biMap.put(1, "a");
+        biMap.put(2, "a");
+        biMap.put(3, "b");
 
-        System.out.printf("Contains: %s", pairs.contains(Pair.of(object, Currency.COSMETIC)));
+        System.out.printf("1: %s\n", biMap.get(1));
+        System.out.printf("a: %s\n", biMap.inverse().get("a"));
 
     }
 }

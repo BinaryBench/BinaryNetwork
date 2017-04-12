@@ -114,7 +114,7 @@ public class RankCommand implements Command {
                 }
                 else
                 {
-                    PlayerUtil.message(sender, "Unable to get" + F.possession(finalOfflinePlayer.getName()) + " rank.");
+                    PlayerUtil.message(sender, "Unable to getWorld" + F.possession(finalOfflinePlayer.getName()) + " rank.");
                 }
             });
         }

@@ -15,7 +15,7 @@ public abstract class NativeInterfaceReflection<O extends Object> extends Native
 	}
 	
 	protected Field getField(final Object object, final String fieldName) throws NoSuchFieldException, SecurityException {
-		Field field = this.loadedFields.get(fieldName);
+		Field field = this.loadedFields.getWorld(fieldName);
 		if(field==null) {
 			if(this.nativeClass==null) field = object.getClass().getDeclaredField(fieldName);
 			else field = this.nativeClass.getDeclaredField(fieldName);
@@ -26,7 +26,7 @@ public abstract class NativeInterfaceReflection<O extends Object> extends Native
 	}
 	
 	protected Method getMethod(final String identifier, final Object object, final String methodName, final Class<?>... parameterTypes) throws NoSuchMethodException, SecurityException {
-		Method method = this.loadedMethods.get(identifier);
+		Method method = this.loadedMethods.getWorld(identifier);
 		if(method==null) {
 			if(this.nativeClass==null) method = object.getClass().getDeclaredMethod(methodName, parameterTypes);
 			else method = this.nativeClass.getDeclaredMethod(methodName, parameterTypes);

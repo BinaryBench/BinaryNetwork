@@ -1,6 +1,8 @@
 package me.binarynetwork.core.common.utils;
 
 import me.binarynetwork.core.common.Log;
+import me.binarynetwork.core.common.NullableConsumer;
+import me.binarynetwork.core.common.scheduler.Scheduler;
 import me.binarynetwork.core.fixes.WorldMemoryFix;
 import org.apache.commons.io.FileUtils;
 import org.bukkit.Bukkit;
@@ -9,6 +11,7 @@ import org.bukkit.WorldCreator;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 
+import javax.annotation.Nullable;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -16,11 +19,16 @@ import java.util.List;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 /**
  * Created by Bench on 8/30/2016.
  */
 public class WorldUtil {
+
+    private static final ArrayList<String> IGNORE_FILES = new ArrayList<>(Arrays.asList("uid.dat", "session.dat", "playerdata", "stats"));
+
     private WorldUtil() {}
 
     private static final String TEMP_FILE_NAME = ".temp";
@@ -91,16 +99,14 @@ public class WorldUtil {
      *
      * @param worldName
      *              The name of the world to be deleted
-     * @param plugin
-     *              A enabled plugin.
      * @return {@code true} if the world is successfully unloaded. (Note: this
      *         method will return {@code true} even if it fails to delete the
      *         world files after it is unloaded)
-     * @see #deleteWorld(String, ScheduledExecutorService, Plugin, Runnable)
+     * @see #deleteWorld(String, ScheduledExecutorService, Consumer)
      */
-    public static boolean deleteWorld(final String worldName, ScheduledExecutorService executorService, Plugin plugin)
+    public static boolean deleteWorld(final String worldName, ScheduledExecutorService executorService)
     {
-        return deleteWorld(worldName, executorService, plugin, null);
+        return deleteWorld(worldName, executorService, null);
     }
 
     /**
@@ -109,8 +115,6 @@ public class WorldUtil {
      *
      * @param worldName
      *              The name of the world to be deleted
-     * @param plugin
-     *              A enabled plugin.
      * @param runAfter
      *              A runnable that will be executed when the world is
      *              unloaded and deleted
@@ -118,7 +122,7 @@ public class WorldUtil {
      *         return true even if it fails to delete the world files after it
      *         is unloaded)
      */
-    public static boolean deleteWorld(final String worldName, ScheduledExecutorService executorService, Plugin plugin, final Runnable runAfter)
+    public static boolean deleteWorld(final String worldName, ScheduledExecutorService executorService, @Nullable final Consumer<Boolean> runAfter)
     {
         // final Plugin plugin = ExGame.getPlugin();
 
@@ -130,7 +134,7 @@ public class WorldUtil {
 
             if (!file.exists()) {
                 System.out.print("Could not find file at: " + file.getPath() + "  Something can't be deleted if its not there.");
-                runAfter.run();
+                runAfter.accept(true);
                 return true;
             }
 
@@ -140,7 +144,7 @@ public class WorldUtil {
                     System.out.print("Deleted the files found at: " + file.getPath() + " though.");
 
                     if (runAfter != null)
-                        Bukkit.getScheduler().runTask(plugin, runAfter);
+                        Scheduler.runSync(runAfter, true);
 
                 } catch (IOException e) {
                     e.printStackTrace();
@@ -148,7 +152,7 @@ public class WorldUtil {
             });
             return true;
         }
-        return deleteWorld(world, executorService, plugin, runAfter);
+        return deleteWorld(world, executorService, runAfter);
     }
 
     /**
@@ -157,16 +161,14 @@ public class WorldUtil {
      *
      * @param world
      *              The name of the world to be deleted
-     * @param plugin
-     *              A enabled plugin.
      * @return {@code true} if the world is successfully unloaded. (Note: this
      *         method will return {@code true} even if it fails to delete the
      *         world files after it is unloaded)
-     * @see #deleteWorld(String, ScheduledExecutorService, Plugin, Runnable)
+     * @see #deleteWorld(String, ScheduledExecutorService, Consumer)
      */
-    public static boolean deleteWorld(World world, ScheduledExecutorService executorService, Plugin plugin)
+    public static boolean deleteWorld(World world, ScheduledExecutorService executorService)
     {
-        return deleteWorld(world, executorService, plugin, null);
+        return deleteWorld(world, executorService, null);
     }
 
     /**
@@ -175,51 +177,54 @@ public class WorldUtil {
      *
      * @param world
      *              world to be deleted
-     * @param plugin
-     *              A enabled plugin.
-     * @param runAfter
+     * @param callback
      *              A runnable that will be executed when the world is
      *              unloaded and deleted
      * @return true if the world is successfully unloaded. (Note: it will
      *         return true even if it fails to delete the world files after it
      *         is unloaded)
      */
-    public static boolean deleteWorld(final World world, ScheduledExecutorService executorService, Plugin plugin, final Runnable runAfter)
+    public static boolean deleteWorld(final World world, ScheduledExecutorService executorService, @Nullable final Consumer<Boolean> callback)
     {
-        // final Plugin plugin = ExGame.getPlugin();
+        Consumer<Boolean> runAfter = new NullableConsumer<>(callback);
 
         final File file = world.getWorldFolder();
 
         for (Player player : world.getPlayers())
-            player.kickPlayer("Welp, that didn't work...");
+            player.kickPlayer("Unloading World");
 
         world.setAutoSave(false);
 
-        if (WorldUtil.unloadWorld(world, executorService, false, (aBoolean) -> {
+        if (WorldUtil.unloadWorld(world, executorService, false, (aBoolean) ->
+        {
             if (aBoolean)
                 Log.infof("Successfully finished unloading %s", world.getName());
             else
                 Log.infof("Failed to unload %s", world.getName());
 
-            try {
+            try
+            {
                 FileUtils.deleteDirectory(file);
-                System.out.print("Successfully deleted " + world.getName());
-                if (runAfter != null)
-                    Bukkit.getScheduler().runTask(plugin, runAfter);
+                Log.infof("Successfully deleted %s", world.getName());
+                Scheduler.runSync(runAfter, true);
             }
             catch (Exception e)
             {
-                System.out.print("COULD NOT DELETE " + world.getName() + "!");
+                Log.infof("COULD NOT DELETE %s!", world.getName());
                 e.printStackTrace();
+                Scheduler.runSync(runAfter, false);
             }
-        })) {
-            System.out.print("Successfully started to unload " + world.getName());
-        } else {
-            System.err.print("Bukkit cowardly refused to unload the world: " + world.getName());
+        }))
+        {
+            Log.infof("Successfully started to unload %s", world.getName());
+            return true;
+        }
+        else
+        {
+            Log.infof("Bukkit cowardly refused to unload the world: %s", world.getName());
+            runAfter.accept(false);
             return false;
         }
-
-        return true;
     }
 
     /**
@@ -269,48 +274,9 @@ public class WorldUtil {
         return Bukkit.createWorld(new WorldCreator(worldName));
     }
 
-    /**
-     *
-     * Copys a minecraft world from the {@code source} to the {@code target}.
-     *
-     * @param source the file of the world you'd like to copy
-     * @param target the file you'd like to copy to
-     *
-     * @author ThunderWaffeMC
-     */
-    public static void copyWorld(File source, File target)
+    public static boolean copyWorld(File source, File target)
     {
-        try
-        {
-
-            ArrayList<String> ignore = new ArrayList<>(Arrays.asList("uid.dat", "session.dat", "playerdata", "stats"));
-
-            if (!ignore.contains(source.getName())) {
-                if (source.isDirectory()) {
-                    if (!target.exists())
-                        target.mkdirs();
-                    String files[] = source.list();
-                    for (String file : files) {
-                        File srcFile = new File(source, file);
-                        File destFile = new File(target, file);
-                        copyWorld(srcFile, destFile);
-                    }
-                } else {
-                    InputStream in = new FileInputStream(source);
-                    OutputStream out = new FileOutputStream(target);
-                    byte[] buffer = new byte[1024];
-                    int length;
-                    while ((length = in.read(buffer)) > 0)
-                        out.write(buffer, 0, length);
-                    in.close();
-                    out.close();
-                }
-            }
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
+        return FileUtil.copy(source, target, file -> !IGNORE_FILES.contains(file.getName()));
     }
 
     public static boolean unloadWorld(World world, ScheduledExecutorService scheduler, boolean save, Consumer<Boolean> callback)
@@ -329,7 +295,6 @@ public class WorldUtil {
         return true;
     }
 
-    //THIS IS A HACK AND SHOULD PROBABLY BE REDONE AT SOME POINT!
     public static World createTemporaryWorld(File srcFile, String worldName)
     {
         World world = WorldUtil.createWorld(srcFile, worldName);
@@ -357,7 +322,7 @@ public class WorldUtil {
 
         for (File file : files)
             if (file.isDirectory() && new File(file, TEMP_FILE_NAME).exists())
-                WorldUtil.deleteWorld(file.getName(), scheduler, ServerUtil.getPlugin());
+                WorldUtil.deleteWorld(file.getName(), scheduler);
     }
 
     public static void markAsTemp(File worldFile)

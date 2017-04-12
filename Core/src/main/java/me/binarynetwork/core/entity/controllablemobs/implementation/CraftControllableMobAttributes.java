@@ -90,13 +90,13 @@ public final class CraftControllableMobAttributes implements ControllableMobAttr
 
 	@Override
 	public boolean canSwim() {
-		//TODO return NativeInterfaces.NAVIGATION.FIELD_CANSWIM.get(this.nmsEntity.getNavigation());
+		//TODO return NativeInterfaces.NAVIGATION.FIELD_CANSWIM.getWorld(this.nmsEntity.getNavigation());
 		return true;
 	}
 
 	@Override
 	public boolean getAvoidWater() {
-		//TODO return NativeInterfaces.NAVIGATION.FIELD_AVOIDWATER.get(this.nmsEntity.getNavigation());
+		//TODO return NativeInterfaces.NAVIGATION.FIELD_AVOIDWATER.getWorld(this.nmsEntity.getNavigation());
 		return false;
 	}
 
@@ -107,7 +107,7 @@ public final class CraftControllableMobAttributes implements ControllableMobAttr
 
 	@Override
 	public boolean getMoveThroughDoors() {
-		//TODO return NativeInterfaces.NAVIGATION.FIELD_USEOPENDOOR.get(this.nmsEntity.getNavigation());
+		//TODO return NativeInterfaces.NAVIGATION.FIELD_USEOPENDOOR.getWorld(this.nmsEntity.getNavigation());
 		return false;
 	}
 
@@ -118,7 +118,7 @@ public final class CraftControllableMobAttributes implements ControllableMobAttr
 
 	@Override
 	public boolean canMoveThroughClosedDoors() {
-		//TODO return NativeInterfaces.NAVIGATION.FIELD_USECLOSEDDOOR.get(this.nmsEntity.getNavigation());
+		//TODO return NativeInterfaces.NAVIGATION.FIELD_USECLOSEDDOOR.getWorld(this.nmsEntity.getNavigation());
 		return false;
 	}
 

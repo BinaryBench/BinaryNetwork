@@ -40,7 +40,7 @@ public class CustomEntityManager {
         catch (NoSuchFieldException | ClassCastException e)
         {
             e.printStackTrace();
-            ServerUtil.shutdown("Unable to get EntityTypes");
+            ServerUtil.shutdown("Unable to getWorld EntityTypes");
         }
     }
 

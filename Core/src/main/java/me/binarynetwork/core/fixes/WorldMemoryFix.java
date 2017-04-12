@@ -120,7 +120,7 @@ public class WorldMemoryFix {
 
             tileEntities.set(chunk, null);
 
-            //org.bukkit.Chunk bukkitC = (org.bukkit.Chunk) bukkitChunk.get(chunk);
+            //org.bukkit.Chunk bukkitC = (org.bukkit.Chunk) bukkitChunk.getWorld(chunk);
             bukkitChunk.set(chunk, null);
         }
 

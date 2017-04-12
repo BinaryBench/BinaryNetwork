@@ -1,6 +1,6 @@
 package me.binarynetwork.game.lobby;
 
-import me.binarynetwork.core.BinaryNetworkPlugin;
+import me.binarynetwork.core.common.scheduler.Scheduler;
 import me.binarynetwork.core.common.utils.FileUtil;
 import me.binarynetwork.core.common.utils.ServerUtil;
 import me.binarynetwork.core.common.utils.WorldUtil;
@@ -30,23 +30,23 @@ public class LobbyWorldComponentOld extends SimpleComponentWrapper implements Su
     private File saveFile;
     private String worldName;
     private World world;
-    private Runnable somethingWentWrong;
+    private Runnable onFail;
 
     public LobbyWorldComponentOld(ScheduledExecutorService scheduler)
     {
         this(scheduler, () -> ServerUtil.shutdown("#BukkitsFault"));
     }
 
-    public LobbyWorldComponentOld(ScheduledExecutorService scheduler, Runnable somethingWentWrong)
+    public LobbyWorldComponentOld(ScheduledExecutorService scheduler, Runnable onFail)
     {
         this.scheduler = scheduler;
-        this.somethingWentWrong = somethingWentWrong;
+        this.onFail = onFail;
         File dataFolder = ServerUtil.getPlugin().getDataFolder();
 
         if (!dataFolder.isDirectory())
         {
             System.err.println("Could not find plugin data folder!");
-            somethingWentWrong.run();
+            onFail.run();
             return;
         }
 
@@ -55,7 +55,7 @@ public class LobbyWorldComponentOld extends SimpleComponentWrapper implements Su
         if (!WorldUtil.isWorld(saveFile))
         {
             System.err.println("Unable to find Lobby World at: " + saveFile.getPath());
-            somethingWentWrong.run();
+            onFail.run();
             return;
         }
 
@@ -81,7 +81,8 @@ public class LobbyWorldComponentOld extends SimpleComponentWrapper implements Su
     @Override
     public void onEnable()
     {
-        WorldUtil.deleteWorld(getWorldName(), getScheduler(), ServerUtil.getPlugin(), () -> {
+        WorldUtil.deleteWorld(getWorldName(), getScheduler(), (aBoolean) -> {
+
             this.world = WorldUtil.createTemporaryWorld(getSaveFile(), getWorldName());
             if (world != null)
             {
@@ -95,13 +96,12 @@ public class LobbyWorldComponentOld extends SimpleComponentWrapper implements Su
     @Override
     public void onDisable()
     {
-        Bukkit.getScheduler().runTaskLater(ServerUtil.getPlugin(), () ->
-                WorldUtil.deleteWorld(getWorld(), getScheduler(), ServerUtil.getPlugin()), 60);
+        Scheduler.runSyncLater(() -> WorldUtil.deleteWorld(getWorld(), getScheduler()), 60);
     }
 
-    public Runnable getSomethingWentWrong()
+    public Runnable getOnFail()
     {
-        return somethingWentWrong;
+        return onFail;
     }
 
     @Override

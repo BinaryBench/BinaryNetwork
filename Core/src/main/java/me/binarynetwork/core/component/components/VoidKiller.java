@@ -5,6 +5,7 @@ import me.binarynetwork.core.common.utils.FileUtil;
 import me.binarynetwork.core.common.utils.PlayerUtil;
 import me.binarynetwork.core.common.utils.ServerUtil;
 import me.binarynetwork.core.component.BaseComponent;
+import me.binarynetwork.core.component.world.WorldConfiguration;
 import me.binarynetwork.core.component.world.WorldManager;
 import me.binarynetwork.core.playerholder.PlayerHolder;
 import org.bukkit.Bukkit;
@@ -26,22 +27,14 @@ public class VoidKiller extends BaseComponent implements Runnable {
     private int height = DEFAULT_HEIGHT;
 
     private PlayerHolder playerHolder;
-    private WorldManager worldManager;
 
-    public VoidKiller(PlayerHolder playerHolder, WorldManager worldManager)
+    public VoidKiller(PlayerHolder playerHolder, WorldConfiguration worldManager)
     {
         this.playerHolder = playerHolder;
-        this.worldManager = worldManager;
-        loadHeight();
+        worldManager.getConfig(mapdata ->
+            this.height = mapdata.getInt("VoidLevel", DEFAULT_HEIGHT)
+        );
     }
-
-    private void loadHeight()
-    {
-        YamlConfiguration mapdata = worldManager.getConfig("mapdata");
-
-        this.height = mapdata.getInt("VoidLevel", DEFAULT_HEIGHT);
-    }
-
 
     @Override
     public void onEnable()
@@ -54,10 +47,6 @@ public class VoidKiller extends BaseComponent implements Runnable {
     {
         Bukkit.getScheduler().cancelTask(this.id);
     }
-
-
-
-
 
     @Override
     public void run()
@@ -72,14 +61,9 @@ public class VoidKiller extends BaseComponent implements Runnable {
         }
     }
 
-
     public PlayerHolder getPlayerHolder()
     {
         return playerHolder;
     }
 
-    public WorldManager getWorldManager()
-    {
-        return worldManager;
-    }
 }

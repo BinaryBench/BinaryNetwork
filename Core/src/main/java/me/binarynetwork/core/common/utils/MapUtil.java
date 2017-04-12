@@ -1,6 +1,7 @@
 package me.binarynetwork.core.common.utils;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by Bench on 8/30/2016.
@@ -52,4 +53,10 @@ public class MapUtil {
         }
         return returnMap;
     }
+
+    public static <K, V> Collection<K> getKeys(Map<K, V> map, V value)
+    {
+        return map.entrySet().stream().filter(entry -> entry.getValue().equals(value)).map(Map.Entry::getKey).collect(Collectors.toList());
+    }
+
 }

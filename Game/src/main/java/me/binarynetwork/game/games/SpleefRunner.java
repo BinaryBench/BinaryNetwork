@@ -5,7 +5,7 @@ import me.binarynetwork.core.component.RunComponent;
 import me.binarynetwork.core.component.SimpleComponentWrapper;
 import me.binarynetwork.core.component.components.*;
 import me.binarynetwork.core.component.runnables.GameModeRunnable;
-import me.binarynetwork.core.component.world.SimpleWorldComponent;
+import me.binarynetwork.core.component.world.GameWorldComponent;
 import me.binarynetwork.core.playerholder.PlayerHolder;
 import me.binarynetwork.game.countdown.TempCountdown;
 import me.binarynetwork.game.countdown.TempPlayerCountdown;
@@ -35,12 +35,12 @@ public class SpleefRunner extends SimpleComponentWrapper {
 
     GameStateManager manager;
     GameModeSpectateComponent spectateManager;
-    SimpleWorldComponent worldManager;
+    GameWorldComponent worldManager;
     SimpleSpawnManager spawnManager;
 
     public SpleefRunner(PlayerHolder playerHolder, ScheduledExecutorService scheduler, Supplier<World> lobbyWorldComponent, Runnable onEnd)
     {
-        worldManager = new SimpleWorldComponent(scheduler, NAME, onEnd);
+        worldManager = new GameWorldComponent(scheduler, NAME, onEnd);
         manager = new GameStateManager(onEnd);
         spectateManager = new GameModeSpectateComponent(playerHolder);
         spawnManager = new SimpleSpawnManager(worldManager, playerHolder);

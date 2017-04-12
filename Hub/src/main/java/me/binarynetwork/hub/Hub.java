@@ -14,6 +14,8 @@ import me.binarynetwork.core.entity.custom.base.CustomZombie;
 import me.binarynetwork.core.entity.custom.types.frozen.FrozenSkeleton;
 import me.binarynetwork.core.entity.custom.types.frozen.FrozenVillager;
 import me.binarynetwork.core.entity.custom.types.frozen.FrozenZombie;
+import me.binarynetwork.core.gui.GUI;
+import me.binarynetwork.core.gui.GUIInventoryExample;
 import me.binarynetwork.core.portal.commands.ServerCommand;
 import me.binarynetwork.hub.npc.NPCManager;
 import me.binarynetwork.hub.respawn.RespawnManager;
@@ -22,7 +24,9 @@ import me.binarynetwork.hub.world.HubWorldManager;
 import net.minecraft.server.v1_8_R3.EntityTypes;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.World;
+import org.bukkit.command.CommandSender;
 import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -30,9 +34,11 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.ItemDespawnEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
 import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -44,13 +50,13 @@ public class Hub extends BinaryNetworkPlugin implements Listener {
 
     private HubWorldManager hubWorldManager;
 
+    private GUI gui;
+
     @Override
     public void enable()
     {
         hubWorldManager = new HubWorldManager();
         getComponentWrapper().addComponent(new PlayerDataPurgeComponent(world -> true, getScheduler()));
-
-
 
         //NPC
         new NPCManager(hubWorldManager);
@@ -70,12 +76,39 @@ public class Hub extends BinaryNetworkPlugin implements Listener {
                 new NoHunger(getServerPlayerHolder())
         );
 
-
         //Commands
         getCommandManager().addCommand(new ServerCommand(getPermissionManager(), "game"), "Game");
 
+        this.gui = new GUIInventoryExample(getScheduler());
+
         ServerUtil.registerEvents(this);
     }
+
+
+    //@EventHandler
+    public void onClick(InventoryClickEvent event)
+    {
+
+        HumanEntity player = event.getWhoClicked();
+
+        print(player, "Inventory", event.getInventory());
+        print(player, "ClickedInventory", event.getClickedInventory());
+        print(player, "Slot", event.getSlot());
+        print(player, "RawSlat", event.getRawSlot());
+        print(player, "Action", event.getAction());
+    }
+
+    private void print(CommandSender player, String label, Object object)
+    {
+        PlayerUtil.message(player, label + ": " + object);
+    }
+
+
+
+
+
+
+
 
 
     public void spawnPlayer(Player player, Location location)
@@ -104,8 +137,11 @@ public class Hub extends BinaryNetworkPlugin implements Listener {
 
     @EventHandler
     public void onBlockRightClick(PlayerInteractEvent event) {
-        if(event.getAction()== Action.RIGHT_CLICK_BLOCK) {
+        if(event.getAction() == Action.RIGHT_CLICK_BLOCK && event.getPlayer().getItemInHand().getType().equals(Material.APPLE))
+        {
+            this.gui.open(event.getPlayer());
 
+            /*
             CustomEntity entity = null;
             Location loc = LocationUtil.centerOnBlock(event.getClickedBlock().getLocation().add(0, 1, 0));
             World world = loc.getWorld();
@@ -123,6 +159,7 @@ public class Hub extends BinaryNetworkPlugin implements Listener {
 
 
             EntityManager.setName(livingEntity, livingEntity.getClass().getSimpleName());
+            */
 
         }
     }

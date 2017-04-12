@@ -1,2 +1,3 @@
-#!/usr/bin/env bash
-java -jar BungeeCord.jar
+#!/bin/sh
+
+java -Xms512M -Xmx512M -jar ../BungeeCord.jar

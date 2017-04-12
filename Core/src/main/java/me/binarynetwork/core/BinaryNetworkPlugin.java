@@ -5,7 +5,6 @@ import com.comphenix.protocol.ProtocolManager;
 import me.binarynetwork.core.account.AccountManager;
 import me.binarynetwork.core.command.CommandManager;
 import me.binarynetwork.core.commands.DefaultCommandManager;
-import me.binarynetwork.core.commands.commands.BackGroundCommand;
 import me.binarynetwork.core.common.Log;
 import me.binarynetwork.core.common.scheduler.Scheduler;
 import me.binarynetwork.core.common.utils.PlayerUtil;
@@ -13,6 +12,7 @@ import me.binarynetwork.core.common.utils.ServerUtil;
 import me.binarynetwork.core.common.utils.WorldUtil;
 import me.binarynetwork.core.component.SimpleComponentWrapper;
 import me.binarynetwork.core.currency.CurrencyManager;
+import me.binarynetwork.core.database.DataSourceManager;
 import me.binarynetwork.core.permissions.PermissionManagerWrapper;
 import me.binarynetwork.core.playerholder.PlayerHolder;
 import me.binarynetwork.core.playerholder.ServerPlayerHolder;
@@ -60,6 +60,7 @@ public abstract class BinaryNetworkPlugin extends JavaPlugin {
     {
         ServerUtil.init(this);
         getDataFolder().mkdirs();
+
         //Scheduler
         scheduler = Executors.newScheduledThreadPool(10);
 
@@ -94,13 +95,6 @@ public abstract class BinaryNetworkPlugin extends JavaPlugin {
         componentWrapper.enable();
         enable();
         Scheduler.runSync(this::onPostWorld);
-        YamlConfiguration.loadConfiguration(new InputStream() {
-            @Override
-            public int read() throws IOException
-            {
-                return 0;
-            }
-        });
     }
 
     public final void onPostWorld()

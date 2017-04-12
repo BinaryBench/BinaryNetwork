@@ -110,7 +110,7 @@ public class AccountManagerOld extends KeyValueDataStorage<UUID, Account> implem
                             ResultSet rs = statement.getResultSet();
 
                             // handle your rs here
-                            //System.err.println("Returning to " + returnList.get(counter).getClass().getSimpleName() + " ResultSet at position " + (counter));
+                            //System.err.println("Returning to " + returnList.getWorld(counter).getClass().getSimpleName() + " ResultSet at position " + (counter));
                             returnList.get(counter++).handleResultSet(account, connection, rs);
 
                         } // if has rs

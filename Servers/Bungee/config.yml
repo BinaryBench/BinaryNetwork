@@ -77,6 +77,8 @@ groups:
   - admin
   Byron:
   - admin
+  fireflydestroyer:
+  - admin
 servers:
   hub:
     motd: '&1BinaryNetwork Hub - Forced Host'

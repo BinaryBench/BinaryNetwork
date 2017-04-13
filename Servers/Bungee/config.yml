@@ -1,6 +1,46 @@
 ip_forward: true
 network_compression_threshold: 256
 stats: e09d4552-4a8b-4598-91c5-8b0edb00c6aa
+groups:
+  BinaryBeauty:
+  - admin
+  BinaryBench:
+  - admin
+  Hacks:
+  - admin
+  KiraBerry:
+  - admin
+  Byron:
+  - admin
+  fireflydestroyer:
+  - admin
+servers:
+  hub:
+    motd: '&1BinaryNetwork Hub - Forced Host'
+    address: localhost:25564
+    restricted: false
+  game:
+    motd: '&1BinaryNetwork Game - Forced Host'
+    address: localhost:25563
+    restricted: false
+timeout: 30000
+player_limit: -1
+listeners:
+- query_port: 25565
+  motd: '&1BinaryNetwork'
+  priorities:
+  - hub
+  - game
+  bind_local_address: true
+  tab_list: SERVER
+  query_enabled: false
+  host: 0.0.0.0:25565
+  forced_hosts:
+    pvp.md-5.net: pvp
+  max_players: 1
+  tab_size: 60
+  ping_passthrough: false
+  force_default_server: true
 permissions:
   default:
   - bungeecord.command.server
@@ -66,46 +106,6 @@ permissions:
   - ab.history
   - ab.systemprefs
   - ab.reload
-groups:
-  BinaryBeauty:
-  - admin
-  BinaryBench:
-  - admin
-  Hacks:
-  - admin
-  KiraBerry:
-  - admin
-  Byron:
-  - admin
-  fireflydestroyer:
-  - admin
-servers:
-  hub:
-    motd: '&1BinaryNetwork Hub - Forced Host'
-    address: localhost:25564
-    restricted: false
-  game:
-    motd: '&1BinaryNetwork Game - Forced Host'
-    address: localhost:25563
-    restricted: false
-timeout: 30000
-listeners:
-- query_port: 25565
-  motd: '&1BinaryNetwork'
-  priorities:
-  - hub
-  - game
-  bind_local_address: true
-  tab_list: SERVER
-  query_enabled: false
-  host: 0.0.0.0:25565
-  forced_hosts:
-    pvp.md-5.net: pvp
-  max_players: 1
-  tab_size: 60
-  ping_passthrough: false
-  force_default_server: true
-player_limit: -1
 online_mode: true
 log_commands: false
 disabled_commands:

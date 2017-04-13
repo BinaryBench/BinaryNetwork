@@ -1,11 +1,10 @@
 package me.binarynetwork.game.countdown;
 
-import com.comphenix.protocol.PacketType;
-import me.binarynetwork.core.BinaryNetworkPlugin;
 import me.binarynetwork.core.common.utils.ServerUtil;
 import me.binarynetwork.core.playerholder.PlayerHolder;
 import me.binarynetwork.core.playerholder.events.PlayerAddEvent;
 import me.binarynetwork.core.playerholder.events.PlayerRemoveEvent;
+import org.bukkit.ChatColor;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
@@ -42,6 +41,7 @@ public class TempPlayerCountdown extends TempCountdown implements Listener {
         {
             if (getCountdown().isRunning())
                 getCountdown().stop();
+            ServerUtil.broadcast(ChatColor.GREEN + "Waiting for players... (" + playerCount + "/" + this.startThreshold + ")!");
         }
     }
 

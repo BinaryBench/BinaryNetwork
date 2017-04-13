@@ -3,6 +3,7 @@ package me.binarynetwork.game.countdown;
 import me.binarynetwork.core.common.utils.ServerUtil;
 import me.binarynetwork.core.component.BaseComponent;
 import me.binarynetwork.core.playerholder.PlayerHolder;
+import org.bukkit.ChatColor;
 
 import java.util.concurrent.ScheduledExecutorService;
 
@@ -38,11 +39,13 @@ public class TempCountdown extends BaseComponent implements Runnable {
     @Override
     public void run()
     {
-        if (getCountdown().getCount() > 0)
-            ServerUtil.broadcast("Something is happening in " + getCountdown().getCount() + "s!");
+        if (getCountdown().getCount() > 0) {
+            //if (getCountdown().getCount() % 5 == 0 || getCountdown().getCount() <= 5)
+            ServerUtil.broadcast(ChatColor.GREEN + "Game starting in " + getCountdown().getCount() + "s!");
+        }
         else
         {
-            ServerUtil.broadcast("Something is happening!");
+            ServerUtil.broadcast(ChatColor.GREEN + "Game started!");
             getOnEnd().run();
             getCountdown().stop();
         }

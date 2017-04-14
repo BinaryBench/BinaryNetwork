@@ -16,11 +16,11 @@ groups:
   - admin
 servers:
   hub:
-    motd: '&1BinaryNetwork Hub - Forced Host'
+    motd: '&aBinaryNetwork Hub'
     address: localhost:25564
     restricted: false
   game:
-    motd: '&1BinaryNetwork Game - Forced Host'
+    motd: '&aBinaryNetwork Game'
     address: localhost:25563
     restricted: false
 timeout: 30000

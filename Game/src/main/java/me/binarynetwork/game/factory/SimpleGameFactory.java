@@ -31,6 +31,9 @@ public class SimpleGameFactory implements GameFactory {
     @Override
     public Component getGame(Runnable onEnd)
     {
+        if (playerHolder.getPlayers().size() <= 1)
+            return new RunnerGame(playerHolder, scheduler, lobbyWorldManager, onEnd);
+
         switch (counter++)
         {
             case 0: return new SpleefGame(playerHolder, scheduler, lobbyWorldManager, onEnd);

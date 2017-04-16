@@ -27,7 +27,7 @@ timeout: 30000
 player_limit: -1
 listeners:
 - query_port: 25565
-  motd: '&1BinaryNetwork'
+  motd: '&aBinaryNetwork'
   priorities:
   - hub
   - game

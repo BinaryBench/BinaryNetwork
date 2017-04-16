@@ -80,18 +80,18 @@ public class LMSVictoryCondition extends ListenerComponent {
     public void sendWinners()
     {
         int counter = 0;
-        int score = 1;
+        int score = 0;
 
 
         List<Player> players = new ArrayList<>(getPlayerHolder().getPlayers());
         players.removeAll(getRank());
 
-        ServerUtil.broadcast("----------", getBroadcast());
-        ServerUtil.broadcast("", getBroadcast());
+        ServerUtil.broadcast("----------\n", getBroadcast());
 
         for (Player player : players)
         {
             counter++;
+            score = 1;
             print(score, player);
             //if (counter >= 3)
                 //break;
@@ -111,8 +111,7 @@ public class LMSVictoryCondition extends ListenerComponent {
             }
         }
 
-        ServerUtil.broadcast("", getBroadcast());
-        ServerUtil.broadcast("----------", getBroadcast());
+        ServerUtil.broadcast("\n----------", getBroadcast());
     }
 
     private void print(int rank, Player player)

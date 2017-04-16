@@ -20,6 +20,7 @@ import me.binarynetwork.game.spectate.GameModeSpectateComponent;
 import me.binarynetwork.game.spectate.components.DeathSpectate;
 import me.binarynetwork.game.spectate.components.JoinSpectate;
 import me.binarynetwork.game.victorycondition.LMSVictoryCondition;
+import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.World;
 
@@ -46,6 +47,12 @@ public class SpleefRunner extends SimpleComponentWrapper {
         spawnManager = new SimpleSpawnManager(worldManager, playerHolder);
 
         addComponent(worldManager, manager, spectateManager, spawnManager, new RunComponent(manager.getSetStateRunnable(GameState.LOBBY)));
+        addComponent(new JoinMessage(playerHolder,
+                ChatColor.DARK_GREEN + "----------\n" +
+                        ChatColor.GREEN + "Game: " + ChatColor.DARK_GREEN + "Spleef/Runner\n \n" +
+                        ChatColor.GREEN + "    1/2 Spleef, 1/3 Runner, have fun!\n \n" +
+                        ChatColor.DARK_GREEN + "----------"
+        ));
 
         //Disable weather
         addComponent(new WeatherComponent(worldManager));

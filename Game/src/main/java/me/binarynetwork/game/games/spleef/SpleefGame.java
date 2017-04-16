@@ -19,6 +19,7 @@ import me.binarynetwork.game.spectate.GameModeSpectateComponent;
 import me.binarynetwork.game.spectate.components.DeathSpectate;
 import me.binarynetwork.game.spectate.components.JoinSpectate;
 import me.binarynetwork.game.victorycondition.LMSVictoryCondition;
+import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.World;
 
@@ -45,7 +46,13 @@ public class SpleefGame extends SimpleComponentWrapper {
         spawnManager = new SimpleSpawnManager(worldManager, playerHolder);
 
         addComponent(worldManager, manager, spectateManager, spawnManager, new RunComponent(manager.getSetStateRunnable(GameState.LOBBY)));
-
+        addComponent(new JoinMessage(playerHolder,
+                ChatColor.DARK_GREEN + "----------\n" +
+                        ChatColor.GREEN + "Game: " + ChatColor.DARK_GREEN + "Spleef\n \n" +
+                        ChatColor.GREEN + "    Punch Blocks to destroy them,\n" +
+                        ChatColor.GREEN + "    Try to be the last one alive!\n \n" +
+                        ChatColor.DARK_GREEN + "----------"
+        ));
         //Disable weather
         addComponent(new WeatherComponent(worldManager));
 

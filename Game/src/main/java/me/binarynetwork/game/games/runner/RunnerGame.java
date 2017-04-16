@@ -19,6 +19,7 @@ import me.binarynetwork.game.spectate.GameModeSpectateComponent;
 import me.binarynetwork.game.spectate.components.DeathSpectate;
 import me.binarynetwork.game.spectate.components.JoinSpectate;
 import me.binarynetwork.game.victorycondition.LMSVictoryCondition;
+import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.World;
 
@@ -45,7 +46,13 @@ public class RunnerGame extends SimpleComponentWrapper {
         spawnManager = new SimpleSpawnManager(worldManager, playerHolder);
 
         addComponent(worldManager, manager, spectateManager, spawnManager, new RunComponent(manager.getSetStateRunnable(GameState.LOBBY)));
-
+        addComponent(new JoinMessage(playerHolder,
+                ChatColor.DARK_GREEN + "----------\n" +
+                ChatColor.GREEN + "Game: " + ChatColor.DARK_GREEN + "Runner\n \n" +
+                        ChatColor.GREEN + "    The blocks fall from below \n" +
+                        ChatColor.GREEN + "    you! Try not to fall!\n \n" +
+                ChatColor.DARK_GREEN + "----------"
+        ));
         //Disable weather
         addComponent(new WeatherComponent(worldManager));
 

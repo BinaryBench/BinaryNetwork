@@ -40,7 +40,7 @@ public class TempCountdown extends BaseComponent implements Runnable {
     public void run()
     {
         if (getCountdown().getCount() > 0) {
-            //if (getCountdown().getCount() % 5 == 0 || getCountdown().getCount() <= 5)
+            if (getCountdown().getCount() % 10 == 0 || getCountdown().getCount() <= 5)
             ServerUtil.broadcast(ChatColor.GREEN + "Game starting in " + getCountdown().getCount() + "s!");
         }
         else
